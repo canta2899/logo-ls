@@ -1,6 +1,7 @@
 package dir
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -80,6 +81,7 @@ func GitRepoCompute() {
 
 func getFilesGitStatus(p string) map[string]string {
 	gitRepo, gitRoot, err := getRepoStatus(p)
+
 	if err != nil || len(gitRepo) == 0 {
 		return nil
 	}
@@ -90,11 +92,11 @@ func getFilesGitStatus(p string) map[string]string {
 
 	t := make(map[string]string)
 	for i, v := range gitRepo {
-		i = gitFilePath(gitRoot+"/"+i, pAbs+"/")
+                i = gitFilePath(filepath.Join(gitRoot, i), filepath.Clean(pAbs))
 		if i == "" {
 			continue
 		}
-		dirs := strings.SplitAfter(i, "/")
+		dirs := strings.SplitAfter(i, string(os.PathSeparator))
 		d := ""
 		for j, seg := range dirs {
 			if j == len(dirs)-1 {

@@ -22,6 +22,7 @@ import (
 
 // create the open dir icon
 var OpenDirIcon = assets.Icon_Def["diropen"].GetColor(1) + assets.Icon_Def["diropen"].GetGlyph() + "\033[0m" + " "
+var PathSeparator string = string(os.PathSeparator)
 
 type FileInfo struct {
 	os.FileInfo
@@ -131,9 +132,9 @@ func New(d *os.File) (*dir, error) {
 
 		if gitRepoStatus != nil {
 			if v.IsDir() {
-				f.gitStatus = gitRepoStatus[v.Name()+"/"]
+				f.gitStatus = gitRepoStatus[PathSeparator + v.Name() + PathSeparator]
 			} else {
-				f.gitStatus = gitRepoStatus[v.Name()]
+				f.gitStatus = gitRepoStatus[PathSeparator + v.Name()]
 			}
 		}
 

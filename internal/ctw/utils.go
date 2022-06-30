@@ -36,3 +36,4 @@ func widthsSum(w [][4]int, p int) int {
 	s -= p
 	return s
 }
+
