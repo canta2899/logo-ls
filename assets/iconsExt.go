@@ -30,6 +30,7 @@ var Icon_Ext = map[string]*Icon_Info{
 	"yaml":              Icon_Set["yaml"],
 	"yaml-tmlanguage":   Icon_Set["yaml"],
 	"yml":               Icon_Set["yaml"],
+    "php":               Icon_Set["php"],
 	"xml":               Icon_Set["xml"],
 	"plist":             Icon_Set["xml"],
 	"xsd":               Icon_Set["xml"],

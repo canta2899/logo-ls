@@ -36,6 +36,7 @@ var Icon_Set = map[string]*Icon_Info{
 	"less":             {i: "\ue60b", c: [3]uint8{2, 119, 189}},   // less
 	"json":             {i: "\ue60b", c: [3]uint8{251, 193, 60}},  // json
 	"yaml":             {i: "\ue60b", c: [3]uint8{244, 68, 62}},   // yaml
+    "php":              {i: "\ue608", c: [3]uint8{65, 129, 190}},  // php
 	"xml":              {i: "\uf72d", c: [3]uint8{64, 153, 69}},   // xml
 	"image":            {i: "\uf71e", c: [3]uint8{48, 166, 154}},  // image
 	"javascript":       {i: "\ue74e", c: [3]uint8{255, 202, 61}},  // javascript
