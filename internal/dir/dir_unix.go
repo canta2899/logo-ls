@@ -30,8 +30,8 @@ func getOwnerGroupInfo(fi os.FileInfo) (o string, g string) {
 				if err != nil {
 					o = ""
 				} else {
-					o = u.Name
-					userMap[UID] = u.Name
+					o = u.Username
+					userMap[UID] = u.Username
 				}
 			}
 		}
