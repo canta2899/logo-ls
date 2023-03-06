@@ -9,3 +9,7 @@ This is a fork of the original [logo-ls repository](https://github.com/Yash-Hand
 
 The original repository has been inactive for more than a year, my pull requests are still pending.
 On this repository you can find separate branches for each feature/fix I worked on, if you want to use my fork you can just pull from the current branch (**main**) and run `go install .` inside the project's base directory.
+
+## Credits
+
+- Thanks to [ehoefel](https://github.com/ehoefel) for his contribution
