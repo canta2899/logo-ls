@@ -102,13 +102,25 @@ func getIndicator(name string, isLongMode bool) (i string) {
 	return i
 }
 
+func isLink(name string) bool {
+	stats, err := os.Lstat(name)
+
+	if err != nil {
+		return false
+	}
+
+	modebit := stats.Mode()
+
+  return modebit&os.ModeSymlink > 0
+}
+
 func getSymlinkIndicator(name string, isLongMode bool) string {
 	if !isLongMode {
 		return "@"
 	}
 
 	if s, err := filepath.EvalSymlinks(name); err == nil {
-		return " -> " + s
+    return " ~> " + strings.Replace(s, os.Getenv("HOME"), "~", 1)
 	}
 
 	return ""

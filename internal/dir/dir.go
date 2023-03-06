@@ -124,7 +124,22 @@ func New(d *os.File) (*dir, error) {
 		}
 
 		if api.FlagVector&api.Flag_i == 0 {
-			f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
+      fullpath := filepath.Join(d.Name(), name)
+      if isLink(fullpath) {
+	      if s, err := filepath.EvalSymlinks(fullpath); err == nil {
+          f2 := new(file)
+          f2.ext = filepath.Ext(s)
+		      f2.name = s[0 : len(s)-len(f2.ext)]
+		      f2.indicator = getIndicator(s, long)
+			    f2.icon, f2.iconColor = getIcon(f2.name, f2.ext, f2.indicator)
+			    f.icon = f2.icon
+			    f.iconColor = f2.iconColor
+        } else {
+			    f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
+        }
+      } else {
+			  f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
+      }
 			if api.FlagVector&api.Flag_c != 0 {
 				f.iconColor = ""
 			}
