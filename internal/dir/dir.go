@@ -108,10 +108,11 @@ func New(d *os.File) (*dir, error) {
 			continue
 		}
 
+		fullpath := filepath.Join(d.Name(), name)
 		f := new(file)
 		f.ext = filepath.Ext(name)
 		f.name = name[0 : len(name)-len(f.ext)]
-		f.indicator = getIndicator(filepath.Join(d.Name(), name), long)
+		f.indicator = getIndicator(fullpath, long)
 		f.size = v.Size()
 		f.modTime = v.ModTime()
 		if long {
@@ -124,22 +125,15 @@ func New(d *os.File) (*dir, error) {
 		}
 
 		if api.FlagVector&api.Flag_i == 0 {
-      fullpath := filepath.Join(d.Name(), name)
-      if isLink(fullpath) {
-	      if s, err := filepath.EvalSymlinks(fullpath); err == nil {
-          f2 := new(file)
-          f2.ext = filepath.Ext(s)
-		      f2.name = s[0 : len(s)-len(f2.ext)]
-		      f2.indicator = getIndicator(s, long)
-			    f2.icon, f2.iconColor = getIcon(f2.name, f2.ext, f2.indicator)
-			    f.icon = f2.icon
-			    f.iconColor = f2.iconColor
-        } else {
-			    f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
-        }
-      } else {
-			  f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
-      }
+			f.icon, f.iconColor = getIcon(f.name, f.ext, f.indicator)
+			if isLink(fullpath) {
+				if s, err := filepath.EvalSymlinks(fullpath); err == nil {
+					realExt := filepath.Ext(s)
+					realName := s[0 : len(s)-len(realExt)]
+					realIndicator := getIndicator(s, long)
+					f.icon, f.iconColor = getIcon(realName, realExt, realIndicator)
+				}
+			}
 			if api.FlagVector&api.Flag_c != 0 {
 				f.iconColor = ""
 			}
@@ -147,9 +141,9 @@ func New(d *os.File) (*dir, error) {
 
 		if gitRepoStatus != nil {
 			if v.IsDir() {
-				f.gitStatus = gitRepoStatus[PathSeparator + v.Name() + PathSeparator]
+				f.gitStatus = gitRepoStatus[PathSeparator+v.Name()+PathSeparator]
 			} else {
-				f.gitStatus = gitRepoStatus[PathSeparator + v.Name()]
+				f.gitStatus = gitRepoStatus[PathSeparator+v.Name()]
 			}
 		}
 
