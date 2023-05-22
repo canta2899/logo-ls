@@ -28,229 +28,229 @@ func (i *Icon_Info) MakeExe() {
 }
 
 var Icon_Set = map[string]*Icon_Info{
-	"html":             {i: "\uf13b", c: [3]uint8{228, 79, 57}},   // html
-	"markdown":         {i: "\uf853", c: [3]uint8{66, 165, 245}},  // markdown
-	"css":              {i: "\uf81b", c: [3]uint8{66, 165, 245}},  // css
-	"css-map":          {i: "\ue749", c: [3]uint8{66, 165, 245}},  // css-map
-	"sass":             {i: "\ue603", c: [3]uint8{237, 80, 122}},  // sass
-	"less":             {i: "\ue60b", c: [3]uint8{2, 119, 189}},   // less
-	"json":             {i: "\ue60b", c: [3]uint8{251, 193, 60}},  // json
-	"yaml":             {i: "\ue60b", c: [3]uint8{244, 68, 62}},   // yaml
-    "php":              {i: "\ue608", c: [3]uint8{65, 129, 190}},  // php
-	"xml":              {i: "\uf72d", c: [3]uint8{64, 153, 69}},   // xml
-	"image":            {i: "\uf71e", c: [3]uint8{48, 166, 154}},  // image
-	"javascript":       {i: "\ue74e", c: [3]uint8{255, 202, 61}},  // javascript
-	"javascript-map":   {i: "\ue781", c: [3]uint8{255, 202, 61}},  // javascript-map
-	"test-jsx":         {i: "\uf595", c: [3]uint8{35, 188, 212}},  // test-jsx
-	"test-js":          {i: "\uf595", c: [3]uint8{255, 202, 61}},  // test-js
-	"react":            {i: "\ue7ba", c: [3]uint8{35, 188, 212}},  // react
-	"react_ts":         {i: "\ue7ba", c: [3]uint8{36, 142, 211}},  // react_ts
-	"settings":         {i: "\uf013", c: [3]uint8{66, 165, 245}},  // settings
-	"typescript":       {i: "\ue628", c: [3]uint8{3, 136, 209}},   // typescript
-	"typescript-def":   {i: "\ufbe4", c: [3]uint8{3, 136, 209}},   // typescript-def
-	"test-ts":          {i: "\uf595", c: [3]uint8{3, 136, 209}},   // test-ts
-	"pdf":              {i: "\uf724", c: [3]uint8{244, 68, 62}},   // pdf
-	"table":            {i: "\uf71a", c: [3]uint8{139, 195, 74}},  // table
-	"visualstudio":     {i: "\ue70c", c: [3]uint8{173, 99, 188}},  // visualstudio
-	"database":         {i: "\ue706", c: [3]uint8{255, 202, 61}},  // database
-	"mysql":            {i: "\ue704", c: [3]uint8{1, 94, 134}},    // mysql
-	"postgresql":       {i: "\ue76e", c: [3]uint8{49, 99, 140}},   // postgresql
-	"sqlite":           {i: "\ue7c4", c: [3]uint8{1, 57, 84}},     // sqlite
-	"csharp":           {i: "\uf81a", c: [3]uint8{2, 119, 189}},   // csharp
-	"zip":              {i: "\uf410", c: [3]uint8{175, 180, 43}},  // zip
-	"exe":              {i: "\uf2d0", c: [3]uint8{229, 77, 58}},   // exe
-	"java":             {i: "\uf675", c: [3]uint8{244, 68, 62}},   // java
-	"c":                {i: "\ufb70", c: [3]uint8{2, 119, 189}},   // c
-	"cpp":              {i: "\ufb71", c: [3]uint8{2, 119, 189}},   // cpp
-	"go":               {i: "\ufcd1", c: [3]uint8{32, 173, 194}},  // go
-	"go-mod":           {i: "\ufcd1", c: [3]uint8{237, 80, 122}},  // go-mod
-	"go-test":          {i: "\ufcd1", c: [3]uint8{255, 213, 79}},  // go-test
-	"python":           {i: "\uf81f", c: [3]uint8{52, 102, 143}},  // python
-	"python-misc":      {i: "\uf820", c: [3]uint8{130, 61, 28}},   // python-misc
-	"url":              {i: "\uf836", c: [3]uint8{66, 165, 245}},  // url
-	"console":          {i: "\uf68c", c: [3]uint8{250, 111, 66}},  // console
-	"word":             {i: "\uf72b", c: [3]uint8{1, 87, 155}},    // word
-	"certificate":      {i: "\uf623", c: [3]uint8{249, 89, 63}},   // certificate
-	"key":              {i: "\uf805", c: [3]uint8{48, 166, 154}},  // key
-	"font":             {i: "\uf031", c: [3]uint8{244, 68, 62}},   // font
-	"lib":              {i: "\uf831", c: [3]uint8{139, 195, 74}},  // lib
-	"ruby":             {i: "\ue739", c: [3]uint8{229, 61, 58}},   // ruby
-	"gemfile":          {i: "\ue21e", c: [3]uint8{229, 61, 58}},   // gemfile
-	"fsharp":           {i: "\ue7a7", c: [3]uint8{55, 139, 186}},  // fsharp
-	"swift":            {i: "\ufbe3", c: [3]uint8{249, 95, 63}},   // swift
-	"docker":           {i: "\uf308", c: [3]uint8{1, 135, 201}},   // docker
-	"powerpoint":       {i: "\uf726", c: [3]uint8{209, 71, 51}},   // powerpoint
-	"video":            {i: "\uf72a", c: [3]uint8{253, 154, 62}},  // video
-	"virtual":          {i: "\uf822", c: [3]uint8{3, 155, 229}},   // virtual
-	"email":            {i: "\uf6ed", c: [3]uint8{66, 165, 245}},  // email
-	"audio":            {i: "\ufb75", c: [3]uint8{239, 83, 80}},   // audio
-	"coffee":           {i: "\uf675", c: [3]uint8{66, 165, 245}},  // coffee
-	"document":         {i: "\uf718", c: [3]uint8{66, 165, 245}},  // document
-	"rust":             {i: "\ue7a8", c: [3]uint8{250, 111, 66}},  // rust
-	"raml":             {i: "\ue60b", c: [3]uint8{66, 165, 245}},  // raml
-	"xaml":             {i: "\ufb72", c: [3]uint8{66, 165, 245}},  // xaml
-	"haskell":          {i: "\ue61f", c: [3]uint8{254, 168, 62}},  // haskell
-	"git":              {i: "\ue702", c: [3]uint8{229, 77, 58}},   // git
-	"lua":              {i: "\ue620", c: [3]uint8{66, 165, 245}},  // lua
-	"clojure":          {i: "\ue76a", c: [3]uint8{100, 221, 23}},  // clojure
-	"groovy":           {i: "\uf2a6", c: [3]uint8{41, 198, 218}},  // groovy
-	"r":                {i: "\ufcd2", c: [3]uint8{25, 118, 210}},  // r
-	"dart":             {i: "\ue798", c: [3]uint8{87, 182, 240}},  // dart
-	"mxml":             {i: "\uf72d", c: [3]uint8{254, 168, 62}},  // mxml
-	"assembly":         {i: "\uf471", c: [3]uint8{250, 109, 63}},  // assembly
-	"vue":              {i: "\ufd42", c: [3]uint8{65, 184, 131}},  // vue
-	"vue-config":       {i: "\ufd42", c: [3]uint8{58, 121, 110}},  // vue-config
-	"lock":             {i: "\uf83d", c: [3]uint8{255, 213, 79}},  // lock
-	"handlebars":       {i: "\ue60f", c: [3]uint8{250, 111, 66}},  // handlebars
-	"perl":             {i: "\ue769", c: [3]uint8{149, 117, 205}}, // perl
-	"elixir":           {i: "\ue62d", c: [3]uint8{149, 117, 205}}, // elixir
-	"erlang":           {i: "\ue7b1", c: [3]uint8{244, 68, 62}},   // erlang
-	"twig":             {i: "\ue61c", c: [3]uint8{155, 185, 47}},  // twig
-	"julia":            {i: "\ue624", c: [3]uint8{134, 82, 159}},  // julia
-	"elm":              {i: "\ue62c", c: [3]uint8{96, 181, 204}},  // elm
-	"smarty":           {i: "\uf834", c: [3]uint8{255, 207, 60}},  // smarty
-	"stylus":           {i: "\ue600", c: [3]uint8{192, 202, 51}},  // stylus
-	"verilog":          {i: "\ufb19", c: [3]uint8{250, 111, 66}},  // verilog
-	"robot":            {i: "\ufba7", c: [3]uint8{249, 89, 63}},   // robot
-	"solidity":         {i: "\ufcb9", c: [3]uint8{3, 136, 209}},   // solidity
-	"yang":             {i: "\ufb7e", c: [3]uint8{66, 165, 245}},  // yang
-	"vercel":           {i: "\uf47e", c: [3]uint8{207, 216, 220}}, // vercel
-	"applescript":      {i: "\uf302", c: [3]uint8{120, 144, 156}}, // applescript
-	"cake":             {i: "\uf5ea", c: [3]uint8{250, 111, 66}},  // cake
-	"nim":              {i: "\uf6a4", c: [3]uint8{255, 202, 61}},  // nim
-	"todo":             {i: "\uf058", c: [3]uint8{124, 179, 66}},  // todo
-	"nix":              {i: "\uf313", c: [3]uint8{80, 117, 193}},  // nix
-	"http":             {i: "\uf484", c: [3]uint8{66, 165, 245}},  // http
-	"webpack":          {i: "\ufc29", c: [3]uint8{142, 214, 251}}, // webpack
-	"ionic":            {i: "\ue7a9", c: [3]uint8{79, 143, 247}},  // ionic
-	"gulp":             {i: "\ue763", c: [3]uint8{229, 61, 58}},   // gulp
-	"nodejs":           {i: "\uf898", c: [3]uint8{139, 195, 74}},  // nodejs
-	"npm":              {i: "\ue71e", c: [3]uint8{203, 56, 55}},   // npm
-	"yarn":             {i: "\uf61a", c: [3]uint8{44, 142, 187}},  // yarn
-	"android":          {i: "\uf531", c: [3]uint8{139, 195, 74}},  // android
-	"tune":             {i: "\ufb69", c: [3]uint8{251, 193, 60}},  // tune
-	"contributing":     {i: "\uf64d", c: [3]uint8{255, 202, 61}},  // contributing
-	"readme":           {i: "\uf7fb", c: [3]uint8{66, 165, 245}},  // readme
-	"changelog":        {i: "\ufba6", c: [3]uint8{139, 195, 74}},  // changelog
-	"credits":          {i: "\uf75f", c: [3]uint8{156, 204, 101}}, // credits
-	"authors":          {i: "\uf0c0", c: [3]uint8{244, 68, 62}},   // authors
-	"favicon":          {i: "\ue623", c: [3]uint8{255, 213, 79}},  // favicon
-	"karma":            {i: "\ue622", c: [3]uint8{60, 190, 174}},  // karma
-	"travis":           {i: "\ue77e", c: [3]uint8{203, 58, 73}},   // travis
-	"heroku":           {i: "\ue607", c: [3]uint8{105, 99, 185}},  // heroku
-	"gitlab":           {i: "\uf296", c: [3]uint8{226, 69, 57}},   // gitlab
-	"bower":            {i: "\ue61a", c: [3]uint8{239, 88, 60}},   // bower
-	"conduct":          {i: "\uf64b", c: [3]uint8{205, 220, 57}},  // conduct
-	"jenkins":          {i: "\ue767", c: [3]uint8{240, 214, 183}}, // jenkins
-	"code-climate":     {i: "\uf7f4", c: [3]uint8{238, 238, 238}}, // code-climate
-	"log":              {i: "\uf719", c: [3]uint8{175, 180, 43}},  // log
-	"ejs":              {i: "\ue618", c: [3]uint8{255, 202, 61}},  // ejs
-	"grunt":            {i: "\ue611", c: [3]uint8{251, 170, 61}},  // grunt
-	"django":           {i: "\ue71d", c: [3]uint8{67, 160, 71}},   // django
-	"makefile":         {i: "\uf728", c: [3]uint8{239, 83, 80}},   // makefile
-	"bitbucket":        {i: "\uf171", c: [3]uint8{31, 136, 229}},  // bitbucket
-	"d":                {i: "\ue7af", c: [3]uint8{244, 68, 62}},   // d
-	"mdx":              {i: "\uf853", c: [3]uint8{255, 202, 61}},  // mdx
-	"azure-pipelines":  {i: "\uf427", c: [3]uint8{20, 101, 192}},  // azure-pipelines
-	"azure":            {i: "\ufd03", c: [3]uint8{31, 136, 229}},  // azure
-	"razor":            {i: "\uf564", c: [3]uint8{66, 165, 245}},  // razor
-	"asciidoc":         {i: "\uf718", c: [3]uint8{244, 68, 62}},   // asciidoc
-	"edge":             {i: "\uf564", c: [3]uint8{239, 111, 60}},  // edge
-	"scheme":           {i: "\ufb26", c: [3]uint8{244, 68, 62}},   // scheme
-	"3d":               {i: "\ue79b", c: [3]uint8{40, 182, 246}},  // 3d
-	"svg":              {i: "\ufc1f", c: [3]uint8{255, 181, 62}},  // svg
-	"vim":              {i: "\ue62b", c: [3]uint8{67, 160, 71}},   // vim
-	"moonscript":       {i: "\uf186", c: [3]uint8{251, 193, 60}},  // moonscript
-	"codeowners":       {i: "\uf507", c: [3]uint8{175, 180, 43}},  // codeowners
-	"disc":             {i: "\ue271", c: [3]uint8{176, 190, 197}}, // disc
-	"fortran":          {i: "F", c: [3]uint8{250, 111, 66}},       // fortran
-	"tcl":              {i: "\ufbd1", c: [3]uint8{239, 83, 80}},   // tcl
-	"liquid":           {i: "\ue275", c: [3]uint8{40, 182, 246}},  // liquid
-	"prolog":           {i: "\ue7a1", c: [3]uint8{239, 83, 80}},   // prolog
-	"husky":            {i: "\uf8e8", c: [3]uint8{229, 229, 229}}, // husky
-	"coconut":          {i: "\uf5d2", c: [3]uint8{141, 110, 99}},  // coconut
-	"sketch":           {i: "\uf6c7", c: [3]uint8{255, 194, 61}},  // sketch
-	"pawn":             {i: "\ue261", c: [3]uint8{239, 111, 60}},  // pawn
-	"commitlint":       {i: "\ufc16", c: [3]uint8{43, 150, 137}},  // commitlint
-	"dhall":            {i: "\uf448", c: [3]uint8{120, 144, 156}}, // dhall
-	"dune":             {i: "\uf7f4", c: [3]uint8{244, 127, 61}},  // dune
-	"shaderlab":        {i: "\ufbad", c: [3]uint8{25, 118, 210}},  // shaderlab
-	"command":          {i: "\ufb32", c: [3]uint8{175, 188, 194}}, // command
-	"stryker":          {i: "\uf05b", c: [3]uint8{239, 83, 80}},   // stryker
-	"modernizr":        {i: "\ue720", c: [3]uint8{234, 72, 99}},   // modernizr
-	"roadmap":          {i: "\ufb6d", c: [3]uint8{48, 166, 154}},  // roadmap
-	"debian":           {i: "\uf306", c: [3]uint8{211, 61, 76}},   // debian
-	"ubuntu":           {i: "\uf31c", c: [3]uint8{214, 73, 53}},   // ubuntu
-	"arch":             {i: "\uf303", c: [3]uint8{33, 142, 202}},  // arch
-	"redhat":           {i: "\uf316", c: [3]uint8{231, 61, 58}},   // redhat
-	"gentoo":           {i: "\uf30d", c: [3]uint8{148, 141, 211}}, // gentoo
-	"linux":            {i: "\ue712", c: [3]uint8{238, 207, 55}},  // linux
-	"raspberry-pi":     {i: "\uf315", c: [3]uint8{208, 60, 76}},   // raspberry-pi
-	"manjaro":          {i: "\uf312", c: [3]uint8{73, 185, 90}},   // manjaro
-	"opensuse":         {i: "\uf314", c: [3]uint8{111, 180, 36}},  // opensuse
-	"fedora":           {i: "\uf30a", c: [3]uint8{52, 103, 172}},  // fedora
-	"freebsd":          {i: "\uf30c", c: [3]uint8{175, 44, 42}},   // freebsd
-	"centOS":           {i: "\uf304", c: [3]uint8{157, 83, 135}},  // centOS
-	"alpine":           {i: "\uf300", c: [3]uint8{14, 87, 123}},   // alpine
-	"mint":             {i: "\uf30f", c: [3]uint8{125, 190, 58}},  // mint
-	"routing":          {i: "\ufb40", c: [3]uint8{67, 160, 71}},   // routing
-	"laravel":          {i: "\ue73f", c: [3]uint8{248, 80, 81}},   // laravel
-	"pug":              {i: "\ue60e", c: [3]uint8{239, 204, 163}}, // pug (Not supported by nerdFont)
-	"blink":            {i: "\uf72a", c: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
-	"postcss":          {i: "\uf81b", c: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
-	"jinja":            {i: "\ue000", c: [3]uint8{174, 44, 42}},   // jinja (Not supported by nerdFont)
-	"sublime":          {i: "\ue7aa", c: [3]uint8{239, 148, 58}},  // sublime (Not supported by nerdFont)
-	"markojs":          {i: "\uf13b", c: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
-	"vscode":           {i: "\ue70c", c: [3]uint8{33, 150, 243}},  // vscode (Not supported by nerdFont)
-	"qsharp":           {i: "\uf292", c: [3]uint8{251, 193, 60}},  // qsharp (Not supported by nerdFont)
-	"vala":             {i: "\uf7ab", c: [3]uint8{149, 117, 205}}, // vala (Not supported by nerdFont)
-	"zig":              {i: "Z", c: [3]uint8{249, 169, 60}},       // zig (Not supported by nerdFont)
-	"h":                {i: "h", c: [3]uint8{2, 119, 189}},        // h (Not supported by nerdFont)
-	"hpp":              {i: "h", c: [3]uint8{2, 119, 189}},        // hpp (Not supported by nerdFont)
-	"powershell":       {i: "\ufcb5", c: [3]uint8{5, 169, 244}},   // powershell (Not supported by nerdFont)
-	"gradle":           {i: "\ufcc4", c: [3]uint8{29, 151, 167}},  // gradle (Not supported by nerdFont)
-	"arduino":          {i: "\ue255", c: [3]uint8{35, 151, 156}},  // arduino (Not supported by nerdFont)
-	"tex":              {i: "\uf783", c: [3]uint8{66, 165, 245}},  // tex (Not supported by nerdFont)
-	"graphql":          {i: "\ue284", c: [3]uint8{237, 80, 122}},  // graphql (Not supported by nerdFont)
-	"kotlin":           {i: "\ue70e", c: [3]uint8{139, 195, 74}},  // kotlin (Not supported by nerdFont)
-	"actionscript":     {i: "\ufb25", c: [3]uint8{244, 68, 62}},   // actionscript (Not supported by nerdFont)
-	"autohotkey":       {i: "\uf812", c: [3]uint8{76, 175, 80}},   // autohotkey (Not supported by nerdFont)
-	"flash":            {i: "\uf740", c: [3]uint8{198, 52, 54}},   // flash (Not supported by nerdFont)
-	"swc":              {i: "\ufbd3", c: [3]uint8{198, 52, 54}},   // swc (Not supported by nerdFont)
-	"cmake":            {i: "\uf425", c: [3]uint8{178, 178, 179}}, // cmake (Not supported by nerdFont)
-	"nuxt":             {i: "\ue2a6", c: [3]uint8{65, 184, 131}},  // nuxt (Not supported by nerdFont)
-	"ocaml":            {i: "\uf1ce", c: [3]uint8{253, 154, 62}},  // ocaml (Not supported by nerdFont)
-	"haxe":             {i: "\uf425", c: [3]uint8{246, 137, 61}},  // haxe (Not supported by nerdFont)
-	"puppet":           {i: "\uf595", c: [3]uint8{251, 193, 60}},  // puppet (Not supported by nerdFont)
-	"purescript":       {i: "\uf670", c: [3]uint8{66, 165, 245}},  // purescript (Not supported by nerdFont)
-	"merlin":           {i: "\uf136", c: [3]uint8{66, 165, 245}},  // merlin (Not supported by nerdFont)
-	"mjml":             {i: "\ue714", c: [3]uint8{249, 89, 63}},   // mjml (Not supported by nerdFont)
-	"terraform":        {i: "\ue20f", c: [3]uint8{92, 107, 192}},  // terraform (Not supported by nerdFont)
-	"apiblueprint":     {i: "\uf031", c: [3]uint8{66, 165, 245}},  // apiblueprint (Not supported by nerdFont)
-	"slim":             {i: "\uf24e", c: [3]uint8{245, 129, 61}},  // slim (Not supported by nerdFont)
-	"babel":            {i: "\uf5a0", c: [3]uint8{253, 217, 59}},  // babel (Not supported by nerdFont)
-	"codecov":          {i: "\ue37c", c: [3]uint8{237, 80, 122}},  // codecov (Not supported by nerdFont)
-	"protractor":       {i: "\uf288", c: [3]uint8{229, 61, 58}},   // protractor (Not supported by nerdFont)
-	"eslint":           {i: "\ufbf6", c: [3]uint8{121, 134, 203}}, // eslint (Not supported by nerdFont)
-	"mocha":            {i: "\uf6a9", c: [3]uint8{161, 136, 127}}, // mocha (Not supported by nerdFont)
-	"firebase":         {i: "\ue787", c: [3]uint8{251, 193, 60}},  // firebase (Not supported by nerdFont)
-	"stylelint":        {i: "\ufb76", c: [3]uint8{207, 216, 220}}, // stylelint (Not supported by nerdFont)
-	"prettier":         {i: "\uf8e2", c: [3]uint8{86, 179, 180}},  // prettier (Not supported by nerdFont)
-	"jest":             {i: "J", c: [3]uint8{244, 85, 62}},        // jest (Not supported by nerdFont)
-	"storybook":        {i: "\ufd2c", c: [3]uint8{237, 80, 122}},  // storybook (Not supported by nerdFont)
-	"fastlane":         {i: "\ufbff", c: [3]uint8{149, 119, 232}}, // fastlane (Not supported by nerdFont)
-	"helm":             {i: "\ufd31", c: [3]uint8{32, 173, 194}},  // helm (Not supported by nerdFont)
-	"i18n":             {i: "\uf7be", c: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
-	"semantic-release": {i: "\uf70f", c: [3]uint8{245, 245, 245}}, // semantic-release (Not supported by nerdFont)
-	"godot":            {i: "\ufba7", c: [3]uint8{79, 195, 247}},  // godot (Not supported by nerdFont)
-	"godot-assets":     {i: "\ufba7", c: [3]uint8{129, 199, 132}}, // godot-assets (Not supported by nerdFont)
-	"vagrant":          {i: "\uf27d", c: [3]uint8{20, 101, 192}},  // vagrant (Not supported by nerdFont)
-	"tailwindcss":      {i: "\ufc8b", c: [3]uint8{77, 182, 172}},  // tailwindcss (Not supported by nerdFont)
-	"gcp":              {i: "\uf662", c: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
-	"opam":             {i: "\uf1ce", c: [3]uint8{255, 213, 79}},  // opam (Not supported by nerdFont)
-	"pascal":           {i: "\uf8da", c: [3]uint8{3, 136, 209}},   // pascal (Not supported by nerdFont)
-	"nuget":            {i: "\ue77f", c: [3]uint8{3, 136, 209}},   // nuget (Not supported by nerdFont)
-	"denizenscript":    {i: "D", c: [3]uint8{255, 213, 79}},       // denizenscript (Not supported by nerdFont)
+	"html":             {i: "\U0000f13b", c: [3]uint8{228, 79, 57}},   // html
+	"markdown":         {i: "\U0000f853", c: [3]uint8{66, 165, 245}},  // markdown
+	"css":              {i: "\U000f031c", c: [3]uint8{66, 165, 245}},  // css
+	"css-map":          {i: "\U0000e749", c: [3]uint8{66, 165, 245}},  // css-map
+	"sass":             {i: "\U0000e603", c: [3]uint8{237, 80, 122}},  // sass
+	"less":             {i: "\U0000e60b", c: [3]uint8{2, 119, 189}},   // less
+	"json":             {i: "\U0000e60b", c: [3]uint8{251, 193, 60}},  // json
+	"yaml":             {i: "\U0000e60b", c: [3]uint8{244, 68, 62}},   // yaml
+	"php":              {i: "\U0000e608", c: [3]uint8{65, 129, 190}},  // php
+	"xml":              {i: "\U0000f72d", c: [3]uint8{64, 153, 69}},   // xml
+	"image":            {i: "\U000f021f", c: [3]uint8{48, 166, 154}},  // image
+	"javascript":       {i: "\U0000e74e", c: [3]uint8{255, 202, 61}},  // javascript
+	"javascript-map":   {i: "\U0000e781", c: [3]uint8{255, 202, 61}},  // javascript-map
+	"test-jsx":         {i: "\U000f0096", c: [3]uint8{35, 188, 212}},  // test-jsx
+	"test-js":          {i: "\U000f0096", c: [3]uint8{255, 202, 61}},  // test-js
+	"react":            {i: "\U0000e7ba", c: [3]uint8{35, 188, 212}},  // react
+	"react_ts":         {i: "\U0000e7ba", c: [3]uint8{36, 142, 211}},  // react_ts
+	"settings":         {i: "\U0000f013", c: [3]uint8{66, 165, 245}},  // settings
+	"typescript":       {i: "\U0000e628", c: [3]uint8{3, 136, 209}},   // typescript
+	"typescript-def":   {i: "\U000f06e6", c: [3]uint8{3, 136, 209}},   // typescript-def
+	"test-ts":          {i: "\U000f0096", c: [3]uint8{3, 136, 209}},   // test-ts
+	"pdf":              {i: "\U0000e67d", c: [3]uint8{244, 68, 62}},   // pdf
+	"table":            {i: "\U000f021b", c: [3]uint8{139, 195, 74}},  // table
+	"visualstudio":     {i: "\U0000e70c", c: [3]uint8{173, 99, 188}},  // visualstudio
+	"database":         {i: "\U0000e706", c: [3]uint8{255, 202, 61}},  // database
+	"mysql":            {i: "\U0000e704", c: [3]uint8{1, 94, 134}},    // mysql
+	"postgresql":       {i: "\U0000e76e", c: [3]uint8{49, 99, 140}},   // postgresql
+	"sqlite":           {i: "\U0000e7c4", c: [3]uint8{1, 57, 84}},     // sqlite
+	"csharp":           {i: "\U000f031b", c: [3]uint8{2, 119, 189}},   // csharp
+	"zip":              {i: "\U0000f410", c: [3]uint8{175, 180, 43}},  // zip
+	"exe":              {i: "\U0000f2d0", c: [3]uint8{229, 77, 58}},   // exe
+	"java":             {i: "\U000f0176", c: [3]uint8{244, 68, 62}},   // java
+	"c":                {i: "\U000f0671", c: [3]uint8{2, 119, 189}},   // c
+	"cpp":              {i: "\U000f0672", c: [3]uint8{2, 119, 189}},   // cpp
+	"go":               {i: "\U000f07d3", c: [3]uint8{32, 173, 194}},  // go
+	"go-mod":           {i: "\U000f07d3", c: [3]uint8{237, 80, 122}},  // go-mod
+	"go-test":          {i: "\U000f07d3", c: [3]uint8{255, 213, 79}},  // go-test
+	"python":           {i: "\U000f0320", c: [3]uint8{52, 102, 143}},  // python
+	"python-misc":      {i: "\U0000f820", c: [3]uint8{130, 61, 28}},   // python-misc
+	"url":              {i: "\U000f0337", c: [3]uint8{66, 165, 245}},  // url
+	"console":          {i: "\U000f018d", c: [3]uint8{250, 111, 66}},  // console
+	"word":             {i: "\U000f022c", c: [3]uint8{1, 87, 155}},    // word
+	"certificate":      {i: "\U000f0124", c: [3]uint8{249, 89, 63}},   // certificate
+	"key":              {i: "\U000f0306", c: [3]uint8{48, 166, 154}},  // key
+	"font":             {i: "\U0000f031", c: [3]uint8{244, 68, 62}},   // font
+	"lib":              {i: "\U0000f831", c: [3]uint8{139, 195, 74}},  // lib
+	"ruby":             {i: "\U0000e739", c: [3]uint8{229, 61, 58}},   // ruby
+	"gemfile":          {i: "\U0000e21e", c: [3]uint8{229, 61, 58}},   // gemfile
+	"fsharp":           {i: "\U0000e7a7", c: [3]uint8{55, 139, 186}},  // fsharp
+	"swift":            {i: "\U000f06e5", c: [3]uint8{249, 95, 63}},   // swift
+	"docker":           {i: "\U0000f308", c: [3]uint8{1, 135, 201}},   // docker
+	"powerpoint":       {i: "\U000f0227", c: [3]uint8{209, 71, 51}},   // powerpoint
+	"video":            {i: "\U000f022b", c: [3]uint8{253, 154, 62}},  // video
+	"virtual":          {i: "\U0000f822", c: [3]uint8{3, 155, 229}},   // virtual
+	"email":            {i: "\U000f01ee", c: [3]uint8{66, 165, 245}},  // email
+	"audio":            {i: "\U000f0388", c: [3]uint8{239, 83, 80}},   // audio
+	"coffee":           {i: "\U000f0176", c: [3]uint8{66, 165, 245}},  // coffee
+	"document":         {i: "\U000f0219", c: [3]uint8{66, 165, 245}},  // document
+	"rust":             {i: "\U0000e7a8", c: [3]uint8{250, 111, 66}},  // rust
+	"raml":             {i: "\U0000e60b", c: [3]uint8{66, 165, 245}},  // raml
+	"xaml":             {i: "\U0000fb72", c: [3]uint8{66, 165, 245}},  // xaml
+	"haskell":          {i: "\U0000e61f", c: [3]uint8{254, 168, 62}},  // haskell
+	"git":              {i: "\U0000e702", c: [3]uint8{229, 77, 58}},   // git
+	"lua":              {i: "\U0000e620", c: [3]uint8{66, 165, 245}},  // lua
+	"clojure":          {i: "\U0000e76a", c: [3]uint8{100, 221, 23}},  // clojure
+	"groovy":           {i: "\U0000f2a6", c: [3]uint8{41, 198, 218}},  // groovy
+	"r":                {i: "\U000f07d4", c: [3]uint8{25, 118, 210}},  // r
+	"dart":             {i: "\U0000e798", c: [3]uint8{87, 182, 240}},  // dart
+	"mxml":             {i: "\U0000f72d", c: [3]uint8{254, 168, 62}},  // mxml
+	"assembly":         {i: "\U0000f471", c: [3]uint8{250, 109, 63}},  // assembly
+	"vue":              {i: "\U000f0844", c: [3]uint8{65, 184, 131}},  // vue
+	"vue-config":       {i: "\U000f0844", c: [3]uint8{58, 121, 110}},  // vue-config
+	"lock":             {i: "\U000f033e", c: [3]uint8{255, 213, 79}},  // lock
+	"handlebars":       {i: "\U0000e60f", c: [3]uint8{250, 111, 66}},  // handlebars
+	"perl":             {i: "\U0000e769", c: [3]uint8{149, 117, 205}}, // perl
+	"elixir":           {i: "\U0000e62d", c: [3]uint8{149, 117, 205}}, // elixir
+	"erlang":           {i: "\U0000e7b1", c: [3]uint8{244, 68, 62}},   // erlang
+	"twig":             {i: "\U0000e61c", c: [3]uint8{155, 185, 47}},  // twig
+	"julia":            {i: "\U0000e624", c: [3]uint8{134, 82, 159}},  // julia
+	"elm":              {i: "\U0000e62c", c: [3]uint8{96, 181, 204}},  // elm
+	"smarty":           {i: "\U000f0335", c: [3]uint8{255, 207, 60}},  // smarty
+	"stylus":           {i: "\U0000e600", c: [3]uint8{192, 202, 51}},  // stylus
+	"verilog":          {i: "\U000f061a", c: [3]uint8{250, 111, 66}},  // verilog
+	"robot":            {i: "\U000f06a9", c: [3]uint8{249, 89, 63}},   // robot
+	"solidity":         {i: "\U000f07bb", c: [3]uint8{3, 136, 209}},   // solidity
+	"yang":             {i: "\U000f0680", c: [3]uint8{66, 165, 245}},  // yang
+	"vercel":           {i: "\U0000f47e", c: [3]uint8{207, 216, 220}}, // vercel
+	"applescript":      {i: "\U0000f302", c: [3]uint8{120, 144, 156}}, // applescript
+	"cake":             {i: "\U000f00eb", c: [3]uint8{250, 111, 66}},  // cake
+	"nim":              {i: "\U000f01a5", c: [3]uint8{255, 202, 61}},  // nim
+	"todo":             {i: "\U0000f058", c: [3]uint8{124, 179, 66}},  // todo
+	"nix":              {i: "\U0000f313", c: [3]uint8{80, 117, 193}},  // nix
+	"http":             {i: "\U0000f484", c: [3]uint8{66, 165, 245}},  // http
+	"webpack":          {i: "\U000f072b", c: [3]uint8{142, 214, 251}}, // webpack
+	"ionic":            {i: "\U0000e7a9", c: [3]uint8{79, 143, 247}},  // ionic
+	"gulp":             {i: "\U0000e763", c: [3]uint8{229, 61, 58}},   // gulp
+	"nodejs":           {i: "\U000f0399", c: [3]uint8{139, 195, 74}},  // nodejs
+	"npm":              {i: "\U0000e71e", c: [3]uint8{203, 56, 55}},   // npm
+	"yarn":             {i: "\U000f011b", c: [3]uint8{44, 142, 187}},  // yarn
+	"android":          {i: "\U000f0032", c: [3]uint8{139, 195, 74}},  // android
+	"tune":             {i: "\U000f066a", c: [3]uint8{251, 193, 60}},  // tune
+	"contributing":     {i: "\U000f014d", c: [3]uint8{255, 202, 61}},  // contributing
+	"readme":           {i: "\U000f02fc", c: [3]uint8{66, 165, 245}},  // readme
+	"changelog":        {i: "\U000f099b", c: [3]uint8{139, 195, 74}},  // changelog
+	"credits":          {i: "\U000f0260", c: [3]uint8{156, 204, 101}}, // credits
+	"authors":          {i: "\U0000f0c0", c: [3]uint8{244, 68, 62}},   // authors
+	"favicon":          {i: "\U0000e623", c: [3]uint8{255, 213, 79}},  // favicon
+	"karma":            {i: "\U0000e622", c: [3]uint8{60, 190, 174}},  // karma
+	"travis":           {i: "\U0000e77e", c: [3]uint8{203, 58, 73}},   // travis
+	"heroku":           {i: "\U0000e607", c: [3]uint8{105, 99, 185}},  // heroku
+	"gitlab":           {i: "\U0000f296", c: [3]uint8{226, 69, 57}},   // gitlab
+	"bower":            {i: "\U0000e61a", c: [3]uint8{239, 88, 60}},   // bower
+	"conduct":          {i: "\U000f014e", c: [3]uint8{205, 220, 57}},  // conduct
+	"jenkins":          {i: "\U0000e767", c: [3]uint8{240, 214, 183}}, // jenkins
+	"code-climate":     {i: "\U000f0509", c: [3]uint8{238, 238, 238}}, // code-climate
+	"log":              {i: "\U0000f719", c: [3]uint8{175, 180, 43}},  // log
+	"ejs":              {i: "\U0000e618", c: [3]uint8{255, 202, 61}},  // ejs
+	"grunt":            {i: "\U0000e611", c: [3]uint8{251, 170, 61}},  // grunt
+	"django":           {i: "\U0000e71d", c: [3]uint8{67, 160, 71}},   // django
+	"makefile":         {i: "\U000f0229", c: [3]uint8{239, 83, 80}},   // makefile
+	"bitbucket":        {i: "\U0000f171", c: [3]uint8{31, 136, 229}},  // bitbucket
+	"d":                {i: "\U0000e7af", c: [3]uint8{244, 68, 62}},   // d
+	"mdx":              {i: "\U0000f853", c: [3]uint8{255, 202, 61}},  // mdx
+	"azure-pipelines":  {i: "\U0000f427", c: [3]uint8{20, 101, 192}},  // azure-pipelines
+	"azure":            {i: "\U0000fd03", c: [3]uint8{31, 136, 229}},  // azure
+	"razor":            {i: "\U000f0065", c: [3]uint8{66, 165, 245}},  // razor
+	"asciidoc":         {i: "\U000f0219", c: [3]uint8{244, 68, 62}},   // asciidoc
+	"edge":             {i: "\U000f0065", c: [3]uint8{239, 111, 60}},  // edge
+	"scheme":           {i: "\U000f0627", c: [3]uint8{244, 68, 62}},   // scheme
+	"3d":               {i: "\U0000e79b", c: [3]uint8{40, 182, 246}},  // 3d
+	"svg":              {i: "\U000f0721", c: [3]uint8{255, 181, 62}},  // svg
+	"vim":              {i: "\U0000e62b", c: [3]uint8{67, 160, 71}},   // vim
+	"moonscript":       {i: "\U0000f186", c: [3]uint8{251, 193, 60}},  // moonscript
+	"codeowners":       {i: "\U000f0008", c: [3]uint8{175, 180, 43}},  // codeowners
+	"disc":             {i: "\U0000e271", c: [3]uint8{176, 190, 197}}, // disc
+	"fortran":          {i: "F", c: [3]uint8{250, 111, 66}},           // fortran
+	"tcl":              {i: "\U000f06d3", c: [3]uint8{239, 83, 80}},   // tcl
+	"liquid":           {i: "\U0000e275", c: [3]uint8{40, 182, 246}},  // liquid
+	"prolog":           {i: "\U0000e7a1", c: [3]uint8{239, 83, 80}},   // prolog
+	"husky":            {i: "\U000f03e9", c: [3]uint8{229, 229, 229}}, // husky
+	"coconut":          {i: "\U000f00d3", c: [3]uint8{141, 110, 99}},  // coconut
+	"sketch":           {i: "\U000f0b8a", c: [3]uint8{255, 194, 61}},  // sketch
+	"pawn":             {i: "\U0000e261", c: [3]uint8{239, 111, 60}},  // pawn
+	"commitlint":       {i: "\U000f0718", c: [3]uint8{43, 150, 137}},  // commitlint
+	"dhall":            {i: "\U0000f448", c: [3]uint8{120, 144, 156}}, // dhall
+	"dune":             {i: "\U000f0509", c: [3]uint8{244, 127, 61}},  // dune
+	"shaderlab":        {i: "\U000f06af", c: [3]uint8{25, 118, 210}},  // shaderlab
+	"command":          {i: "\U000f0633", c: [3]uint8{175, 188, 194}}, // command
+	"stryker":          {i: "\U0000f05b", c: [3]uint8{239, 83, 80}},   // stryker
+	"modernizr":        {i: "\U0000e720", c: [3]uint8{234, 72, 99}},   // modernizr
+	"roadmap":          {i: "\U000f066e", c: [3]uint8{48, 166, 154}},  // roadmap
+	"debian":           {i: "\U0000f306", c: [3]uint8{211, 61, 76}},   // debian
+	"ubuntu":           {i: "\U0000f31c", c: [3]uint8{214, 73, 53}},   // ubuntu
+	"arch":             {i: "\U0000f303", c: [3]uint8{33, 142, 202}},  // arch
+	"redhat":           {i: "\U0000f316", c: [3]uint8{231, 61, 58}},   // redhat
+	"gentoo":           {i: "\U0000f30d", c: [3]uint8{148, 141, 211}}, // gentoo
+	"linux":            {i: "\U0000e712", c: [3]uint8{238, 207, 55}},  // linux
+	"raspberry-pi":     {i: "\U0000f315", c: [3]uint8{208, 60, 76}},   // raspberry-pi
+	"manjaro":          {i: "\U0000f312", c: [3]uint8{73, 185, 90}},   // manjaro
+	"opensuse":         {i: "\U0000f314", c: [3]uint8{111, 180, 36}},  // opensuse
+	"fedora":           {i: "\U0000f30a", c: [3]uint8{52, 103, 172}},  // fedora
+	"freebsd":          {i: "\U0000f30c", c: [3]uint8{175, 44, 42}},   // freebsd
+	"centOS":           {i: "\U0000f304", c: [3]uint8{157, 83, 135}},  // centOS
+	"alpine":           {i: "\U0000f300", c: [3]uint8{14, 87, 123}},   // alpine
+	"mint":             {i: "\U0000f30f", c: [3]uint8{125, 190, 58}},  // mint
+	"routing":          {i: "\U000f0641", c: [3]uint8{67, 160, 71}},   // routing
+	"laravel":          {i: "\U0000e73f", c: [3]uint8{248, 80, 81}},   // laravel
+	"pug":              {i: "\U0000e60e", c: [3]uint8{239, 204, 163}}, // pug (Not supported by nerdFont)
+	"blink":            {i: "\U000f022b", c: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
+	"postcss":          {i: "\U000f031c", c: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
+	"jinja":            {i: "\U0000e000", c: [3]uint8{174, 44, 42}},   // jinja (Not supported by nerdFont)
+	"sublime":          {i: "\U0000e7aa", c: [3]uint8{239, 148, 58}},  // sublime (Not supported by nerdFont)
+	"markojs":          {i: "\U0000f13b", c: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
+	"vscode":           {i: "\U0000e70c", c: [3]uint8{33, 150, 243}},  // vscode (Not supported by nerdFont)
+	"qsharp":           {i: "\U0000f292", c: [3]uint8{251, 193, 60}},  // qsharp (Not supported by nerdFont)
+	"vala":             {i: "\U000f02ac", c: [3]uint8{149, 117, 205}}, // vala (Not supported by nerdFont)
+	"zig":              {i: "Z", c: [3]uint8{249, 169, 60}},           // zig (Not supported by nerdFont)
+	"h":                {i: "h", c: [3]uint8{2, 119, 189}},            // h (Not supported by nerdFont)
+	"hpp":              {i: "h", c: [3]uint8{2, 119, 189}},            // hpp (Not supported by nerdFont)
+	"powershell":       {i: "\U000f07b7", c: [3]uint8{5, 169, 244}},   // powershell (Not supported by nerdFont)
+	"gradle":           {i: "\U000f07c6", c: [3]uint8{29, 151, 167}},  // gradle (Not supported by nerdFont)
+	"arduino":          {i: "\U0000e255", c: [3]uint8{35, 151, 156}},  // arduino (Not supported by nerdFont)
+	"tex":              {i: "\U000f0284", c: [3]uint8{66, 165, 245}},  // tex (Not supported by nerdFont)
+	"graphql":          {i: "\U0000e284", c: [3]uint8{237, 80, 122}},  // graphql (Not supported by nerdFont)
+	"kotlin":           {i: "\U0000e70e", c: [3]uint8{139, 195, 74}},  // kotlin (Not supported by nerdFont)
+	"actionscript":     {i: "\U0000fb25", c: [3]uint8{244, 68, 62}},   // actionscript (Not supported by nerdFont)
+	"autohotkey":       {i: "\U000f0313", c: [3]uint8{76, 175, 80}},   // autohotkey (Not supported by nerdFont)
+	"flash":            {i: "\U000f0241", c: [3]uint8{198, 52, 54}},   // flash (Not supported by nerdFont)
+	"swc":              {i: "\U000f06d5", c: [3]uint8{198, 52, 54}},   // swc (Not supported by nerdFont)
+	"cmake":            {i: "\U0000f425", c: [3]uint8{178, 178, 179}}, // cmake (Not supported by nerdFont)
+	"nuxt":             {i: "\U0000e2a6", c: [3]uint8{65, 184, 131}},  // nuxt (Not supported by nerdFont)
+	"ocaml":            {i: "\U0000f1ce", c: [3]uint8{253, 154, 62}},  // ocaml (Not supported by nerdFont)
+	"haxe":             {i: "\U0000f425", c: [3]uint8{246, 137, 61}},  // haxe (Not supported by nerdFont)
+	"puppet":           {i: "\U000f0096", c: [3]uint8{251, 193, 60}},  // puppet (Not supported by nerdFont)
+	"purescript":       {i: "\U000f0171", c: [3]uint8{66, 165, 245}},  // purescript (Not supported by nerdFont)
+	"merlin":           {i: "\U0000f136", c: [3]uint8{66, 165, 245}},  // merlin (Not supported by nerdFont)
+	"mjml":             {i: "\U0000e714", c: [3]uint8{249, 89, 63}},   // mjml (Not supported by nerdFont)
+	"terraform":        {i: "\U0000e20f", c: [3]uint8{92, 107, 192}},  // terraform (Not supported by nerdFont)
+	"apiblueprint":     {i: "\U0000f031", c: [3]uint8{66, 165, 245}},  // apiblueprint (Not supported by nerdFont)
+	"slim":             {i: "\U0000f24e", c: [3]uint8{245, 129, 61}},  // slim (Not supported by nerdFont)
+	"babel":            {i: "\U000f00a1", c: [3]uint8{253, 217, 59}},  // babel (Not supported by nerdFont)
+	"codecov":          {i: "\U0000e37c", c: [3]uint8{237, 80, 122}},  // codecov (Not supported by nerdFont)
+	"protractor":       {i: "\U0000f288", c: [3]uint8{229, 61, 58}},   // protractor (Not supported by nerdFont)
+	"eslint":           {i: "\U000f06f8", c: [3]uint8{121, 134, 203}}, // eslint (Not supported by nerdFont)
+	"mocha":            {i: "\U000f01aa", c: [3]uint8{161, 136, 127}}, // mocha (Not supported by nerdFont)
+	"firebase":         {i: "\U0000e787", c: [3]uint8{251, 193, 60}},  // firebase (Not supported by nerdFont)
+	"stylelint":        {i: "\U000f0678", c: [3]uint8{207, 216, 220}}, // stylelint (Not supported by nerdFont)
+	"prettier":         {i: "\U000f03e3", c: [3]uint8{86, 179, 180}},  // prettier (Not supported by nerdFont)
+	"jest":             {i: "J", c: [3]uint8{244, 85, 62}},            // jest (Not supported by nerdFont)
+	"storybook":        {i: "\U000f082e", c: [3]uint8{237, 80, 122}},  // storybook (Not supported by nerdFont)
+	"fastlane":         {i: "\U000f0700", c: [3]uint8{149, 119, 232}}, // fastlane (Not supported by nerdFont)
+	"helm":             {i: "\U000f0833", c: [3]uint8{32, 173, 194}},  // helm (Not supported by nerdFont)
+	"i18n":             {i: "\U000f02bf", c: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
+	"semantic-release": {i: "\U000f0210", c: [3]uint8{245, 245, 245}}, // semantic-release (Not supported by nerdFont)
+	"godot":            {i: "\U000f06a9", c: [3]uint8{79, 195, 247}},  // godot (Not supported by nerdFont)
+	"godot-assets":     {i: "\U000f06a9", c: [3]uint8{129, 199, 132}}, // godot-assets (Not supported by nerdFont)
+	"vagrant":          {i: "\U0000f27d", c: [3]uint8{20, 101, 192}},  // vagrant (Not supported by nerdFont)
+	"tailwindcss":      {i: "\U000f078d", c: [3]uint8{77, 182, 172}},  // tailwindcss (Not supported by nerdFont)
+	"gcp":              {i: "\U000f0163", c: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
+	"opam":             {i: "\U0000f1ce", c: [3]uint8{255, 213, 79}},  // opam (Not supported by nerdFont)
+	"pascal":           {i: "\U000f03db", c: [3]uint8{3, 136, 209}},   // pascal (Not supported by nerdFont)
+	"nuget":            {i: "\U0000e77f", c: [3]uint8{3, 136, 209}},   // nuget (Not supported by nerdFont)
+	"denizenscript":    {i: "D", c: [3]uint8{255, 213, 79}},           // denizenscript (Not supported by nerdFont)
 	// "riot":             {i:"\u", c:[3]uint8{255, 255, 255}},       // riot
 	// "autoit":           {i:"\u", c:[3]uint8{255, 255, 255}},       // autoit
 	// "livescript":       {i:"\u", c:[3]uint8{255, 255, 255}},       // livescript
@@ -335,26 +335,26 @@ var Icon_Set = map[string]*Icon_Info{
 	// "sas":              {i:"\u", c:[3]uint8{255, 255, 255}},       // sas
 	// "slug":             {i:"\u", c:[3]uint8{255, 255, 255}},       // slug
 
-	"dir-config":      {i: "\ue5fc", c: [3]uint8{32, 173, 194}},  // dir-config
-	"dir-controller":  {i: "\ue5fc", c: [3]uint8{255, 194, 61}},  // dir-controller
-	"dir-git":         {i: "\ue5fb", c: [3]uint8{250, 111, 66}},  // dir-git
-	"dir-github":      {i: "\ue5fd", c: [3]uint8{84, 110, 122}},  // dir-github
-	"dir-npm":         {i: "\ue5fa", c: [3]uint8{203, 56, 55}},   // dir-npm
-	"dir-include":     {i: "\uf756", c: [3]uint8{3, 155, 229}},   // dir-include
-	"dir-import":      {i: "\uf756", c: [3]uint8{175, 180, 43}},  // dir-import
-	"dir-upload":      {i: "\uf758", c: [3]uint8{250, 111, 66}},  // dir-upload
-	"dir-download":    {i: "\uf74c", c: [3]uint8{76, 175, 80}},   // dir-download
-	"dir-secure":      {i: "\uf74f", c: [3]uint8{249, 169, 60}},  // dir-secure
-	"dir-images":      {i: "\uf74e", c: [3]uint8{43, 150, 137}},  // dir-images
-	"dir-environment": {i: "\uf74e", c: [3]uint8{102, 187, 106}}, // dir-environment
+	"dir-config":      {i: "\U0000e5fc", c: [3]uint8{32, 173, 194}},  // dir-config
+	"dir-controller":  {i: "\U0000e5fc", c: [3]uint8{255, 194, 61}},  // dir-controller
+	"dir-git":         {i: "\U0000e5fb", c: [3]uint8{250, 111, 66}},  // dir-git
+	"dir-github":      {i: "\U0000e5fd", c: [3]uint8{84, 110, 122}},  // dir-github
+	"dir-npm":         {i: "\U0000e5fa", c: [3]uint8{203, 56, 55}},   // dir-npm
+	"dir-include":     {i: "\U000f0257", c: [3]uint8{3, 155, 229}},   // dir-include
+	"dir-import":      {i: "\U000f0257", c: [3]uint8{175, 180, 43}},  // dir-import
+	"dir-upload":      {i: "\U000f0259", c: [3]uint8{250, 111, 66}},  // dir-upload
+	"dir-download":    {i: "\U000f024d", c: [3]uint8{76, 175, 80}},   // dir-download
+	"dir-secure":      {i: "\U000f0250", c: [3]uint8{249, 169, 60}},  // dir-secure
+	"dir-images":      {i: "\U000f024f", c: [3]uint8{43, 150, 137}},  // dir-images
+	"dir-environment": {i: "\U000f024f", c: [3]uint8{102, 187, 106}}, // dir-environment
 }
 
 // default icons in case nothing can be found
 var Icon_Def = map[string]*Icon_Info{
-	"dir":        {i: "\uf74a", c: [3]uint8{224, 177, 77}},
-	"diropen":    {i: "\ufc6e", c: [3]uint8{224, 177, 77}},
-	"hiddendir":  {i: "\uf755", c: [3]uint8{224, 177, 77}},
-	"exe":        {i: "\uf713", c: [3]uint8{76, 175, 80}},
-	"file":       {i: "\uf723", c: [3]uint8{65, 129, 190}},
-	"hiddenfile": {i: "\ufb12", c: [3]uint8{65, 129, 190}},
+	"dir":        {i: "\U000f024b", c: [3]uint8{224, 177, 77}},
+	"diropen":    {i: "\U000f0770", c: [3]uint8{224, 177, 77}},
+	"hiddendir":  {i: "\U000f0256", c: [3]uint8{224, 177, 77}},
+	"exe":        {i: "\U000f0214", c: [3]uint8{76, 175, 80}},
+	"file":       {i: "\U000f0224", c: [3]uint8{65, 129, 190}},
+	"hiddenfile": {i: "\U000f0613", c: [3]uint8{65, 129, 190}},
 }
