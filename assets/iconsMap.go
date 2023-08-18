@@ -29,7 +29,7 @@ func (i *Icon_Info) MakeExe() {
 
 var Icon_Set = map[string]*Icon_Info{
 	"html":             {i: "\U0000f13b", c: [3]uint8{228, 79, 57}},   // html
-	"markdown":         {i: "\U0000f853", c: [3]uint8{66, 165, 245}},  // markdown
+	"markdown":         {i: "\U0000eb1d", c: [3]uint8{66, 165, 245}},  // markdown
 	"css":              {i: "\U000f031c", c: [3]uint8{66, 165, 245}},  // css
 	"css-map":          {i: "\U0000e749", c: [3]uint8{66, 165, 245}},  // css-map
 	"sass":             {i: "\U0000e603", c: [3]uint8{237, 80, 122}},  // sass
@@ -37,7 +37,8 @@ var Icon_Set = map[string]*Icon_Info{
 	"json":             {i: "\U0000e60b", c: [3]uint8{251, 193, 60}},  // json
 	"yaml":             {i: "\U0000e60b", c: [3]uint8{244, 68, 62}},   // yaml
 	"php":              {i: "\U0000e608", c: [3]uint8{65, 129, 190}},  // php
-	"xml":              {i: "\U0000f72d", c: [3]uint8{64, 153, 69}},   // xml
+	"xml":              {i: "\U000f05c0", c: [3]uint8{64, 153, 69}},   // xml
+	"xaml":             {i: "\U000f05c0", c: [3]uint8{64, 153, 69}},   // xaml
 	"image":            {i: "\U000f021f", c: [3]uint8{48, 166, 154}},  // image
 	"javascript":       {i: "\U0000e74e", c: [3]uint8{255, 202, 61}},  // javascript
 	"javascript-map":   {i: "\U0000e781", c: [3]uint8{255, 202, 61}},  // javascript-map
@@ -89,7 +90,6 @@ var Icon_Set = map[string]*Icon_Info{
 	"document":         {i: "\U000f0219", c: [3]uint8{66, 165, 245}},  // document
 	"rust":             {i: "\U0000e7a8", c: [3]uint8{250, 111, 66}},  // rust
 	"raml":             {i: "\U0000e60b", c: [3]uint8{66, 165, 245}},  // raml
-	"xaml":             {i: "\U0000fb72", c: [3]uint8{66, 165, 245}},  // xaml
 	"haskell":          {i: "\U0000e61f", c: [3]uint8{254, 168, 62}},  // haskell
 	"git":              {i: "\U0000e702", c: [3]uint8{229, 77, 58}},   // git
 	"lua":              {i: "\U0000e620", c: [3]uint8{66, 165, 245}},  // lua
