@@ -9,17 +9,21 @@ import (
 	"testing"
 )
 
+// Node type declaration.
 type nodes []struct {
 	name        string
 	textContent []byte
 	dirContent  *nodes
 }
 
+// Create a set of directories and file from a given set of nodes.
 func (n *nodes) create(t *testing.T, dir string) {
 	for _, f := range *n {
+		// Turn node name into filepath.
 		fn := filepath.Join(dir, f.name)
 
 		if f.textContent != nil {
+			// Write textContent into created file.
 			if err := ioutil.WriteFile(fn, f.textContent, 0666); err != nil {
 				t.Fatal(err)
 			}
@@ -29,25 +33,29 @@ func (n *nodes) create(t *testing.T, dir string) {
 				t.Fail()
 				continue
 			}
+			// Recursively follow dirContent to fill out tree.
 			f.dirContent.create(t, fn)
 		}
 	}
 }
 
+// Main testing function.
 func TestE2E(t *testing.T) {
 	goExec, err := exec.LookPath("go")
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Create a temporary directory environment.
+	// Check the proper test environment and prepare the filesystem.
 	dirEnv := filepath.Join("./testdata", "dirEnv")
 	os.RemoveAll(dirEnv)
 
-	// create a temp directory environment
+	// Create the directories listed in dirEnv.
 	if err := os.Mkdir(dirEnv, 0777); err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(dirEnv)
+	defer os.RemoveAll(dirEnv) // Mark dirEnv for deletion after program completion.
 
 	// if you update the fileStruct or create any changes that may break the snapshorts present in ./testdata/logo-ls*.txt
 	// then you do have to update the snapshorts like: logo-ls -V > ./testdata/logo-ls-V.txt
@@ -74,6 +82,7 @@ func TestE2E(t *testing.T) {
 	}
 	fileStruct.create(t, dirEnv)
 
+	// Define different test cases for each set of arguments.
 	tt := []struct {
 		args     []string
 		testFile string
@@ -92,6 +101,7 @@ func TestE2E(t *testing.T) {
 		{args: []string{"-?"}, testFile: "logo-ls--help.snap", td: "Testing -? (help) prints help message"},
 	}
 
+	// Run through test cases.
 	for _, test := range tt {
 		t.Run(test.td, func(st *testing.T) {
 			args := []string{"run", "."}
@@ -105,6 +115,7 @@ func TestE2E(t *testing.T) {
 			if err := cmd.Start(); err != nil {
 				st.Fatal(err)
 			}
+
 			cmdData, err := ioutil.ReadAll(stdout)
 			if err != nil {
 				st.Fatal(err)
@@ -118,8 +129,9 @@ func TestE2E(t *testing.T) {
 				st.Fatal(err)
 			}
 
+			// Compare command output with the expected test file content.
 			if bytes.Compare(cmdData, fileData) != 0 {
-				t.Fatalf("expected output of the command:\n-----------\n%s\n=============\nbut got:\n-----------\n%s", fileData, cmdData)
+				t.Fatalf("Failed on %s. \nExpected output of the command:\n-----------\n%s\n=============\nbut got:\n-----------\n%s", test.td, fileData, cmdData)
 			}
 		})
 	}
