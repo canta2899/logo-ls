@@ -196,6 +196,8 @@ var Icon_Set = map[string]*Icon_Info{
 	"mint":             {i: "\U0000f30f", c: [3]uint8{125, 190, 58}},  // mint
 	"routing":          {i: "\U000f0641", c: [3]uint8{67, 160, 71}},   // routing
 	"laravel":          {i: "\U0000e73f", c: [3]uint8{248, 80, 81}},   // laravel
+	"bun":              {i: "\U000f0685", c: [3]uint8{249, 241, 225}}, // bun
+	"typst":            {i: "t", c: [3]uint8{34, 157, 172}},           // typst
 	"pug":              {i: "\U0000e60e", c: [3]uint8{239, 204, 163}}, // pug (Not supported by nerdFont)
 	"blink":            {i: "\U000f022b", c: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
 	"postcss":          {i: "\U000f031c", c: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)

@@ -339,6 +339,7 @@ var Icon_FileName = map[string]*Icon_Info{
 	"routes.tsx":                          Icon_Set["routing"],
 	"routes.js":                           Icon_Set["routing"],
 	"routes.jsx":                          Icon_Set["routing"],
+	"bun.lockb":                           Icon_Set["bun"],
 	// ".vfl":                                Icon_Set["vfl"],
 	// ".kl":                                 Icon_Set["kl"],
 	// "project.graphcool":                   Icon_Set["graphcool"],
