@@ -85,7 +85,7 @@ var Icon_Set = map[string]*Icon_Info{
 	"virtual":          {i: "\U0000f822", c: [3]uint8{3, 155, 229}},   // virtual
 	"email":            {i: "\U000f01ee", c: [3]uint8{66, 165, 245}},  // email
 	"audio":            {i: "\U000f0388", c: [3]uint8{239, 83, 80}},   // audio
-  "midi":             {i: "\U000f08f2", c: [3]uint8{66, 165, 245}},   // midi
+	"midi":             {i: "\U000f08f2", c: [3]uint8{66, 165, 245}},   // midi
 	"coffee":           {i: "\U000f0176", c: [3]uint8{66, 165, 245}},  // coffee
 	"document":         {i: "\U000f0219", c: [3]uint8{66, 165, 245}},  // document
 	"rust":             {i: "\U0000e7a8", c: [3]uint8{250, 111, 66}},  // rust
@@ -164,7 +164,7 @@ var Icon_Set = map[string]*Icon_Info{
 	"moonscript":       {i: "\U0000f186", c: [3]uint8{251, 193, 60}},  // moonscript
 	"codeowners":       {i: "\U000f0008", c: [3]uint8{175, 180, 43}},  // codeowners
 	"disc":             {i: "\U0000e271", c: [3]uint8{176, 190, 197}}, // disc
-	"fortran":          {i: "F", c: [3]uint8{250, 111, 66}},           // fortran
+	"fortran":          {i: "\U000f121a", c: [3]uint8{250, 111, 66}},  // fortran
 	"tcl":              {i: "\U000f06d3", c: [3]uint8{239, 83, 80}},   // tcl
 	"liquid":           {i: "\U0000e275", c: [3]uint8{40, 182, 246}},  // liquid
 	"prolog":           {i: "\U0000e7a1", c: [3]uint8{239, 83, 80}},   // prolog
@@ -196,62 +196,66 @@ var Icon_Set = map[string]*Icon_Info{
 	"mint":             {i: "\U0000f30f", c: [3]uint8{125, 190, 58}},  // mint
 	"routing":          {i: "\U000f0641", c: [3]uint8{67, 160, 71}},   // routing
 	"laravel":          {i: "\U0000e73f", c: [3]uint8{248, 80, 81}},   // laravel
-	"pug":              {i: "\U0000e60e", c: [3]uint8{239, 204, 163}}, // pug (Not supported by nerdFont)
+	"pug":              {i: "\U0000e686", c: [3]uint8{239, 204, 163}}, // pug
+	"jinja":            {i: "\U0000e66f", c: [3]uint8{174, 44, 42}},   // jinja
+	"sublime":          {i: "\U0000e696", c: [3]uint8{239, 148, 58}},  // sublime
+	"zig":              {i: "\U0000e6a9", c: [3]uint8{249, 169, 60}},  // zig
+	"powershell":       {i: "\U000f0a0a", c: [3]uint8{5, 169, 244}},   // powershell
+	"gradle":           {i: "\U0000e660", c: [3]uint8{29, 151, 167}},  // gradle
+	"arduino":          {i: "\U0000f34b", c: [3]uint8{35, 151, 156}},  // arduino
+	"tex":              {i: "\U0000e69b", c: [3]uint8{66, 165, 245}},  // tex
+	"graphql":          {i: "\U000f0877", c: [3]uint8{237, 80, 122}},  // graphql
+	"kotlin":           {i: "\U0000e634", c: [3]uint8{139, 195, 74}},  // kotlin
+	"nuxt":             {i: "\U000f1106", c: [3]uint8{65, 184, 131}},  // nuxt
+	"ocaml":            {i: "\U0000e67a", c: [3]uint8{253, 154, 62}},  // ocaml
+	"haxe":             {i: "\U0000e666", c: [3]uint8{246, 137, 61}},  // haxe
+	"puppet":           {i: "\U0000e631", c: [3]uint8{251, 193, 60}},  // puppet
+	"purescript":       {i: "\U0000e630", c: [3]uint8{66, 165, 245}},  // purescript
+	"terraform":        {i: "\U000f1062", c: [3]uint8{92, 107, 192}},  // terraform
+	"babel":            {i: "\U000f0a25", c: [3]uint8{253, 217, 59}},  // babel
+	"eslint":           {i: "\U000f0c7a", c: [3]uint8{121, 134, 203}}, // eslint
+	"firebase":         {i: "\U000f0967", c: [3]uint8{251, 193, 60}},  // firebase
+	"stylelint":        {i: "\U0000e695", c: [3]uint8{207, 216, 220}}, // stylelint
+	"prettier":         {i: "\U0000e6b4", c: [3]uint8{86, 179, 180}},  // prettier
+	"godot":            {i: "\U0000e65f", c: [3]uint8{79, 195, 247}},  // godot
+	"godot-assets":     {i: "\U0000e65f", c: [3]uint8{129, 199, 132}}, // godot-assets
+	"tailwindcss":      {i: "\U000f13ff", c: [3]uint8{77, 182, 172}},  // tailwindcss
+	"svelte":           {i: "\U0000e697", c: [3]uint8{255, 62, 0}},    // svelte
+	"prisma":           {i: "\U0000e684", c: [3]uint8{229, 56, 150}},  // prisma
+	"rollup":           {i: "\U000f0bc0", c: [3]uint8{233, 61, 50}},   // rollup
+	"gatsby":           {i: "\U000f0e43", c: [3]uint8{70, 0, 130}},    // gatsby
 	"blink":            {i: "\U000f022b", c: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
 	"postcss":          {i: "\U000f031c", c: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
-	"jinja":            {i: "\U0000e000", c: [3]uint8{174, 44, 42}},   // jinja (Not supported by nerdFont)
-	"sublime":          {i: "\U0000e7aa", c: [3]uint8{239, 148, 58}},  // sublime (Not supported by nerdFont)
 	"markojs":          {i: "\U0000f13b", c: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
 	"vscode":           {i: "\U0000e70c", c: [3]uint8{33, 150, 243}},  // vscode (Not supported by nerdFont)
 	"qsharp":           {i: "\U0000f292", c: [3]uint8{251, 193, 60}},  // qsharp (Not supported by nerdFont)
-	"vala":             {i: "\U000f02ac", c: [3]uint8{149, 117, 205}}, // vala (Not supported by nerdFont)
-	"zig":              {i: "Z", c: [3]uint8{249, 169, 60}},           // zig (Not supported by nerdFont)
-	"h":                {i: "h", c: [3]uint8{2, 119, 189}},            // h (Not supported by nerdFont)
-	"hpp":              {i: "h", c: [3]uint8{2, 119, 189}},            // hpp (Not supported by nerdFont)
-	"powershell":       {i: "\U000f07b7", c: [3]uint8{5, 169, 244}},   // powershell (Not supported by nerdFont)
-	"gradle":           {i: "\U000f07c6", c: [3]uint8{29, 151, 167}},  // gradle (Not supported by nerdFont)
-	"arduino":          {i: "\U0000e255", c: [3]uint8{35, 151, 156}},  // arduino (Not supported by nerdFont)
-	"tex":              {i: "\U000f0284", c: [3]uint8{66, 165, 245}},  // tex (Not supported by nerdFont)
-	"graphql":          {i: "\U0000e284", c: [3]uint8{237, 80, 122}},  // graphql (Not supported by nerdFont)
-	"kotlin":           {i: "\U0000e70e", c: [3]uint8{139, 195, 74}},  // kotlin (Not supported by nerdFont)
+	"vala":             {i: "\U0000e69e", c: [3]uint8{149, 117, 205}}, // vala (Not supported by nerdFont)
+	"h":                {i: "\U000f0c00", c: [3]uint8{2, 119, 189}},   // h (Not supported by nerdFont)
+	"hpp":              {i: "\U000f0b0f", c: [3]uint8{2, 119, 189}},   // hpp (Not supported by nerdFont)
 	"actionscript":     {i: "\U0000fb25", c: [3]uint8{244, 68, 62}},   // actionscript (Not supported by nerdFont)
 	"autohotkey":       {i: "\U000f0313", c: [3]uint8{76, 175, 80}},   // autohotkey (Not supported by nerdFont)
 	"flash":            {i: "\U000f0241", c: [3]uint8{198, 52, 54}},   // flash (Not supported by nerdFont)
 	"swc":              {i: "\U000f06d5", c: [3]uint8{198, 52, 54}},   // swc (Not supported by nerdFont)
 	"cmake":            {i: "\U0000f425", c: [3]uint8{178, 178, 179}}, // cmake (Not supported by nerdFont)
-	"nuxt":             {i: "\U0000e2a6", c: [3]uint8{65, 184, 131}},  // nuxt (Not supported by nerdFont)
-	"ocaml":            {i: "\U0000f1ce", c: [3]uint8{253, 154, 62}},  // ocaml (Not supported by nerdFont)
-	"haxe":             {i: "\U0000f425", c: [3]uint8{246, 137, 61}},  // haxe (Not supported by nerdFont)
-	"puppet":           {i: "\U000f0096", c: [3]uint8{251, 193, 60}},  // puppet (Not supported by nerdFont)
-	"purescript":       {i: "\U000f0171", c: [3]uint8{66, 165, 245}},  // purescript (Not supported by nerdFont)
 	"merlin":           {i: "\U0000f136", c: [3]uint8{66, 165, 245}},  // merlin (Not supported by nerdFont)
 	"mjml":             {i: "\U0000e714", c: [3]uint8{249, 89, 63}},   // mjml (Not supported by nerdFont)
-	"terraform":        {i: "\U0000e20f", c: [3]uint8{92, 107, 192}},  // terraform (Not supported by nerdFont)
 	"apiblueprint":     {i: "\U0000f031", c: [3]uint8{66, 165, 245}},  // apiblueprint (Not supported by nerdFont)
 	"slim":             {i: "\U0000f24e", c: [3]uint8{245, 129, 61}},  // slim (Not supported by nerdFont)
-	"babel":            {i: "\U000f00a1", c: [3]uint8{253, 217, 59}},  // babel (Not supported by nerdFont)
 	"codecov":          {i: "\U0000e37c", c: [3]uint8{237, 80, 122}},  // codecov (Not supported by nerdFont)
 	"protractor":       {i: "\U0000f288", c: [3]uint8{229, 61, 58}},   // protractor (Not supported by nerdFont)
-	"eslint":           {i: "\U000f06f8", c: [3]uint8{121, 134, 203}}, // eslint (Not supported by nerdFont)
 	"mocha":            {i: "\U000f01aa", c: [3]uint8{161, 136, 127}}, // mocha (Not supported by nerdFont)
-	"firebase":         {i: "\U0000e787", c: [3]uint8{251, 193, 60}},  // firebase (Not supported by nerdFont)
-	"stylelint":        {i: "\U000f0678", c: [3]uint8{207, 216, 220}}, // stylelint (Not supported by nerdFont)
-	"prettier":         {i: "\U000f03e3", c: [3]uint8{86, 179, 180}},  // prettier (Not supported by nerdFont)
-	"jest":             {i: "J", c: [3]uint8{244, 85, 62}},            // jest (Not supported by nerdFont)
+	"jest":             {i: "\U000f0af7", c: [3]uint8{244, 85, 62}},   // jest (Not supported by nerdFont)
 	"storybook":        {i: "\U000f082e", c: [3]uint8{237, 80, 122}},  // storybook (Not supported by nerdFont)
 	"fastlane":         {i: "\U000f0700", c: [3]uint8{149, 119, 232}}, // fastlane (Not supported by nerdFont)
 	"helm":             {i: "\U000f0833", c: [3]uint8{32, 173, 194}},  // helm (Not supported by nerdFont)
-	"i18n":             {i: "\U000f02bf", c: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
+	"i18n":             {i: "\U000f05ca", c: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
 	"semantic-release": {i: "\U000f0210", c: [3]uint8{245, 245, 245}}, // semantic-release (Not supported by nerdFont)
-	"godot":            {i: "\U000f06a9", c: [3]uint8{79, 195, 247}},  // godot (Not supported by nerdFont)
-	"godot-assets":     {i: "\U000f06a9", c: [3]uint8{129, 199, 132}}, // godot-assets (Not supported by nerdFont)
 	"vagrant":          {i: "\U0000f27d", c: [3]uint8{20, 101, 192}},  // vagrant (Not supported by nerdFont)
-	"tailwindcss":      {i: "\U000f078d", c: [3]uint8{77, 182, 172}},  // tailwindcss (Not supported by nerdFont)
 	"gcp":              {i: "\U000f0163", c: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
 	"opam":             {i: "\U0000f1ce", c: [3]uint8{255, 213, 79}},  // opam (Not supported by nerdFont)
 	"pascal":           {i: "\U000f03db", c: [3]uint8{3, 136, 209}},   // pascal (Not supported by nerdFont)
 	"nuget":            {i: "\U0000e77f", c: [3]uint8{3, 136, 209}},   // nuget (Not supported by nerdFont)
-	"denizenscript":    {i: "D", c: [3]uint8{255, 213, 79}},           // denizenscript (Not supported by nerdFont)
+	"denizenscript":    {i: "\U000f0af1", c: [3]uint8{255, 213, 79}},  // denizenscript (Not supported by nerdFont)
 	// "riot":             {i:"\u", c:[3]uint8{255, 255, 255}},       // riot
 	// "autoit":           {i:"\u", c:[3]uint8{255, 255, 255}},       // autoit
 	// "livescript":       {i:"\u", c:[3]uint8{255, 255, 255}},       // livescript
@@ -277,7 +281,6 @@ var Icon_Set = map[string]*Icon_Info{
 	// "editorconfig":     {i:"\u", c:[3]uint8{255, 255, 255}},       // editorconfig
 	// "watchman":         {i:"\u", c:[3]uint8{255, 255, 255}},       // watchman
 	// "aurelia":          {i:"\u", c:[3]uint8{255, 255, 255}},       // aurelia
-	// "rollup":           {i:"\u", c:[3]uint8{255, 255, 255}},       // rollup
 	// "hack":             {i:"\u", c:[3]uint8{255, 255, 255}},       // hack
 	// "apollo":           {i:"\u", c:[3]uint8{255, 255, 255}},       // apollo
 	// "nodemon":          {i:"\u", c:[3]uint8{255, 255, 255}},       // nodemon
@@ -289,7 +292,6 @@ var Icon_Set = map[string]*Icon_Info{
 	// "cuda":             {i:"\u", c:[3]uint8{255, 255, 255}},       // cuda
 	// "dotjs":            {i:"\u", c:[3]uint8{255, 255, 255}},       // dotjs
 	// "sequelize":        {i:"\u", c:[3]uint8{255, 255, 255}},       // sequelize
-	// "gatsby":           {i:"\u", c:[3]uint8{255, 255, 255}},       // gatsby
 	// "wakatime":         {i:"\u", c:[3]uint8{255, 255, 255}},       // wakatime
 	// "circleci":         {i:"\u", c:[3]uint8{255, 255, 255}},       // circleci
 	// "cloudfoundry":     {i:"\u", c:[3]uint8{255, 255, 255}},       // cloudfoundry
@@ -308,13 +310,11 @@ var Icon_Set = map[string]*Icon_Info{
 	// "bazel":            {i:"\u", c:[3]uint8{255, 255, 255}},       // bazel
 	// "mint":             {i:"\u", c:[3]uint8{255, 255, 255}},       // mint
 	// "velocity":         {i:"\u", c:[3]uint8{255, 255, 255}},       // velocity
-	// "prisma":           {i:"\u", c:[3]uint8{255, 255, 255}},       // prisma
 	// "abc":              {i:"\u", c:[3]uint8{255, 255, 255}},       // abc
 	// "istanbul":         {i:"\u", c:[3]uint8{255, 255, 255}},       // istanbul
 	// "lisp":             {i:"\u", c:[3]uint8{255, 255, 255}},       // lisp
 	// "buildkite":        {i:"\u", c:[3]uint8{255, 255, 255}},       // buildkite
 	// "netlify":          {i:"\u", c:[3]uint8{255, 255, 255}},       // netlify
-	// "svelte":           {i:"\u", c:[3]uint8{255, 255, 255}},       // svelte
 	// "nest":             {i:"\u", c:[3]uint8{255, 255, 255}},       // nest
 	// "percy":            {i:"\u", c:[3]uint8{255, 255, 255}},       // percy
 	// "gitpod":           {i:"\u", c:[3]uint8{255, 255, 255}},       // gitpod
