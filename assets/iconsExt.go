@@ -451,6 +451,7 @@ var Icon_Ext = map[string]*Icon_Info{
 	"openbsd":           Icon_Set["freebsd"],
 	"svelte":            Icon_Set["svelte"],
 	"prisma":            Icon_Set["prisma"],
+	"typ":               Icon_Set["typst"],
 	// "ls":                Icon_Set["livescript"],
 	// "re":                Icon_Set["reason"],
 	// "rei":               Icon_Set["reason"],

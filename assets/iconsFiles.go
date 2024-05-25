@@ -371,6 +371,7 @@ var Icon_FileName = map[string]*Icon_Info{
 	"gatsby-node.js":                      Icon_Set["gatsby"],
 	"gatsby-browser.js":                   Icon_Set["gatsby"],
 	"gatsby-ssr.js":                       Icon_Set["gatsby"],
+	"bun.lockb":                           Icon_Set["bun"],
 	// ".vfl":                                Icon_Set["vfl"],
 	// ".kl":                                 Icon_Set["kl"],
 	// "project.graphcool":                   Icon_Set["graphcool"],

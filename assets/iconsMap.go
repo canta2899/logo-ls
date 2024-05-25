@@ -224,6 +224,8 @@ var Icon_Set = map[string]*Icon_Info{
 	"prisma":           {i: "\U0000e684", c: [3]uint8{229, 56, 150}},  // prisma
 	"rollup":           {i: "\U000f0bc0", c: [3]uint8{233, 61, 50}},   // rollup
 	"gatsby":           {i: "\U000f0e43", c: [3]uint8{70, 0, 130}},    // gatsby
+	"bun":              {i: "\U000f0685", c: [3]uint8{249, 241, 225}}, // bun
+	"typst":            {i: "t", c: [3]uint8{34, 157, 172}},           // typst
 	"blink":            {i: "\U000f022b", c: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
 	"postcss":          {i: "\U000f031c", c: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
 	"markojs":          {i: "\U0000f13b", c: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
