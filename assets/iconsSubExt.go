@@ -11,6 +11,7 @@ var Icon_SubExt = map[string]*Icon_Info{
 	"routes.jsx":           Icon_Set["routing"],
 	"sln.dotsettings":      Icon_Set["settings"],
 	"d.ts":                 Icon_Set["typescript-def"],
+	"d.mts":                Icon_Set["typescript-def"],
 	"vcxitems.filters":     Icon_Set["visualstudio"],
 	"vcxproj.filters":      Icon_Set["visualstudio"],
 	"js.map":               Icon_Set["javascript-map"],
