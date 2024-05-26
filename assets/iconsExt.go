@@ -92,6 +92,8 @@ var Icon_Ext = map[string]*Icon_Info{
 	"js":                Icon_Set["javascript"],
 	"esx":               Icon_Set["javascript"],
 	"mj":                Icon_Set["javascript"],
+	"mjs":               Icon_Set["javascript"],
+	"cjs":               Icon_Set["javascript"],
 	"jsx":               Icon_Set["react"],
 	"tsx":               Icon_Set["react_ts"],
 	"ini":               Icon_Set["settings"],
