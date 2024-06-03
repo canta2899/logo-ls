@@ -225,7 +225,7 @@ func New_ArgFiles(files []FileInfo) *dir {
 	return t
 }
 
-func New_Recussion(d *os.File) {
+func New_Recussion(d *os.File, currentAbsolutePath string) {
 	dd, err := New(d)
 	d.Close()
 	if err != nil {
@@ -246,7 +246,13 @@ func New_Recussion(d *os.File) {
 	temp := make([]string, len(dd.dirs))
 	sort.Strings(dd.dirs)
 	for i, v := range dd.dirs {
-		temp[i] = filepath.Join(d.Name(), v)
+		rel, err := filepath.Rel(currentAbsolutePath, d.Name())
+
+		if err == nil {
+			temp[i] = filepath.Join(rel, v)
+		} else {
+			temp[i] = filepath.Join(d.Name(), v)
+		}
 	}
 	for _, v := range temp {
 		fmt.Printf("\n%s:\n", OpenDirIcon+v)
@@ -257,7 +263,7 @@ func New_Recussion(d *os.File) {
 			sysState.ExitCode(sysState.Code_Minor)
 			continue
 		}
-		New_Recussion(f)
+		New_Recussion(f, currentAbsolutePath)
 	}
 }
 

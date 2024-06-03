@@ -91,11 +91,20 @@ func main() {
 			if i > 0 {
 				fmt.Println()
 			}
-			fmt.Printf("%s:\n", dir.OpenDirIcon+v.Name())
+
+			currentAbsolutePath, _ := filepath.Abs(".")
+			fileRelativePath, err := filepath.Rel(currentAbsolutePath, v.Name())
+
+			if err == nil {
+				fmt.Printf("%s:\n", dir.OpenDirIcon+fileRelativePath)
+			} else {
+				fmt.Printf("%s:\n", dir.OpenDirIcon+v.Name())
+			}
+
 			if api.FlagVector&api.Flag_D > 0 {
 				dir.GitRepoCompute()
 			}
-			dir.New_Recussion(v)
+			dir.New_Recussion(v, currentAbsolutePath)
 		}
 	} else {
 		pName := len(dirs) > 1
