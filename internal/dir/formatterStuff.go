@@ -54,7 +54,7 @@ func lessFuncGenerator(d *dir) {
 		d.less = func(i, j int) bool {
 			if mainSort(d.files[i].ext, d.files[j].ext) {
 				return true
-			} else if strings.ToLower(d.files[i].ext) == strings.ToLower(d.files[j].ext) {
+			} else if strings.EqualFold(d.files[i].ext, d.files[j].ext) {
 				return mainSort(d.files[i].name+d.files[i].ext, d.files[j].name+d.files[j].ext)
 			} else {
 				return false
@@ -154,7 +154,7 @@ func getIcon(name, ext, indicator string) (icon, color string) {
 		if ok {
 			break
 		}
-		if len(name) == 0 || '.' == name[0] {
+		if len(name) == 0 || name[0] == '.' {
 			i = assets.Icon_Def["hiddendir"]
 			break
 		}
@@ -184,7 +184,7 @@ func getIcon(name, ext, indicator string) (icon, color string) {
 			break
 		}
 
-		if len(name) == 0 || '.' == name[0] {
+		if len(name) == 0 || name[0] == '.' {
 			i = assets.Icon_Def["hiddenfile"]
 			break
 		}

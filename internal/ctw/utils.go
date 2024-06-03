@@ -10,7 +10,7 @@ var (
 )
 
 func DisplayColor(b bool) {
-	if b == false {
+	if !b {
 		noColor = ""
 		green = ""
 		brown = ""

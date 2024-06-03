@@ -59,7 +59,7 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 			if (1<<j)&skipCol > 0 {
 				continue
 			}
-			if f == false {
+			if !f {
 				fmt.Fprintf(buf, "%s", empty)
 			}
 

@@ -10,7 +10,7 @@ import (
 
 	"github.com/Yash-Handa/logo-ls/internal/sysState"
 	"github.com/pborman/getopt/v2"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // flags with corresponding bit values
@@ -219,7 +219,7 @@ func Bootstrap() {
 	case *f_1:
 	default:
 		// screen width for custom tw
-		w, _, e := terminal.GetSize(int(os.Stdout.Fd()))
+		w, _, e := term.GetSize(int(os.Stdout.Fd()))
 		if e == nil {
 			if w == 0 {
 				// for systems that don’t support ‘TIOCGWINSZ’.
