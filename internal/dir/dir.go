@@ -278,7 +278,7 @@ func (d *dir) Print() *bytes.Buffer {
 		w := ctw.NewLong(9)
 		for _, v := range d.files {
 			if api.FlagVector&api.Flag_s > 0 {
-				w.AddRow(getSizeInFormate(v.blocks*512), v.mode, v.owner, v.group, getSizeInFormate(v.size), v.modTime.Format(api.GetTimeFormate()), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
+				w.AddRow(getSizeInFormate(v.blocks), v.mode, v.owner, v.group, getSizeInFormate(v.size), v.modTime.Format(api.GetTimeFormate()), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			} else {
 				w.AddRow("", v.mode, v.owner, v.group, getSizeInFormate(v.size), v.modTime.Format(api.GetTimeFormate()), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			}
@@ -289,7 +289,7 @@ func (d *dir) Print() *bytes.Buffer {
 		w := ctw.NewLong(4)
 		for _, v := range d.files {
 			if api.FlagVector&api.Flag_s > 0 {
-				w.AddRow(getSizeInFormate(v.blocks*512), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
+				w.AddRow(getSizeInFormate(v.blocks), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			} else {
 				w.AddRow("", v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			}
@@ -300,7 +300,7 @@ func (d *dir) Print() *bytes.Buffer {
 		w := ctw.New(sysState.GetTerminalWidth())
 		for _, v := range d.files {
 			if api.FlagVector&api.Flag_s > 0 {
-				w.AddRow(getSizeInFormate(v.blocks*512), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
+				w.AddRow(getSizeInFormate(v.blocks), v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			} else {
 				w.AddRow("", v.icon, v.name+v.ext+v.indicator, v.gitStatus)
 			}
