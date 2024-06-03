@@ -47,7 +47,7 @@ func (w *CTW) AddRow(args ...string) {
 	w.nw = append(w.nw, len(args[2]))
 	w.gw = append(w.gw, len(args[3]))
 
-	if w.showIcon == false {
+	if !w.showIcon {
 		w.showIcon = len(args[1]) > 0
 	}
 
@@ -97,25 +97,19 @@ func (w *CTW) Flush(buf *bytes.Buffer) {
 			// not even first iteration done print similar to logo-ls -1
 			if len(widths) == 0 {
 				widths = make([][4]int, len(iw))
-				for i := range iw {
-					widths[i] = iw[i]
-				}
+				copy(widths, iw)
 			}
 			break
 		} else if totW >= w.termW/2 { // if total width of the ls block is more than half of terminal
 			// copy iw to widths
 			widths = make([][4]int, len(iw))
-			for i := range iw {
-				widths[i] = iw[i]
-			}
+			copy(widths, iw)
 		}
 
 		if cols == dn { // if content comes in one line of terminal
 			// copy widths to prevWidths
 			widths = make([][4]int, len(iw))
-			for i := range iw {
-				widths[i] = iw[i]
-			}
+			copy(widths, iw)
 			break
 		}
 	}

@@ -11,14 +11,14 @@ import (
 
 	"github.com/Yash-Handa/logo-ls/assets"
 	"github.com/Yash-Handa/logo-ls/internal/ctw"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func TestFileIcons(t *testing.T) {
 	log.Println("Printing each supported file name and ext by the icon pack")
 
 	// get terminal width
-	terminalWidth, _, e := terminal.GetSize(int(os.Stdout.Fd()))
+	terminalWidth, _, e := term.GetSize(int(os.Stdout.Fd()))
 	if e != nil {
 		terminalWidth = 80
 	}
@@ -62,7 +62,7 @@ func TestFileIcons(t *testing.T) {
 
 func TestIconDisplay(t *testing.T) {
 	// get terminal width
-	terminalWidth, _, e := terminal.GetSize(int(os.Stdout.Fd()))
+	terminalWidth, _, e := term.GetSize(int(os.Stdout.Fd()))
 	if e != nil {
 		terminalWidth = 80
 	}

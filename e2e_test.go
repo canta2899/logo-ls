@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,7 +24,7 @@ func (n *nodes) create(t *testing.T, dir string) {
 
 		if f.textContent != nil {
 			// Write textContent into created file.
-			if err := ioutil.WriteFile(fn, f.textContent, 0666); err != nil {
+			if err := os.WriteFile(fn, f.textContent, 0666); err != nil {
 				t.Fatal(err)
 			}
 		} else if f.dirContent != nil {
@@ -107,30 +107,33 @@ func TestE2E(t *testing.T) {
 			args := []string{"run", "."}
 			args = append(args, test.args...)
 			cmd := exec.Command(goExec, append(args, dirEnv)...)
+
 			stdout, err := cmd.StdoutPipe()
-			defer stdout.Close()
 			if err != nil {
 				st.Fatal(err)
 			}
+			defer stdout.Close() // Ensure the pipe is closed after the function returns.
+
 			if err := cmd.Start(); err != nil {
 				st.Fatal(err)
 			}
 
-			cmdData, err := ioutil.ReadAll(stdout)
+			cmdData, err := io.ReadAll(stdout)
 			if err != nil {
 				st.Fatal(err)
 			}
+
 			if err := cmd.Wait(); err != nil {
 				st.Fatal(err)
 			}
 
-			fileData, err := ioutil.ReadFile(filepath.Join("./testdata", test.testFile))
+			fileData, err := os.ReadFile(filepath.Join("./testdata", test.testFile))
 			if err != nil {
 				st.Fatal(err)
 			}
 
 			// Compare command output with the expected test file content.
-			if bytes.Compare(cmdData, fileData) != 0 {
+			if !bytes.Equal(cmdData, fileData) {
 				t.Fatalf("Failed on %s. \nExpected output of the command:\n-----------\n%s\n=============\nbut got:\n-----------\n%s", test.td, fileData, cmdData)
 			}
 		})
