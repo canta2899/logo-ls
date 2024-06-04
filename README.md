@@ -21,10 +21,24 @@ In **July 2023** I made a **breaking change** which breaks compatibility with ne
 
 If you want to contribute, it would be really cool to:
 
-- Implement proper unit testing (for now, there's something called `e2e_test.go` which is broken)
+- Implement proper unit testing (for now, there's something called `e2e_test.go` which does not seem enough)
 - Clean up the codebase
 - Refactor some uselessly complex parts of the code
 - Deploy to package managers like homebrew, apt, yum, yay, pacman, etc.
+
+## Adding Icons
+
+In order to add new icons you need to: 
+
+1. Fork the repository
+2. Add an entry in the map `Icon_Set` in `assets/iconsMap.go`. The key should be the **name of the icon** and **not** its extension (i.e. `markdown` for markdown files). The value should be of type `Icon_Info`, a struct indicating the unicode character and its color. 
+3. Add one or more entries in the map `Icon_Ext` in `assets/iconExt.go`, mapping the entry defined in `Icon_Set` to each one of the desired extensions
+
+You can map an icon to a specific file name (i.e. `tsconfig.json`) by editing `assets/iconsFiles.go`.
+
+You can override an icon for a specific file name (i.e. use a different icon for `gitlab-ci.yml` rather than the standard YML one) by editing `assets/iconsSubExt.go`.
+
+You can then submit a pull request and I will merge the new icons.
 
 ## Installation
 
@@ -47,7 +61,3 @@ If you want to build the binary only you can, instead, run
 cd logo-ls
 go build -o logo-ls .
 ```
-
-## Credits
-
-- Thanks to [ehoefel](https://github.com/ehoefel) for his [contribution](https://github.com/canta2899/logo-ls/pull/1)
