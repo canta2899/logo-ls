@@ -1,16 +1,15 @@
-package dir
+package format
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/Yash-Handa/logo-ls/assets"
-	"github.com/Yash-Handa/logo-ls/internal/api"
+	"github.com/canta2899/logo-ls/assets"
+	"github.com/canta2899/logo-ls/internal/model"
 )
 
-func mainSort(a, b string) bool {
+func MainSort(a, b string) bool {
 	switch a {
 	case ".", "..":
 	default:
@@ -25,60 +24,58 @@ func mainSort(a, b string) bool {
 }
 
 // Custom less functions
-func lessFuncGenerator(d *dir) {
-	switch {
-	case (api.FlagVector & api.Flag_alpha) > 0:
+func LessFuncGenerator(d *model.Dir, sortMode model.Sort) {
+	switch sortMode {
+	case model.SortAlphabetical:
 		// sort by alphabetical order of name.ext
-		d.less = func(i, j int) bool {
-			return mainSort(d.files[i].name+d.files[i].ext, d.files[j].name+d.files[j].ext)
+		d.LessFn = func(i, j int) bool {
+			return MainSort(d.Files[i].Name+d.Files[i].Ext, d.Files[j].Name+d.Files[j].Ext)
 		}
-	case (api.FlagVector & api.Flag_S) > 0:
-		// sort by file size, largest first
-		d.less = func(i, j int) bool {
-			if d.files[i].size > d.files[j].size {
+	case model.SortSize:
+		// sort by file.Size, largest first
+		d.LessFn = func(i, j int) bool {
+			if d.Files[i].Size > d.Files[j].Size {
 				return true
-			} else if d.files[i].size == d.files[j].size {
-				return mainSort(d.files[i].name+d.files[i].ext, d.files[j].name+d.files[j].ext)
+			} else if d.Files[i].Size == d.Files[j].Size {
+				return MainSort(d.Files[i].Name+d.Files[i].Ext, d.Files[j].Name+d.Files[j].Ext)
 			} else {
 				return false
 			}
 		}
-	case (api.FlagVector & api.Flag_t) > 0:
+	case model.SortModTime:
 		// sort by modification time, newest first
 		// not sorting by alphabetical order because equality is quite rare
-		d.less = func(i, j int) bool {
-			return d.files[i].modTime.After(d.files[j].modTime)
+		d.LessFn = func(i, j int) bool {
+			return d.Files[i].ModTime.After(d.Files[j].ModTime)
 		}
-	case (api.FlagVector & api.Flag_X) > 0:
+	case model.SortExtension:
 		// sort alphabetically by entry extension
-		d.less = func(i, j int) bool {
-			if mainSort(d.files[i].ext, d.files[j].ext) {
+		d.LessFn = func(i, j int) bool {
+			if MainSort(d.Files[i].Ext, d.Files[j].Ext) {
 				return true
-			} else if strings.EqualFold(d.files[i].ext, d.files[j].ext) {
-				return mainSort(d.files[i].name+d.files[i].ext, d.files[j].name+d.files[j].ext)
+			} else if strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
+				return MainSort(d.Files[i].Name+d.Files[i].Ext, d.Files[j].Name+d.Files[j].Ext)
 			} else {
 				return false
 			}
 		}
-	case (api.FlagVector & api.Flag_v) > 0:
+	case model.SortNatural:
 		// natural sort of (version) numbers within text
-		d.less = func(i, j int) bool {
-			return d.files[i].name+d.files[i].ext < d.files[j].name+d.files[j].ext
+		d.LessFn = func(i, j int) bool {
+			return d.Files[i].Name+d.Files[i].Ext < d.Files[j].Name+d.Files[j].Ext
 		}
+	case model.SortNone:
+		fallthrough
 	default:
 		// no sorting
-		d.less = func(i, j int) bool {
+		d.LessFn = func(i, j int) bool {
 			return i < j
 		}
 	}
 }
 
-// get Owner and Group info
-var grpMap = make(map[string]string)
-var userMap = make(map[string]string)
-
 // get indicator of the file
-func getIndicator(name string, isLongMode bool) (i string) {
+func GetIndicator(name string, isLongMode bool) (i string) {
 	stats, err := os.Lstat(name)
 
 	if err != nil {
@@ -93,7 +90,7 @@ func getIndicator(name string, isLongMode bool) (i string) {
 	case modebit&os.ModeNamedPipe > 0:
 		i = "|"
 	case modebit&os.ModeSymlink > 0:
-		i = getSymlinkIndicator(name, isLongMode)
+		i = GetSymlinkIndicator(name, isLongMode)
 	case modebit&os.ModeSocket > 0:
 		i = "="
 	case modebit&1000000 > 0:
@@ -102,7 +99,7 @@ func getIndicator(name string, isLongMode bool) (i string) {
 	return i
 }
 
-func isLink(name string) bool {
+func IsLink(name string) bool {
 	stats, err := os.Lstat(name)
 
 	if err != nil {
@@ -111,40 +108,22 @@ func isLink(name string) bool {
 
 	modebit := stats.Mode()
 
-  return modebit&os.ModeSymlink > 0
+	return modebit&os.ModeSymlink > 0
 }
 
-func getSymlinkIndicator(name string, isLongMode bool) string {
+func GetSymlinkIndicator(name string, isLongMode bool) string {
 	if !isLongMode {
 		return "@"
 	}
 
 	if s, err := filepath.EvalSymlinks(name); err == nil {
-    return " ~> " + strings.Replace(s, os.Getenv("HOME"), "~", 1)
+		return " ~> " + strings.Replace(s, os.Getenv("HOME"), "~", 1)
 	}
 
 	return ""
 }
 
-func getSizeInFormate(b int64) string {
-	if api.FlagVector&api.Flag_h == 0 {
-		return fmt.Sprintf("%d", b)
-	}
-
-	const unit = 1024
-	if b < unit {
-		return fmt.Sprintf("%d", b)
-	}
-	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f%c",
-		float64(b)/float64(div), "KMGTPE"[exp])
-}
-
-func getIcon(name, ext, indicator string) (icon, color string) {
+func GetIcon(name, ext, indicator string) (icon, color string) {
 	var i *assets.Icon_Info
 	var ok bool
 

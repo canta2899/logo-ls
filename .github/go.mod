@@ -1,1 +1,0 @@
-// An empty go.mod file to refrain this dir to be distributed with the cli tool

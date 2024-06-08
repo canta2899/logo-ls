@@ -9,8 +9,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/Yash-Handa/logo-ls/assets"
-	"github.com/Yash-Handa/logo-ls/internal/ctw"
+	"github.com/canta2899/logo-ls/assets"
+	"github.com/canta2899/logo-ls/internal/ctw"
 	"golang.org/x/term"
 )
 
@@ -35,7 +35,7 @@ func TestFileIcons(t *testing.T) {
 			fmt.Fprintln(os.Stderr)
 			buf := bytes.NewBuffer([]byte(""))
 			log.Println("Printing files of type", i.GetColor(1)+v+"\033[0m")
-			w := ctw.New(terminalWidth)
+			w := ctw.NewStandardCTW(terminalWidth)
 			for f, d := range assets.Icon_FileName {
 				if d == i {
 					w.AddRow("    ", d.GetGlyph(), f, "")
@@ -47,7 +47,7 @@ func TestFileIcons(t *testing.T) {
 
 			buf = bytes.NewBuffer([]byte(""))
 			log.Println("Printing extentions of type", i.GetColor(1)+v+"\033[0m")
-			w = ctw.New(terminalWidth)
+			w = ctw.NewStandardCTW(terminalWidth)
 			for e, d := range assets.Icon_Ext {
 				if d == i {
 					w.AddRow("    ", d.GetGlyph(), e, "")
@@ -80,7 +80,7 @@ func TestIconDisplay(t *testing.T) {
 
 			// display icons
 			buf := bytes.NewBuffer([]byte("\n"))
-			w := ctw.New(terminalWidth)
+			w := ctw.NewStandardCTW(terminalWidth)
 			for _, v := range ks {
 				w.AddRow("    ", set[v].GetGlyph(), v, "")
 				w.IconColor(set[v].GetColor(1))

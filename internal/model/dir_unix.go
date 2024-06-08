@@ -1,27 +1,30 @@
 // this file contain dir type definition
 
+//go:build !windows
 // +build !windows
 
-package dir
+package model
 
 import (
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
-
-	"github.com/Yash-Handa/logo-ls/internal/api"
 )
 
-func dirBlocks(info *file, fi os.FileInfo) {
+var grpMap = make(map[string]string)
+var userMap = make(map[string]string)
+
+func DirBlocks(info *Entry, fi os.FileInfo) {
 	if s, ok := fi.Sys().(*syscall.Stat_t); ok {
-		info.blocks = s.Blocks
+		info.Blocks = s.Blocks
 	}
 }
 
-func getOwnerGroupInfo(fi os.FileInfo) (o string, g string) {
+func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode Listing) (o string, g string) {
+
 	if stat, ok := fi.Sys().(*syscall.Stat_t); ok {
-		if api.FlagVector&(api.Flag_l|api.Flag_o) > 0 {
+		if longListingMode == LongListingDefault || longListingMode == LongListingOwner {
 			UID := strconv.Itoa(int(stat.Uid))
 			if n, ok := userMap[UID]; ok {
 				o = n
@@ -36,7 +39,7 @@ func getOwnerGroupInfo(fi os.FileInfo) (o string, g string) {
 			}
 		}
 
-		if api.FlagVector&api.Flag_G == 0 && api.FlagVector&(api.Flag_l|api.Flag_g) > 0 {
+		if !noGroup && (longListingMode == LongListingDefault || longListingMode == LongListingGroup) {
 			GID := strconv.Itoa(int(stat.Gid))
 			if n, ok := grpMap[GID]; ok {
 				g = n

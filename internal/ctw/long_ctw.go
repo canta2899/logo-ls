@@ -6,14 +6,16 @@ import (
 )
 
 type LongCTW struct {
+	*baseCtw
 	d    [][]string // entire data passed to ctw
 	c    []int      // widths of each column
 	ic   []string   // color of file icon of a row
 	cols int        // zero based no of cols (or total cols -1)
 }
 
-func NewLong(cols int) *LongCTW {
+func NewLongCTW(cols int) *LongCTW {
 	t := new(LongCTW)
+	t.baseCtw = newBaseCtw()
 	t.cols = cols - 1
 
 	// initialize right size slice
@@ -60,14 +62,14 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 				continue
 			}
 			if !f {
-				fmt.Fprintf(buf, "%s", empty)
+				fmt.Fprintf(buf, "%s", l.empty)
 			}
 
 			if j == l.cols-2 {
-				fmt.Fprintf(buf, "%s%*s%s", l.ic[i], l.c[j], c, noColor)
+				fmt.Fprintf(buf, "%s%*s%s", l.ic[i], l.c[j], c, l.noColor)
 			} else if j >= l.cols-1 && (1<<l.cols)&skipCol == 0 {
-				color := getGitColor(r[l.cols])
-				fmt.Fprintf(buf, "%s%-*s%s", color, l.c[j], c, noColor)
+				color := l.GetGitColor(r[l.cols])
+				fmt.Fprintf(buf, "%s%-*s%s", color, l.c[j], c, l.noColor)
 			} else {
 				fmt.Fprintf(buf, "%-*s", l.c[j], c)
 			}

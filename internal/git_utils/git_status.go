@@ -1,4 +1,4 @@
-package dir
+package git_utils
 
 import (
 	"os"
@@ -79,7 +79,7 @@ func GitRepoCompute() {
 	gitRepoComputedAlready = false
 }
 
-func getFilesGitStatus(p string) map[string]string {
+func GetFilesGitStatus(p string) map[string]string {
 	gitRepo, gitRoot, err := getRepoStatus(p)
 
 	if err != nil || len(gitRepo) == 0 {
@@ -92,7 +92,7 @@ func getFilesGitStatus(p string) map[string]string {
 
 	t := make(map[string]string)
 	for i, v := range gitRepo {
-                i = gitFilePath(filepath.Join(gitRoot, i), filepath.Clean(pAbs))
+		i = gitFilePath(filepath.Join(gitRoot, i), filepath.Clean(pAbs))
 		if i == "" {
 			continue
 		}
