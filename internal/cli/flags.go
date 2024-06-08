@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -72,7 +71,7 @@ func GetConfig() *app.Config {
 	// using getopt.Getopt instead of parse to provide custom err
 	err := getopt.Getopt(nil)
 	if err != nil {
-		log.Printf("%v\nTry 'logo-ls -?' for more information.", err)
+		fmt.Printf("%v\nTry 'logo-ls -?' for more information.", err)
 		os.Exit(1)
 	}
 

@@ -13,13 +13,13 @@ import (
 	"golang.org/x/term"
 )
 
+const standardTerminalWidth = 80
+
 func GetCliApp() *app.App {
 	command := GetConfig()
 	writer := getCliWriter()
-	log.SetPrefix("logo-ls: ")
-	log.SetFlags(0)
-
-	terminalWidth := 80
+	logger := log.New(writer, "logo-ls: ", 0)
+	terminalWidth := standardTerminalWidth
 
 	if command.LongListingMode == model.LongListingNone {
 		terminalWidth = getCustomTerminalWidth()
@@ -29,6 +29,7 @@ func GetCliApp() *app.App {
 		Config:        command,
 		Writer:        writer,
 		TerminalWidth: terminalWidth,
+		Logger:        logger,
 	}
 }
 
@@ -49,7 +50,7 @@ func getCustomTerminalWidth() int {
 	w, _, e := term.GetSize(int(os.Stdout.Fd()))
 
 	if e != nil {
-		return 80
+		return standardTerminalWidth
 	}
 
 	if w == 0 {

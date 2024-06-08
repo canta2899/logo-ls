@@ -3,6 +3,7 @@ package model
 
 import (
 	"os"
+	"sort"
 	"time"
 
 	"github.com/canta2899/logo-ls/assets"
@@ -57,4 +58,12 @@ func (d *Dir) Swap(i, j int) {
 
 func (d *Dir) Less(i, j int) bool {
 	return d.LessFn(i, j)
+}
+
+func (d *Dir) Sort(sortMode SortMode, reverse bool) {
+	if sortMode != SortNone && reverse {
+		sort.Sort(sort.Reverse(d))
+	} else {
+		sort.Sort(d)
+	}
 }

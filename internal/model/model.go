@@ -10,10 +10,10 @@ const (
 	IncludeAll
 )
 
-type Sort int
+type SortMode int
 
 const (
-	SortSize Sort = iota
+	SortSize SortMode = iota
 	SortModTime
 	SortExtension
 	SortAlphabetical

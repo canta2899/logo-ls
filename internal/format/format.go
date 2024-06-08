@@ -24,7 +24,7 @@ func MainSort(a, b string) bool {
 }
 
 // Custom less functions
-func LessFuncGenerator(d *model.Dir, sortMode model.Sort) {
+func SetLessFunction(d *model.Dir, sortMode model.SortMode) {
 	switch sortMode {
 	case model.SortAlphabetical:
 		// sort by alphabetical order of name.ext

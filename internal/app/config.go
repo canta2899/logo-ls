@@ -9,7 +9,7 @@ import (
 type Config struct {
 	FileList        []model.FileEntry
 	AllMode         model.Include
-	SortMode        model.Sort
+	SortMode        model.SortMode
 	LongListingMode model.Listing
 	TimeFormat      string
 	Recursive       bool

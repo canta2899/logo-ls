@@ -22,6 +22,7 @@ type App struct {
 	Writer        io.Writer
 	ExitCode      model.ExitCode
 	TerminalWidth int
+	Logger        *log.Logger
 }
 
 type Args struct {
@@ -110,33 +111,28 @@ func (a *App) GetCtw() ctw.CTW {
 	return out
 }
 
+func (a *App) blockSize(block int64) string {
+	if a.Config.ShowBlockSize {
+		return a.getSizeFromFormat(block)
+	}
+
+	return ""
+}
+
 func (a *App) Print(d *model.Dir) {
 
-	format.LessFuncGenerator(d, a.Config.SortMode)
-
-	if a.Config.SortMode != model.SortNone && a.Config.Reverse {
-		sort.Sort(sort.Reverse(d))
-	} else {
-		sort.Sort(d)
-	}
+	format.SetLessFunction(d, a.Config.SortMode)
+	d.Sort(a.Config.SortMode, a.Config.Reverse)
 
 	buf := bytes.NewBuffer([]byte(""))
 	lineCtw := a.GetCtw()
-
-	blockSize := func(block int64) string {
-		if a.Config.ShowBlockSize {
-			return a.getSizeFromFormat(block)
-		}
-
-		return ""
-	}
 
 	switch {
 
 	case a.Config.LongListingMode != model.LongListingNone:
 		for _, v := range d.Files {
 			lineCtw.AddRow(
-				blockSize(v.Blocks),
+				a.blockSize(v.Blocks),
 				v.Mode,
 				v.Owner,
 				v.Group,
@@ -151,13 +147,13 @@ func (a *App) Print(d *model.Dir) {
 
 	case a.Config.OneFilePerLine:
 		for _, v := range d.Files {
-			lineCtw.AddRow(blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 
 	default:
 		for _, v := range d.Files {
-			lineCtw.AddRow(blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 	}
