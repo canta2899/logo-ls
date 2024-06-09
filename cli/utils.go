@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/canta2899/logo-ls/internal/app"
-	"github.com/canta2899/logo-ls/internal/model"
+	"github.com/canta2899/logo-ls/app"
+	"github.com/canta2899/logo-ls/model"
 	"github.com/mattn/go-colorable"
 	"golang.org/x/term"
 )

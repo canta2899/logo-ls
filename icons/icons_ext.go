@@ -1,4 +1,4 @@
-package assets
+package icons
 
 var Icon_Ext = map[string]*Icon_Info{
 	"htm":               Icon_Set["html"],

@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/canta2899/logo-ls/assets"
-	"github.com/canta2899/logo-ls/internal/model"
+	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/model"
 )
 
 func MainSort(a, b string) bool {
@@ -24,7 +24,7 @@ func MainSort(a, b string) bool {
 }
 
 // Custom less functions
-func SetLessFunction(d *model.Dir, sortMode model.SortMode) {
+func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	switch sortMode {
 	case model.SortAlphabetical:
 		// sort by alphabetical order of name.ext
@@ -124,56 +124,56 @@ func GetSymlinkIndicator(name string, isLongMode bool) string {
 }
 
 func GetIcon(name, ext, indicator string) (icon, color string) {
-	var i *assets.Icon_Info
+	var i *icons.Icon_Info
 	var ok bool
 
 	switch indicator {
 	case "/":
-		i, ok = assets.Icon_Dir[strings.ToLower(name+ext)]
+		i, ok = icons.Icon_Dir[strings.ToLower(name+ext)]
 		if ok {
 			break
 		}
 		if len(name) == 0 || name[0] == '.' {
-			i = assets.Icon_Def["hiddendir"]
+			i = icons.Icon_Def["hiddendir"]
 			break
 		}
-		i = assets.Icon_Def["dir"]
+		i = icons.Icon_Def["dir"]
 	default:
-		i, ok = assets.Icon_FileName[strings.ToLower(name+ext)]
+		i, ok = icons.Icon_FileName[strings.ToLower(name+ext)]
 		if ok {
 			break
 		}
 
 		// a special admiration for goLang
 		if ext == ".go" && strings.HasSuffix(name, "_test") {
-			i = assets.Icon_Set["go-test"]
+			i = icons.Icon_Set["go-test"]
 			break
 		}
 
 		t := strings.Split(name, ".")
 		if len(t) > 1 && t[0] != "" {
-			i, ok = assets.Icon_SubExt[strings.ToLower(t[len(t)-1]+ext)]
+			i, ok = icons.Icon_SubExt[strings.ToLower(t[len(t)-1]+ext)]
 			if ok {
 				break
 			}
 		}
 
-		i, ok = assets.Icon_Ext[strings.ToLower(strings.TrimPrefix(ext, "."))]
+		i, ok = icons.Icon_Ext[strings.ToLower(strings.TrimPrefix(ext, "."))]
 		if ok {
 			break
 		}
 
 		if len(name) == 0 || name[0] == '.' {
-			i = assets.Icon_Def["hiddenfile"]
+			i = icons.Icon_Def["hiddenfile"]
 			break
 		}
-		i = assets.Icon_Def["file"]
+		i = icons.Icon_Def["file"]
 	}
 
 	// change icon color if the file is executable
 	if indicator == "*" {
 		if i.GetGlyph() == "\uf723" {
-			i = assets.Icon_Def["exe"]
+			i = icons.Icon_Def["exe"]
 		}
 		i.MakeExe()
 	}

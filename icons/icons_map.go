@@ -1,5 +1,5 @@
 // assets contains all the Icon glyphs info
-package assets
+package icons
 
 import "fmt"
 
@@ -85,7 +85,7 @@ var Icon_Set = map[string]*Icon_Info{
 	"virtual":          {i: "\U0000f822", c: [3]uint8{3, 155, 229}},   // virtual
 	"email":            {i: "\U000f01ee", c: [3]uint8{66, 165, 245}},  // email
 	"audio":            {i: "\U000f0388", c: [3]uint8{239, 83, 80}},   // audio
-	"midi":             {i: "\U000f08f2", c: [3]uint8{66, 165, 245}},   // midi
+	"midi":             {i: "\U000f08f2", c: [3]uint8{66, 165, 245}},  // midi
 	"coffee":           {i: "\U000f0176", c: [3]uint8{66, 165, 245}},  // coffee
 	"document":         {i: "\U000f0219", c: [3]uint8{66, 165, 245}},  // document
 	"rust":             {i: "\U0000e7a8", c: [3]uint8{250, 111, 66}},  // rust

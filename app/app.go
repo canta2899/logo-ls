@@ -10,11 +10,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/canta2899/logo-ls/assets"
-	"github.com/canta2899/logo-ls/internal/ctw"
-	"github.com/canta2899/logo-ls/internal/format"
-	"github.com/canta2899/logo-ls/internal/git_utils"
-	"github.com/canta2899/logo-ls/internal/model"
+	"github.com/canta2899/logo-ls/ctw"
+	"github.com/canta2899/logo-ls/format"
+	"github.com/canta2899/logo-ls/git_utils"
+	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/model"
 )
 
 type App struct {
@@ -26,8 +26,8 @@ type App struct {
 }
 
 type Args struct {
-	Files []model.FileInfo
-	Dirs  []model.File
+	Files []model.FileEntry
+	Dirs  []model.DirectoryEntry
 }
 
 func (a *App) Exit() {
@@ -46,7 +46,7 @@ func (a *App) GetArguments() *Args {
 	dirs := a.Config.FileList
 
 	sort.Slice(dirs, func(i, j int) bool {
-		return dirs[i].Path < dirs[j].Path
+		return dirs[i] < dirs[j]
 	})
 
 	args := &Args{}
@@ -54,10 +54,16 @@ func (a *App) GetArguments() *Args {
 	// segregate args in files and dirs, and print error for those which cannot be opened
 	for _, v := range dirs {
 
-		d, err := os.Open(v.AbsolutePath)
+		abs, err := filepath.Abs(v)
 
 		if err != nil {
-			log.Printf("cannot access %q: %v\n", v, err)
+			panic(err)
+		}
+
+		d, err := os.Open(abs)
+
+		if err != nil {
+			a.Logger.Printf("cannot access %q: %v\n", v, err)
 			d.Close()
 			a.ExitCode.SetSerious()
 			continue
@@ -65,21 +71,21 @@ func (a *App) GetArguments() *Args {
 
 		ds, err := d.Stat()
 		if err != nil {
-			log.Printf("cannot access %q: %v\n", v, err)
+			a.Logger.Printf("cannot access %q: %v\n", v, err)
 			d.Close()
 			a.ExitCode.SetSerious()
 			continue
 		}
 
 		if ds.IsDir() {
-			args.Dirs = append(args.Dirs, model.File{
+			args.Dirs = append(args.Dirs, model.DirectoryEntry{
 				File:    *d,
-				AbsPath: v.AbsolutePath,
+				AbsPath: abs,
 			})
 		} else {
-			args.Files = append(args.Files, model.FileInfo{
+			args.Files = append(args.Files, model.FileEntry{
 				FileInfo: ds,
-				AbsPath:  v.AbsolutePath,
+				AbsPath:  abs,
 			})
 		}
 	}
@@ -98,10 +104,9 @@ func (a *App) GetCtw() ctw.CTW {
 		out = ctw.NewStandardCTW(a.TerminalWidth)
 	}
 
-	out.DisplayColor(!a.Config.DisableColor)
-
 	if a.Config.DisableColor {
-		model.OpenDirIcon = assets.Icon_Def["diropen"].GetGlyph() + " "
+		out.DisplayColor(false)
+		model.OpenDirIcon = icons.Icon_Def["diropen"].GetGlyph() + " "
 	}
 
 	if a.Config.DisableIcon {
@@ -111,15 +116,15 @@ func (a *App) GetCtw() ctw.CTW {
 	return out
 }
 
-func (a *App) blockSize(block int64) string {
+func (a *App) getBlockSize(block int64) string {
 	if a.Config.ShowBlockSize {
-		return a.getSizeFromFormat(block)
+		return a.getFormattedSize(block)
 	}
 
 	return ""
 }
 
-func (a *App) Print(d *model.Dir) {
+func (a *App) Print(d *model.Directory) {
 
 	format.SetLessFunction(d, a.Config.SortMode)
 	d.Sort(a.Config.SortMode, a.Config.Reverse)
@@ -132,11 +137,11 @@ func (a *App) Print(d *model.Dir) {
 	case a.Config.LongListingMode != model.LongListingNone:
 		for _, v := range d.Files {
 			lineCtw.AddRow(
-				a.blockSize(v.Blocks),
+				a.getBlockSize(v.Blocks),
 				v.Mode,
 				v.Owner,
 				v.Group,
-				a.getSizeFromFormat(v.Size),
+				a.getFormattedSize(v.Size),
 				v.ModTime.Format(a.Config.TimeFormat),
 				v.Icon,
 				v.Name+v.Ext+v.Indicator,
@@ -147,13 +152,13 @@ func (a *App) Print(d *model.Dir) {
 
 	case a.Config.OneFilePerLine:
 		for _, v := range d.Files {
-			lineCtw.AddRow(a.blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.getBlockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 
 	default:
 		for _, v := range d.Files {
-			lineCtw.AddRow(a.blockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.getBlockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 	}
@@ -162,11 +167,11 @@ func (a *App) Print(d *model.Dir) {
 	a.Write(buf)
 }
 
-func (a *App) ListFiles(files []model.FileInfo) *model.Dir {
+func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 
 	isLong := a.Config.LongListingMode != model.LongListingNone
 
-	t := new(model.Dir)
+	t := new(model.Directory)
 
 	for _, v := range files {
 		name := v.Name()
@@ -199,13 +204,13 @@ func (a *App) ListFiles(files []model.FileInfo) *model.Dir {
 	return t
 }
 
-func (a *App) ListDirs(d *model.File) (*model.Dir, error) {
+func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error) {
 	// some flag variable combinations
 	long := a.Config.LongListingMode != model.LongListingNone
 	currentDir := a.Config.AllMode == model.IncludeAll || a.Config.Directory
 	showHidden := a.Config.AllMode != model.IncludeDefault
 
-	t := new(model.Dir)
+	t := new(model.Directory)
 
 	// filing current dir info
 	t.Info = new(model.Entry)
@@ -236,9 +241,9 @@ func (a *App) ListDirs(d *model.File) (*model.Dir, error) {
 			model.DirBlocks(t.Info, ds)
 		}
 		if !a.Config.DisableIcon {
-			t.Info.Icon = assets.Icon_Def["diropen"].GetGlyph()
+			t.Info.Icon = icons.Icon_Def["diropen"].GetGlyph()
 			if !a.Config.DisableColor {
-				t.Info.IconColor = assets.Icon_Def["diropen"].GetColor(1)
+				t.Info.IconColor = icons.Icon_Def["diropen"].GetColor(1)
 			}
 		}
 	}
@@ -328,9 +333,9 @@ func (a *App) ListDirs(d *model.File) (*model.Dir, error) {
 			model.DirBlocks(t.Parent, pds)
 		}
 		if !a.Config.DisableIcon {
-			t.Parent.Icon = assets.Icon_Def["diropen"].GetGlyph()
+			t.Parent.Icon = icons.Icon_Def["diropen"].GetGlyph()
 			if !a.Config.DisableColor {
-				t.Parent.IconColor = assets.Icon_Def["diropen"].GetColor(1)
+				t.Parent.IconColor = icons.Icon_Def["diropen"].GetColor(1)
 			}
 		}
 		t.Files = append(t.Files, t.Parent)
@@ -341,12 +346,12 @@ func (a *App) ListDirs(d *model.File) (*model.Dir, error) {
 	return t, err
 }
 
-func (a *App) RecurseDirs(d *model.File, startingAbsolutePath string) {
-	dd, err := a.ListDirs(d)
+func (a *App) RecurseDirectory(d *model.DirectoryEntry, startingAbsolutePath string) {
+	dd, err := a.ProcessDirectory(d)
 	d.Close()
 	if err != nil {
-		log.Printf("partial access to %q: %v\n", d.Name(), err)
-		// sysState.ExitCode(sysState.Code_Minor)
+		a.Logger.Printf("partial access to %q: %v\n", d.Name(), err)
+		a.ExitCode.SetMinor()
 	}
 
 	a.Print(dd)
@@ -371,21 +376,21 @@ func (a *App) RecurseDirs(d *model.File, startingAbsolutePath string) {
 		fmt.Printf("\n%s:\n", model.OpenDirIcon+v)
 		f, err := os.Open(v)
 		if err != nil {
-			log.Printf("cannot access %q: %v\n", v, err)
+			a.Logger.Printf("cannot access %q: %v\n", v, err)
 			f.Close()
-			// sysState.ExitCode(sysState.Code_Minor)
+			a.ExitCode.SetMinor()
 			continue
 		}
-		abs, err := filepath.Abs(v)
 
 		if err != nil {
-			log.Println("Cannot compute abs path")
+			a.Logger.Println("Cannot compute abs path")
 			f.Close()
 			continue
 		}
 
-		next := &model.File{File: *f, AbsPath: abs}
-		a.RecurseDirs(next, startingAbsolutePath)
+		abs, err := filepath.Abs(v)
+		next := &model.DirectoryEntry{File: *f, AbsPath: abs}
+		a.RecurseDirectory(next, startingAbsolutePath)
 	}
 }
 
@@ -395,11 +400,13 @@ func (a *App) Run() {
 
 	// process and display all files
 	if len(args.Files) > 0 {
-		a.Print(a.ListFiles(args.Files))
+		a.Print(a.ProcessFiles(args.Files))
 		if len(args.Dirs) > 0 {
 			fmt.Println()
 		}
 	}
+
+	currentAbsolutePath, _ := filepath.Abs(".")
 
 	// process and display all the dirs in arg
 	if a.Config.Recursive {
@@ -409,7 +416,6 @@ func (a *App) Run() {
 				fmt.Println()
 			}
 
-			currentAbsolutePath, _ := filepath.Abs(".")
 			fileRelativePath, err := filepath.Rel(currentAbsolutePath, v.Name())
 
 			if err == nil {
@@ -422,7 +428,7 @@ func (a *App) Run() {
 				git_utils.GitRepoCompute()
 			}
 
-			a.RecurseDirs(&v, currentAbsolutePath)
+			a.RecurseDirectory(&v, currentAbsolutePath)
 		}
 	} else {
 		pName := len(args.Dirs) > 1
@@ -433,10 +439,10 @@ func (a *App) Run() {
 			if a.Config.GitStatus {
 				git_utils.GitRepoCompute()
 			}
-			d, err := a.ListDirs(&v)
+			d, err := a.ProcessDirectory(&v)
 			v.Close()
 			if err != nil {
-				log.Printf("partial access to %q: %v\n", v.Name(), err)
+				a.Logger.Printf("partial access to %q: %v\n", v.Name(), err)
 				a.ExitCode.SetSerious()
 			}
 			a.Print(d)
@@ -447,7 +453,7 @@ func (a *App) Run() {
 	}
 }
 
-func (a *App) getSizeFromFormat(b int64) string {
+func (a *App) getFormattedSize(b int64) string {
 
 	if !a.Config.HumanReadable {
 		return fmt.Sprintf("%d", b)

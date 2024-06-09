@@ -1,4 +1,4 @@
-package assets
+package icons
 
 var Icon_Dir = map[string]*Icon_Info{
 	"config":         Icon_Set["dir-config"],

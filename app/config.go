@@ -3,11 +3,11 @@ package app
 import (
 	"time"
 
-	"github.com/canta2899/logo-ls/internal/model"
+	"github.com/canta2899/logo-ls/model"
 )
 
 type Config struct {
-	FileList        []model.FileEntry
+	FileList        []string
 	AllMode         model.Include
 	SortMode        model.SortMode
 	LongListingMode model.Listing
@@ -41,6 +41,6 @@ func NewConfig() *Config {
 		HumanReadable:   false,
 		ShowBlockSize:   false,
 		TimeFormat:      time.Stamp,
-		FileList:        []model.FileEntry{},
+		FileList:        []string{},
 	}
 }

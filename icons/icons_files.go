@@ -1,4 +1,4 @@
-package assets
+package icons
 
 var Icon_FileName = map[string]*Icon_Info{
 	".pug-lintrc":                         Icon_Set["pug"],

@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/canta2899/logo-ls/internal/app"
-	"github.com/canta2899/logo-ls/internal/model"
+	"github.com/canta2899/logo-ls/app"
+	"github.com/canta2899/logo-ls/model"
 	"github.com/pborman/getopt/v2"
 )
 
@@ -129,15 +129,9 @@ func GetConfig() *app.Config {
 
 	args := getopt.Args()
 	if len(args) > 0 {
-		var additionalPaths []model.FileEntry
-
-		for _, arg := range args {
-			additionalPaths = append(additionalPaths, model.NewFileEntry(arg))
-		}
-
-		c.FileList = append(c.FileList, additionalPaths...)
+		c.FileList = append(c.FileList, args...)
 	} else {
-		c.FileList = append(c.FileList, model.NewFileEntry("."))
+		c.FileList = append(c.FileList, ".")
 	}
 
 	return c

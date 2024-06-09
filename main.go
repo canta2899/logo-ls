@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/canta2899/logo-ls/internal/cli"
+	"github.com/canta2899/logo-ls/cli"
 )
 
 func main() {

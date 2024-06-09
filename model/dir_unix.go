@@ -1,5 +1,3 @@
-// this file contain dir type definition
-
 //go:build !windows
 // +build !windows
 
