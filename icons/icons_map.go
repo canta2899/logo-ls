@@ -4,17 +4,17 @@ package icons
 import "fmt"
 
 // Icon_Info (icon information)
-type Icon_Info struct {
+type IconInfo struct {
 	i string
 	c [3]uint8 // represents the color in rgb (default 0,0,0 is black)
 	e bool     // whether or not the file is executable [true = is executable]
 }
 
-func (i *Icon_Info) GetGlyph() string {
+func (i *IconInfo) GetGlyph() string {
 	return i.i
 }
 
-func (i *Icon_Info) GetColor(f uint8) string {
+func (i *IconInfo) GetColor(f uint8) string {
 	if i.e {
 		return "\033[38;2;76;175;080m"
 	} else if f == 1 {
@@ -23,11 +23,11 @@ func (i *Icon_Info) GetColor(f uint8) string {
 	return fmt.Sprintf("\033[38;2;%03d;%03d;%03dm", i.c[0], i.c[1], i.c[2])
 }
 
-func (i *Icon_Info) MakeExe() {
+func (i *IconInfo) MakeExe() {
 	i.e = true
 }
 
-var Icon_Set = map[string]*Icon_Info{
+var IconSet = map[string]*IconInfo{
 	"html":             {i: "\U0000f13b", c: [3]uint8{228, 79, 57}},   // html
 	"markdown":         {i: "\U0000eb1d", c: [3]uint8{66, 165, 245}},  // markdown
 	"css":              {i: "\U000f031c", c: [3]uint8{66, 165, 245}},  // css
@@ -353,7 +353,7 @@ var Icon_Set = map[string]*Icon_Info{
 }
 
 // default icons in case nothing can be found
-var Icon_Def = map[string]*Icon_Info{
+var IconDef = map[string]*IconInfo{
 	"dir":        {i: "\U000f024b", c: [3]uint8{224, 177, 77}},
 	"diropen":    {i: "\U000f0770", c: [3]uint8{224, 177, 77}},
 	"hiddendir":  {i: "\U000f0256", c: [3]uint8{224, 177, 77}},

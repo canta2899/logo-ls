@@ -124,56 +124,56 @@ func GetSymlinkIndicator(name string, isLongMode bool) string {
 }
 
 func GetIcon(name, ext, indicator string) (icon, color string) {
-	var i *icons.Icon_Info
+	var i *icons.IconInfo
 	var ok bool
 
 	switch indicator {
 	case "/":
-		i, ok = icons.Icon_Dir[strings.ToLower(name+ext)]
+		i, ok = icons.IconDir[strings.ToLower(name+ext)]
 		if ok {
 			break
 		}
 		if len(name) == 0 || name[0] == '.' {
-			i = icons.Icon_Def["hiddendir"]
+			i = icons.IconDef["hiddendir"]
 			break
 		}
-		i = icons.Icon_Def["dir"]
+		i = icons.IconDef["dir"]
 	default:
-		i, ok = icons.Icon_FileName[strings.ToLower(name+ext)]
+		i, ok = icons.IconFileName[strings.ToLower(name+ext)]
 		if ok {
 			break
 		}
 
 		// a special admiration for goLang
 		if ext == ".go" && strings.HasSuffix(name, "_test") {
-			i = icons.Icon_Set["go-test"]
+			i = icons.IconSet["go-test"]
 			break
 		}
 
 		t := strings.Split(name, ".")
 		if len(t) > 1 && t[0] != "" {
-			i, ok = icons.Icon_SubExt[strings.ToLower(t[len(t)-1]+ext)]
+			i, ok = icons.IconSubExt[strings.ToLower(t[len(t)-1]+ext)]
 			if ok {
 				break
 			}
 		}
 
-		i, ok = icons.Icon_Ext[strings.ToLower(strings.TrimPrefix(ext, "."))]
+		i, ok = icons.IconExt[strings.ToLower(strings.TrimPrefix(ext, "."))]
 		if ok {
 			break
 		}
 
 		if len(name) == 0 || name[0] == '.' {
-			i = icons.Icon_Def["hiddenfile"]
+			i = icons.IconDef["hiddenfile"]
 			break
 		}
-		i = icons.Icon_Def["file"]
+		i = icons.IconDef["file"]
 	}
 
 	// change icon color if the file is executable
 	if indicator == "*" {
 		if i.GetGlyph() == "\uf723" {
-			i = icons.Icon_Def["exe"]
+			i = icons.IconDef["exe"]
 		}
 		i.MakeExe()
 	}

@@ -24,19 +24,19 @@ func TestFileIcons(t *testing.T) {
 	}
 
 	ks := make([]string, 0)
-	for k := range icons.Icon_Set {
+	for k := range icons.IconSet {
 		ks = append(ks, k)
 	}
 	sort.Strings(ks)
 
 	for _, v := range ks {
 		t.Run("Testing icon: "+v, func(st *testing.T) {
-			i := icons.Icon_Set[v]
+			i := icons.IconSet[v]
 			fmt.Fprintln(os.Stderr)
 			buf := bytes.NewBuffer([]byte(""))
 			log.Println("Printing files of type", i.GetColor(1)+v+"\033[0m")
 			w := ctw.NewStandardCTW(terminalWidth)
-			for f, d := range icons.Icon_FileName {
+			for f, d := range icons.IconFileName {
 				if d == i {
 					w.AddRow("    ", d.GetGlyph(), f, "")
 					w.IconColor(d.GetColor(1))
@@ -48,7 +48,7 @@ func TestFileIcons(t *testing.T) {
 			buf = bytes.NewBuffer([]byte(""))
 			log.Println("Printing extentions of type", i.GetColor(1)+v+"\033[0m")
 			w = ctw.NewStandardCTW(terminalWidth)
-			for e, d := range icons.Icon_Ext {
+			for e, d := range icons.IconExt {
 				if d == i {
 					w.AddRow("    ", d.GetGlyph(), e, "")
 					w.IconColor(d.GetColor(1))
@@ -67,7 +67,7 @@ func TestIconDisplay(t *testing.T) {
 		terminalWidth = 80
 	}
 
-	temp := [2]map[string]*icons.Icon_Info{icons.Icon_Set, icons.Icon_Def}
+	temp := [2]map[string]*icons.IconInfo{icons.IconSet, icons.IconDef}
 
 	for i, set := range temp {
 		t.Run(fmt.Sprintf("Icon Set %d", i+1), func(st *testing.T) {

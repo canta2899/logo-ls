@@ -106,7 +106,7 @@ func (a *App) GetCtw() ctw.CTW {
 
 	if a.Config.DisableColor {
 		out.DisplayColor(false)
-		model.OpenDirIcon = icons.Icon_Def["diropen"].GetGlyph() + " "
+		model.OpenDirIcon = icons.IconDef["diropen"].GetGlyph() + " "
 	}
 
 	if a.Config.DisableIcon {
@@ -241,9 +241,9 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 			model.DirBlocks(t.Info, ds)
 		}
 		if !a.Config.DisableIcon {
-			t.Info.Icon = icons.Icon_Def["diropen"].GetGlyph()
+			t.Info.Icon = icons.IconDef["diropen"].GetGlyph()
 			if !a.Config.DisableColor {
-				t.Info.IconColor = icons.Icon_Def["diropen"].GetColor(1)
+				t.Info.IconColor = icons.IconDef["diropen"].GetColor(1)
 			}
 		}
 	}
@@ -333,9 +333,9 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 			model.DirBlocks(t.Parent, pds)
 		}
 		if !a.Config.DisableIcon {
-			t.Parent.Icon = icons.Icon_Def["diropen"].GetGlyph()
+			t.Parent.Icon = icons.IconDef["diropen"].GetGlyph()
 			if !a.Config.DisableColor {
-				t.Parent.IconColor = icons.Icon_Def["diropen"].GetColor(1)
+				t.Parent.IconColor = icons.IconDef["diropen"].GetColor(1)
 			}
 		}
 		t.Files = append(t.Files, t.Parent)
