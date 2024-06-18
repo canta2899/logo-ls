@@ -18,11 +18,10 @@ import (
 )
 
 type App struct {
-	Config        *Config
-	Writer        io.Writer
-	ExitCode      model.ExitCode
-	TerminalWidth int
-	Logger        *log.Logger
+	Config   *Config
+	Writer   io.Writer
+	ExitCode model.ExitCode
+	Logger   *log.Logger
 }
 
 type Args struct {
@@ -101,7 +100,7 @@ func (a *App) GetCtw() ctw.CTW {
 	} else if a.Config.OneFilePerLine {
 		out = ctw.NewLongCTW(4)
 	} else {
-		out = ctw.NewStandardCTW(a.TerminalWidth)
+		out = ctw.NewStandardCTW(a.Config.TerminalWidth)
 	}
 
 	if a.Config.DisableColor {

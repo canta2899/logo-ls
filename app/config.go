@@ -22,6 +22,7 @@ type Config struct {
 	NoGroup         bool
 	HumanReadable   bool
 	ShowBlockSize   bool
+	TerminalWidth   int
 }
 
 func NewConfig() *Config {
@@ -40,6 +41,7 @@ func NewConfig() *Config {
 		NoGroup:         false,
 		HumanReadable:   false,
 		ShowBlockSize:   false,
+		TerminalWidth:   80,
 		TimeFormat:      time.Stamp,
 		FileList:        []string{},
 	}

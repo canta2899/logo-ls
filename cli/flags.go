@@ -3,12 +3,16 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/pborman/getopt/v2"
+	"golang.org/x/term"
 )
+
+const standardTerminalWidth = 80
 
 func GetConfig() *app.Config {
 
@@ -134,6 +138,12 @@ func GetConfig() *app.Config {
 		c.FileList = append(c.FileList, ".")
 	}
 
+	if c.LongListingMode == model.LongListingNone {
+		c.TerminalWidth = getCustomTerminalWidth()
+	} else {
+		c.TerminalWidth = standardTerminalWidth
+	}
+
 	return c
 }
 
@@ -196,4 +206,20 @@ func printHelpMessage() {
 	fmt.Println(" 0  if OK,")
 	fmt.Println(" 1  if minor problems (e.g., cannot access subdirectory),")
 	fmt.Println(" 2  if serious trouble (e.g., cannot access command-line argument).")
+}
+
+func getCustomTerminalWidth() int {
+	// screen width for custom tw
+	w, _, e := term.GetSize(int(os.Stdout.Fd()))
+
+	if e != nil {
+		return standardTerminalWidth
+	}
+
+	if w == 0 {
+		// for systems that don’t support ‘TIOCGWINSZ’.
+		w, _ = strconv.Atoi(os.Getenv("COLUMNS"))
+	}
+
+	return w
 }
