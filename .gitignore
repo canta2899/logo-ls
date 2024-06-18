@@ -12,7 +12,6 @@
 *.out
 
 # Do not commit executables
-logo-ls
 build/
 
 # distribution directory
