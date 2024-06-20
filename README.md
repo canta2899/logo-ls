@@ -1,8 +1,6 @@
 # logo-ls
 
-This is a fork of the original [logo-ls repository](https://github.com/Yash-Handa/logo-ls) (which has been inactive since 2021) in June 2022 and my PRs have been pending since then. I ended up mantaining my own version of this software.
-
-Despite the output is pretty cool (I personally prefer logo-ls to something like [exa](https://github.com/ogham/exa)) the codebase is a mess and most of the time it's difficult to understand what is happening.
+This is a fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago.
 
 My primary goals have been:
 
