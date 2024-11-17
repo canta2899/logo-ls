@@ -104,7 +104,7 @@ func TestE2E(t *testing.T) {
 	// Run through test cases.
 	for _, test := range tt {
 		t.Run(test.td, func(st *testing.T) {
-			args := []string{"run", "."}
+			args := []string{"run", "./cmd/logo-ls"}
 			args = append(args, test.args...)
 			cmd := exec.Command(goExec, append(args, dirEnv)...)
 
@@ -112,6 +112,7 @@ func TestE2E(t *testing.T) {
 			if err != nil {
 				st.Fatal(err)
 			}
+
 			defer stdout.Close() // Ensure the pipe is closed after the function returns.
 
 			if err := cmd.Start(); err != nil {
