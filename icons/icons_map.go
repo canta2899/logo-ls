@@ -82,6 +82,7 @@ var IconSet = map[string]*IconInfo{
 	"document":         {i: "\U000f0219", c: [3]uint8{66, 165, 245}},  // document
 	"dune":             {i: "\U000f0509", c: [3]uint8{244, 127, 61}},  // dune
 	"edge":             {i: "\U000f0065", c: [3]uint8{239, 111, 60}},  // edge
+	"editorconfig":     {i: "\U0000e652", c: [3]uint8{255, 242, 242}}, // editorconfig
 	"ejs":              {i: "\U0000e618", c: [3]uint8{255, 202, 61}},  // ejs
 	"elixir":           {i: "\U0000e62d", c: [3]uint8{149, 117, 205}}, // elixir
 	"elm":              {i: "\U0000e62c", c: [3]uint8{96, 181, 204}},  // elm
@@ -102,6 +103,7 @@ var IconSet = map[string]*IconInfo{
 	"gcp":              {i: "\U000f0163", c: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
 	"gemfile":          {i: "\U0000e21e", c: [3]uint8{229, 61, 58}},   // gemfile
 	"gentoo":           {i: "\U0000f30d", c: [3]uint8{148, 141, 211}}, // gentoo
+	"gnu":              {i: "\U0000e779", c: [3]uint8{229, 61, 58}},   // GNU
 	"git":              {i: "\U0000e702", c: [3]uint8{229, 77, 58}},   // git
 	"gitlab":           {i: "\U0000f296", c: [3]uint8{226, 69, 57}},   // gitlab
 	"go":               {i: "\U000f07d3", c: [3]uint8{32, 173, 194}},  // go
