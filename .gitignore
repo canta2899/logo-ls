@@ -19,3 +19,5 @@ dist
 
 # test related data
 testdata/dirEnv*
+
+.DS_Store
