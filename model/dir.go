@@ -27,7 +27,7 @@ type Entry struct {
 	Size                 int64
 	Mode                 string
 	ModeBits             uint32
-	NumHardLinks         uint16
+	NumHardLinks         uint64
 	Owner, Group         string
 	Blocks               int64
 	GitStatus            string
