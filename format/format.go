@@ -100,7 +100,7 @@ func GetIndicator(name string, isLongMode bool) (i string) {
 	return i
 }
 
-func GetHardLinkCount(absPath string) uint16 {
+func GetHardLinkCount(absPath string) uint64 {
 	// Get file info
 	fileInfo, err := os.Stat(absPath)
 	if err != nil {
@@ -114,7 +114,7 @@ func GetHardLinkCount(absPath string) uint16 {
 	}
 
 	// Return the number of hard links
-	return stat.Nlink
+	return uint64(stat.Nlink)
 }
 
 func IsLink(name string) bool {
