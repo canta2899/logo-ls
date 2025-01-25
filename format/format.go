@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
@@ -97,6 +98,23 @@ func GetIndicator(name string, isLongMode bool) (i string) {
 		i = "*"
 	}
 	return i
+}
+
+func GetHardLinkCount(absPath string) uint16 {
+	// Get file info
+	fileInfo, err := os.Stat(absPath)
+	if err != nil {
+		return 0
+	}
+
+	// Get the underlying stat structure
+	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
+	if !ok {
+		return 0
+	}
+
+	// Return the number of hard links
+	return stat.Nlink
 }
 
 func IsLink(name string) bool {

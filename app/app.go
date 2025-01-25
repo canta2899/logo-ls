@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/canta2899/logo-ls/ctw"
@@ -96,7 +97,7 @@ func (a *App) GetCtw() ctw.CTW {
 	var out ctw.CTW
 
 	if a.Config.LongListingMode != model.LongListingNone {
-		out = ctw.NewLongCTW(9)
+		out = ctw.NewLongCTW(10)
 	} else if a.Config.OneFilePerLine {
 		out = ctw.NewLongCTW(4)
 	} else {
@@ -138,6 +139,7 @@ func (a *App) Print(d *model.Directory) {
 			lineCtw.AddRow(
 				a.getBlockSize(v.Blocks),
 				v.Mode,
+				fmt.Sprintf(" %v", strconv.Itoa(int(v.NumHardLinks))),
 				v.Owner,
 				v.Group,
 				a.getFormattedSize(v.Size),
@@ -183,6 +185,7 @@ func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 
 		if isLong {
 			f.Mode = v.Mode().String()
+			f.NumHardLinks = format.GetHardLinkCount(v.AbsPath)
 			f.ModeBits = uint32(v.Mode())
 			f.Owner, f.Group = model.GetOwnerGroupInfo(v, a.Config.NoGroup, a.Config.LongListingMode)
 		}
@@ -234,6 +237,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		if long {
 			t.Info.Mode = ds.Mode().String()
 			t.Info.ModeBits = uint32(ds.Mode())
+			t.Info.NumHardLinks = format.GetHardLinkCount(d.Name())
 			t.Info.Owner, t.Info.Group = model.GetOwnerGroupInfo(ds, a.Config.NoGroup, a.Config.LongListingMode)
 		}
 		if a.Config.ShowBlockSize {
@@ -270,6 +274,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		if long {
 			f.Mode = v.Mode().String()
 			f.ModeBits = uint32(v.Mode())
+			f.NumHardLinks = format.GetHardLinkCount(fullpath)
 			f.Owner, f.Group = model.GetOwnerGroupInfo(v, a.Config.NoGroup, a.Config.LongListingMode)
 		}
 		if a.Config.ShowBlockSize {
@@ -326,6 +331,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		if long {
 			t.Parent.Mode = pds.Mode().String()
 			t.Parent.ModeBits = uint32(pds.Mode())
+			t.Parent.NumHardLinks = format.GetHardLinkCount(pp)
 			t.Parent.Owner, t.Parent.Group = model.GetOwnerGroupInfo(pds, a.Config.NoGroup, a.Config.LongListingMode)
 		}
 		if a.Config.ShowBlockSize {
