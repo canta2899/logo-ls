@@ -18,6 +18,7 @@ func GetConfig() *app.Config {
 
 	c := app.NewConfig()
 
+	getopt.AllowAnyOrder(true)
 	getopt.SetParameters("[files ...]")
 
 	help := getopt.BoolLong("help", '?', "display this help and exit")
