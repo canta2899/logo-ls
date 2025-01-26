@@ -112,11 +112,11 @@ func GetConfig() *app.Config {
 
 	switch {
 	case *longListingMode:
-		c.LongListingMode = model.LongListingDefault
+		c.LongListingMode = model.LongListingOwner
 	case *longListingGroup:
 		c.LongListingMode = model.LongListingGroup
 	case *longListingDefault:
-		c.LongListingMode = model.LongListingOwner
+		c.LongListingMode = model.LongListingDefault
 	}
 
 	c.TimeFormat = toTimeFormat(*timeFormat)
