@@ -124,6 +124,16 @@ func (a *App) getBlockSize(block int64) string {
 	return ""
 }
 
+func (a *App) blockSizeWithInode(entry *model.Entry) string {
+	blockSize := a.getBlockSize(entry.Blocks)
+
+	if a.Config.ShowInodeNumber {
+		blockSize = fmt.Sprintf("%s %s", entry.InodeNumber, blockSize)
+	}
+
+	return blockSize
+}
+
 func (a *App) Print(d *model.Directory) {
 
 	format.SetLessFunction(d, a.Config.SortMode)
@@ -137,7 +147,7 @@ func (a *App) Print(d *model.Directory) {
 	case a.Config.LongListingMode != model.LongListingNone:
 		for _, v := range d.Files {
 			lineCtw.AddRow(
-				a.getBlockSize(v.Blocks),
+				a.blockSizeWithInode(v),
 				v.Mode,
 				fmt.Sprintf(" %v", strconv.Itoa(int(v.NumHardLinks))),
 				v.Owner,
@@ -153,13 +163,13 @@ func (a *App) Print(d *model.Directory) {
 
 	case a.Config.OneFilePerLine:
 		for _, v := range d.Files {
-			lineCtw.AddRow(a.getBlockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.blockSizeWithInode(v), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 
 	default:
 		for _, v := range d.Files {
-			lineCtw.AddRow(a.getBlockSize(v.Blocks), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
+			lineCtw.AddRow(a.blockSizeWithInode(v), v.Icon, v.Name+v.Ext+v.Indicator, v.GitStatus)
 			lineCtw.IconColor(v.IconColor)
 		}
 	}
@@ -183,6 +193,12 @@ func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 		f.Size = v.Size()
 		f.ModTime = v.ModTime()
 
+		if a.Config.ShowInodeNumber {
+			f.InodeNumber = format.GetInodeNumber(v.AbsPath)
+		} else {
+			f.InodeNumber = ""
+		}
+
 		if isLong {
 			f.Mode = v.Mode().String()
 			f.NumHardLinks = format.GetHardLinkCount(v.AbsPath)
@@ -196,9 +212,6 @@ func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 
 		if !a.Config.DisableIcon {
 			f.Icon, f.IconColor = format.GetIcon(f.Name, f.Ext, f.Indicator)
-			if a.Config.DisableColor {
-				f.IconColor = ""
-			}
 		}
 
 		t.Files = append(t.Files, f)
@@ -234,6 +247,11 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 	if currentDir {
 		t.Info.Size = ds.Size()
 		t.Info.ModTime = ds.ModTime()
+		if a.Config.ShowInodeNumber {
+			t.Info.InodeNumber = format.GetInodeNumber(d.Name())
+		} else {
+			t.Info.InodeNumber = ""
+		}
 		if long {
 			t.Info.Mode = ds.Mode().String()
 			t.Info.ModeBits = uint32(ds.Mode())
@@ -245,9 +263,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		}
 		if !a.Config.DisableIcon {
 			t.Info.Icon = icons.IconDef["diropen"].GetGlyph()
-			if !a.Config.DisableColor {
-				t.Info.IconColor = icons.IconDef["diropen"].GetColor(1)
-			}
+			t.Info.IconColor = icons.IconDef["diropen"].GetColor(1)
 		}
 	}
 
@@ -271,6 +287,12 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		f.Indicator = format.GetIndicator(fullpath, long)
 		f.Size = v.Size()
 		f.ModTime = v.ModTime()
+
+		if a.Config.ShowInodeNumber {
+			f.InodeNumber = format.GetInodeNumber(fullpath)
+		} else {
+			f.InodeNumber = ""
+		}
 		if long {
 			f.Mode = v.Mode().String()
 			f.ModeBits = uint32(v.Mode())
@@ -328,6 +350,13 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		t.Parent.Name = ".."
 		t.Parent.Size = pds.Size()
 		t.Parent.ModTime = pds.ModTime()
+
+		if a.Config.ShowInodeNumber {
+			t.Parent.InodeNumber = format.GetInodeNumber(d.Name())
+		} else {
+			t.Parent.InodeNumber = ""
+		}
+
 		if long {
 			t.Parent.Mode = pds.Mode().String()
 			t.Parent.ModeBits = uint32(pds.Mode())
@@ -343,6 +372,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 				t.Parent.IconColor = icons.IconDef["diropen"].GetColor(1)
 			}
 		}
+
 		t.Files = append(t.Files, t.Parent)
 	}
 
@@ -403,6 +433,12 @@ func (a *App) Run() {
 
 	args := a.GetArguments()
 
+	openDirIcon := model.OpenDirIcon
+
+	if a.Config.DisableIcon {
+		openDirIcon = ""
+	}
+
 	// process and display all files
 	if len(args.Files) > 0 {
 		a.Print(a.ProcessFiles(args.Files))
@@ -424,9 +460,9 @@ func (a *App) Run() {
 			fileRelativePath, err := filepath.Rel(currentAbsolutePath, v.Name())
 
 			if err == nil {
-				fmt.Printf("%s:\n", model.OpenDirIcon+fileRelativePath)
+				fmt.Printf("%s:\n", openDirIcon+fileRelativePath)
 			} else {
-				fmt.Printf("%s:\n", model.OpenDirIcon+v.Name())
+				fmt.Printf("%s:\n", openDirIcon+v.Name())
 			}
 
 			if a.Config.GitStatus {
@@ -439,7 +475,7 @@ func (a *App) Run() {
 		pName := len(args.Dirs) > 1
 		for i, v := range args.Dirs {
 			if pName {
-				fmt.Printf("%s:\n", model.OpenDirIcon+v.Name())
+				fmt.Printf("%s:\n", openDirIcon+v.Name())
 			}
 			if a.Config.GitStatus {
 				git_utils.GitRepoCompute()

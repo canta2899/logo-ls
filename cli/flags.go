@@ -39,7 +39,8 @@ func GetConfig() *app.Config {
 	recursive := getopt.BoolLong("recursive", 'R', "list subdirectories recursively")
 	gitStatus := getopt.BoolLong("git-status", 'D', "print git status of files")
 	disableColor := getopt.BoolLong("disable-color", 'c', "don't color icons, filenames and git status (use this to print to a file)")
-	disableIcon := getopt.BoolLong("disable-icon", 'i', "don't print icons of the files")
+	disableIcon := getopt.BoolLong("disable-icon", 'I', "don't print icons of the files")
+	showInodeNumber := getopt.BoolLong("inode", 'i', "print the index number of each file")
 	oneFilePerLine := getopt.Bool('1', "list one file per line.")
 	directory := getopt.BoolLong("directory", 'd', "list directories themselves, not their contents")
 	noGroup := getopt.BoolLong("no-group", 'G', "in a long listing, don't print group names")
@@ -131,6 +132,7 @@ func GetConfig() *app.Config {
 	c.NoGroup = *noGroup
 	c.HumanReadable = *humanReadable
 	c.ShowBlockSize = *showBlockSize
+	c.ShowInodeNumber = *showInodeNumber
 
 	args := getopt.Args()
 	if len(args) > 0 {
