@@ -33,6 +33,7 @@ type Entry struct {
 	GitStatus            string
 	Icon                 string
 	IconColor            string
+	InodeNumber          string
 }
 
 type Directory struct {

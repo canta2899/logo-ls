@@ -23,6 +23,7 @@ type Config struct {
 	HumanReadable   bool
 	ShowBlockSize   bool
 	TerminalWidth   int
+	ShowInodeNumber bool
 }
 
 func NewConfig() *Config {
@@ -41,6 +42,7 @@ func NewConfig() *Config {
 		NoGroup:         false,
 		HumanReadable:   false,
 		ShowBlockSize:   false,
+		ShowInodeNumber: false,
 		TerminalWidth:   80,
 		TimeFormat:      time.Stamp,
 		FileList:        []string{},

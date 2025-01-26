@@ -3,6 +3,7 @@ package format
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -101,20 +102,33 @@ func GetIndicator(name string, isLongMode bool) (i string) {
 }
 
 func GetHardLinkCount(absPath string) uint64 {
-	// Get file info
 	fileInfo, err := os.Stat(absPath)
 	if err != nil {
 		return 0
 	}
 
-	// Get the underlying stat structure
 	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
 	if !ok {
 		return 0
 	}
 
-	// Return the number of hard links
 	return uint64(stat.Nlink)
+}
+
+func GetInodeNumber(path string) string {
+	fileInfo, err := os.Stat(path)
+
+	if err != nil {
+		return ""
+	}
+
+	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
+
+	if !ok {
+		return ""
+	}
+
+	return strconv.Itoa(int(stat.Ino))
 }
 
 func IsLink(name string) bool {
