@@ -131,7 +131,7 @@ func (a *App) blockSizeWithInode(entry *model.Entry) string {
 		blockSize = fmt.Sprintf("%s %s", entry.InodeNumber, blockSize)
 	}
 
-	return blockSize
+	return strings.TrimSpace(blockSize)
 }
 
 func (a *App) Print(d *model.Directory) {
@@ -149,7 +149,7 @@ func (a *App) Print(d *model.Directory) {
 			lineCtw.AddRow(
 				a.blockSizeWithInode(v),
 				v.Mode,
-				fmt.Sprintf(" %v", strconv.Itoa(int(v.NumHardLinks))),
+				fmt.Sprintf("%v", strconv.Itoa(int(v.NumHardLinks))),
 				v.Owner,
 				v.Group,
 				a.getFormattedSize(v.Size),
