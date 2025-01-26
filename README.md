@@ -16,6 +16,9 @@ The modifications I made involved:
 - Implementing a symlink resolution that behaves like the one of the original [ls(coreutils)](https://www.gnu.org/software/coreutils/manual/html_node/ls-invocation.html#ls-invocation).
 - Restructuring the code base to make it easier to apply changes and introduce features (still in progress)
 - Nerd Fonts Version 3 migration (this breaks compatibility with codepoints of previous versions)
+- Added hard link count
+- Added `-i` flag to toggle inode numbers
+- Updated CLI args parsing so that it behaves like the one of ls(coreutils)
 
 Feel free to contribute and I'll be more than happy to merge your changes. In case you want to add some new icons, please make a PR so that we can all benefit from that. The following sections explains how to do it.
 
