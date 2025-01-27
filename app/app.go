@@ -118,7 +118,7 @@ func (a *App) GetCtw() ctw.CTW {
 
 func (a *App) getBlockSize(block int64) string {
 	if a.Config.ShowBlockSize {
-		return a.getFormattedSize(block)
+		return format.GetFormattedSize(block, a.Config.HumanReadable)
 	}
 
 	return ""
@@ -152,7 +152,7 @@ func (a *App) Print(d *model.Directory) {
 				fmt.Sprintf("%v", strconv.Itoa(int(v.NumHardLinks))),
 				v.Owner,
 				v.Group,
-				a.getFormattedSize(v.Size),
+				format.GetFormattedSize(v.Size, a.Config.HumanReadable),
 				a.Config.TimeFormatter.Format(&v.ModTime),
 				v.Icon,
 				v.Name+v.Ext+v.Indicator,
@@ -492,31 +492,4 @@ func (a *App) Run() {
 			}
 		}
 	}
-}
-
-func (a *App) getFormattedSize(b int64) string {
-	if !a.Config.HumanReadable {
-		return fmt.Sprintf("%d", b)
-	}
-
-	const unit = 1024
-	if b < unit {
-		return fmt.Sprintf("%d", b)
-	}
-
-	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-
-	size := float64(b) / float64(div)
-
-	// Check if the size is a whole number
-	if size == float64(int64(size)) {
-		return fmt.Sprintf("%d%c", int64(size), "KMGTPE"[exp])
-	}
-
-	// Otherwise, keep one decimal place
-	return fmt.Sprintf("%.1f%c", size, "KMGTPE"[exp])
 }
