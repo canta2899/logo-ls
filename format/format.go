@@ -1,6 +1,7 @@
 package format
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -211,4 +212,31 @@ func GetIcon(name, ext, indicator string) (icon, color string) {
 	}
 
 	return i.GetGlyph(), i.GetColor(1)
+}
+
+func GetFormattedSize(b int64, humanReadable bool) string {
+	if humanReadable {
+		return fmt.Sprintf("%d", b)
+	}
+
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d", b)
+	}
+
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+
+	size := float64(b) / float64(div)
+
+	// Check if the size is a whole number
+	if size == float64(int64(size)) {
+		return fmt.Sprintf("%d%c", int64(size), "KMGTPE"[exp])
+	}
+
+	// Otherwise, keep one decimal place
+	return fmt.Sprintf("%.1f%c", size, "KMGTPE"[exp])
 }
