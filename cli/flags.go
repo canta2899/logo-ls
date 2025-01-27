@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/canta2899/logo-ls/app"
+	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/pborman/getopt/v2"
 	"golang.org/x/term"
@@ -47,26 +47,7 @@ func GetConfig() *app.Config {
 	humanReadable := getopt.BoolLong("human-readable", 'h', "with -l and -s, print sizes like 1K 234M 2G etc.")
 	showBlockSize := getopt.BoolLong("size", 's', "print the allocated size of each file, in blocks")
 
-	timeFormat := getopt.EnumLong(
-		"time-style",
-		'T',
-		[]string{
-			"Stamp",
-			"StampMilli",
-			"Kitchen",
-			"ANSIC",
-			"UnixDate",
-			"RubyDate",
-			"RFC1123",
-			"RFC1123Z",
-			"RFC3339",
-			"RFC822",
-			"RFC822Z",
-			"RFC850",
-		},
-		"Stamp",
-		"time/date format with -l; see time-style below",
-	)
+	completeTimeInformation := getopt.BoolLong("time-style", 'T', "display complete time information")
 
 	c.LongListingMode = model.LongListingNone
 
@@ -120,7 +101,7 @@ func GetConfig() *app.Config {
 		c.LongListingMode = model.LongListingDefault
 	}
 
-	c.TimeFormat = toTimeFormat(*timeFormat)
+	c.TimeFormatter = format.GetFormatter(*completeTimeInformation)
 
 	c.Reverse = *reverse
 	c.Recursive = *recursive
@@ -150,40 +131,8 @@ func GetConfig() *app.Config {
 	return c
 }
 
-func toTimeFormat(tf string) string {
-	switch tf {
-	case "Stamp":
-		return time.Stamp
-	case "StampMilli":
-		return time.StampMilli
-	case "Kitchen":
-		return time.Kitchen
-	case "ANSIC":
-		return time.ANSIC
-	case "UnixDate":
-		return time.UnixDate
-	case "RubyDate":
-		return time.RubyDate
-	case "RFC1123":
-		return time.RFC1123
-	case "RFC1123Z":
-		return time.RFC1123Z
-	case "RFC3339":
-		return time.RFC3339
-	case "RFC822":
-		return time.RFC822
-	case "RFC822Z":
-		return time.RFC822Z
-	case "RFC850":
-		return time.RFC850
-	default:
-		return time.Stamp
-	}
-}
-
 func printVersion() {
-	fmt.Printf("logo-ls %s\nCopyright (c) 2020 Yash Handa\nLicense MIT <https://opensource.org/licenses/MIT>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n", "v1.3.7")
-	fmt.Println("\nWritten by Yash Handa")
+	fmt.Printf("logo-ls %s\nLicense MIT <https://opensource.org/licenses/MIT>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n", "v1.3.7")
 }
 
 func printHelpMessage() {

@@ -153,7 +153,7 @@ func (a *App) Print(d *model.Directory) {
 				v.Owner,
 				v.Group,
 				a.getFormattedSize(v.Size),
-				v.ModTime.Format(a.Config.TimeFormat),
+				a.Config.TimeFormatter.Format(&v.ModTime),
 				v.Icon,
 				v.Name+v.Ext+v.Indicator,
 				v.GitStatus)
@@ -495,7 +495,6 @@ func (a *App) Run() {
 }
 
 func (a *App) getFormattedSize(b int64) string {
-
 	if !a.Config.HumanReadable {
 		return fmt.Sprintf("%d", b)
 	}
@@ -510,6 +509,14 @@ func (a *App) getFormattedSize(b int64) string {
 		div *= unit
 		exp++
 	}
-	return fmt.Sprintf("%.1f%c",
-		float64(b)/float64(div), "KMGTPE"[exp])
+
+	size := float64(b) / float64(div)
+
+	// Check if the size is a whole number
+	if size == float64(int64(size)) {
+		return fmt.Sprintf("%d%c", int64(size), "KMGTPE"[exp])
+	}
+
+	// Otherwise, keep one decimal place
+	return fmt.Sprintf("%.1f%c", size, "KMGTPE"[exp])
 }

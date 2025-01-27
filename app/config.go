@@ -1,8 +1,7 @@
 package app
 
 import (
-	"time"
-
+	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -11,7 +10,7 @@ type Config struct {
 	AllMode         model.Include
 	SortMode        model.SortMode
 	LongListingMode model.Listing
-	TimeFormat      string
+	TimeFormatter   format.Timestamp
 	Recursive       bool
 	GitStatus       bool
 	Reverse         bool
@@ -44,7 +43,7 @@ func NewConfig() *Config {
 		ShowBlockSize:   false,
 		ShowInodeNumber: false,
 		TerminalWidth:   80,
-		TimeFormat:      time.Stamp,
+		TimeFormatter:   nil,
 		FileList:        []string{},
 	}
 }
