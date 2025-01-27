@@ -70,8 +70,10 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 			} else if j >= l.cols-1 && (1<<l.cols)&skipCol == 0 {
 				color := l.GetGitColor(r[l.cols])
 				fmt.Fprintf(buf, "%s%-*s%s", color, l.c[j], c, l.noColor)
-			} else {
+			} else if (1<<l.cols)&skipCol > 0 && j == l.cols-1 {
 				fmt.Fprintf(buf, "%-*s", l.c[j], c)
+			} else {
+				fmt.Fprintf(buf, "%*s", l.c[j], c)
 			}
 			f = false
 		}
