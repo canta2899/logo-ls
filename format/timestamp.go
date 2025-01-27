@@ -10,7 +10,7 @@ type DefaultFormatter struct{}
 type ExtendedFormatter struct{}
 
 func (*DefaultFormatter) Format(t *time.Time) string {
-	if t.Year() != time.Now().Year() {
+	if t.Year() == time.Now().Year() {
 		return t.Format("Jan 02 15:04")
 	}
 
