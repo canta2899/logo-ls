@@ -5,9 +5,9 @@ package model
 
 import "os"
 
-func DirBlocks(info *file, fi os.FileInfo) {
+func DirBlocks(info *Entry, fi os.FileInfo) {
 }
 
-func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode model.Listing) (o string, g string) {
+func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode Listing) (o string, g string) {
 	return
 }

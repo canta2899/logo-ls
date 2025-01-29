@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
@@ -100,36 +98,6 @@ func GetIndicator(name string, isLongMode bool) (i string) {
 		i = "*"
 	}
 	return i
-}
-
-func GetHardLinkCount(absPath string) uint64 {
-	fileInfo, err := os.Stat(absPath)
-	if err != nil {
-		return 0
-	}
-
-	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-	if !ok {
-		return 0
-	}
-
-	return uint64(stat.Nlink)
-}
-
-func GetInodeNumber(path string) string {
-	fileInfo, err := os.Stat(path)
-
-	if err != nil {
-		return ""
-	}
-
-	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-
-	if !ok {
-		return ""
-	}
-
-	return strconv.Itoa(int(stat.Ino))
 }
 
 func IsLink(name string) bool {
