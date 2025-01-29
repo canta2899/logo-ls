@@ -111,7 +111,7 @@ func computeStatusMap(repoRoot string) (map[string]string, error) {
 			if !strings.HasSuffix(parentDir, string(filepath.Separator)) {
 				parentDir += string(filepath.Separator)
 			}
-			result[parentDir] = "●"
+			result[parentDir] = "M"
 		}
 	}
 	return result, nil
