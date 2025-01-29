@@ -3,11 +3,13 @@
 
 package model
 
-import "os"
+import (
+	"os"
+)
 
 func DirBlocks(info *Entry, fi os.FileInfo) {
 }
 
-func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode Listing) (o string, g string) {
-	return
+func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode Listing) (string, string) {
+	return "", ""
 }

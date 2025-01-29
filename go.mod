@@ -8,6 +8,7 @@ require (
 	github.com/go-git/go-git/v5 v5.13.1
 	github.com/mattn/go-colorable v0.1.14
 	github.com/pborman/getopt/v2 v2.0.0-00010101000000-000000000000
+	golang.org/x/sys v0.29.0
 	golang.org/x/term v0.28.0
 )
 
@@ -30,7 +31,6 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
 
