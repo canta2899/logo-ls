@@ -41,7 +41,7 @@ func NewStandardCTW(termW int) *StandardCTW {
 	return t
 }
 
-func (w *StandardCTW) AddRow(args ...string) {
+func (w *StandardCTW) AddRow(color string, args ...string) {
 	// length checking for args
 	if len(args) != w.cols+1 {
 		return
@@ -56,10 +56,7 @@ func (w *StandardCTW) AddRow(args ...string) {
 	}
 
 	w.d = append(w.d, args)
-}
-
-func (w *StandardCTW) IconColor(c string) {
-	w.ic = append(w.ic, c)
+	w.ic = append(w.ic, color)
 }
 
 func (w *StandardCTW) Flush(buf *bytes.Buffer) {

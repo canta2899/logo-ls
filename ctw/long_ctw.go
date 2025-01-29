@@ -25,7 +25,7 @@ func NewLongCTW(cols int) *LongCTW {
 	return t
 }
 
-func (l *LongCTW) AddRow(args ...string) {
+func (l *LongCTW) AddRow(color string, args ...string) {
 	// add length checking for args
 	if len(args) != l.cols+1 {
 		return
@@ -36,10 +36,7 @@ func (l *LongCTW) AddRow(args ...string) {
 		}
 	}
 	l.d = append(l.d, args)
-}
-
-func (l *LongCTW) IconColor(c string) {
-	l.ic = append(l.ic, c)
+	l.ic = append(l.ic, color)
 }
 
 func (l *LongCTW) Flush(buf *bytes.Buffer) {

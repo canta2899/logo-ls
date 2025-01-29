@@ -7,13 +7,12 @@ import (
 	"runtime"
 
 	"github.com/canta2899/logo-ls/app"
-	"github.com/canta2899/logo-ls/cli"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/mattn/go-colorable"
 )
 
 func main() {
-	command := cli.GetConfig()
+	command := app.GetConfigFromCli()
 
 	var writer io.Writer = os.Stdout
 

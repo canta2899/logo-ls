@@ -1,11 +1,10 @@
-package cli
+package app
 
 import (
 	"fmt"
 	"os"
 	"strconv"
 
-	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/pborman/getopt/v2"
@@ -14,9 +13,9 @@ import (
 
 const standardTerminalWidth = 80
 
-func GetConfig() *app.Config {
+func GetConfigFromCli() *Config {
 
-	c := app.NewConfig()
+	c := NewConfig()
 
 	getopt.AllowAnyOrder(true)
 	getopt.SetParameters("[files ...]")

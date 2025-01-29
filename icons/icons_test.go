@@ -38,8 +38,7 @@ func TestFileIcons(t *testing.T) {
 			w := ctw.NewStandardCTW(terminalWidth)
 			for f, d := range icons.IconFileName {
 				if d == i {
-					w.AddRow("    ", d.GetGlyph(), f, "")
-					w.IconColor(d.GetColor(1))
+					w.AddRow(d.GetColor(1), "    ", d.GetGlyph(), f, "")
 				}
 			}
 			w.Flush(buf)
@@ -50,8 +49,7 @@ func TestFileIcons(t *testing.T) {
 			w = ctw.NewStandardCTW(terminalWidth)
 			for e, d := range icons.IconExt {
 				if d == i {
-					w.AddRow("    ", d.GetGlyph(), e, "")
-					w.IconColor(d.GetColor(1))
+					w.AddRow(d.GetColor(1), "    ", d.GetGlyph(), e, "")
 				}
 			}
 			w.Flush(buf)
@@ -82,8 +80,7 @@ func TestIconDisplay(t *testing.T) {
 			buf := bytes.NewBuffer([]byte("\n"))
 			w := ctw.NewStandardCTW(terminalWidth)
 			for _, v := range ks {
-				w.AddRow("    ", set[v].GetGlyph(), v, "")
-				w.IconColor(set[v].GetColor(1))
+				w.AddRow(set[v].GetColor(1), "    ", set[v].GetGlyph(), v, "")
 			}
 			w.Flush(buf)
 			io.Copy(os.Stdout, buf)
