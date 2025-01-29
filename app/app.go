@@ -134,11 +134,6 @@ func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 
 		fmt.Printf("%s:\n", openDirIcon+relName)
 
-		// If Git status is requested, prepare the repository info.
-		if a.Config.GitStatus {
-			git_utils.GitRepoCompute()
-		}
-
 		a.recurseDirectory(&dirEntry, currentAbs)
 	}
 }
@@ -154,10 +149,6 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 	for i, dirEntry := range dirs {
 		if pName {
 			fmt.Printf("%s:\n", openDirIcon+dirEntry.Name())
-		}
-
-		if a.Config.GitStatus {
-			git_utils.GitRepoCompute()
 		}
 
 		d, err := a.ProcessDirectory(&dirEntry)
@@ -323,9 +314,10 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		if gitRepoStatus != nil {
 			// Directories in Git can be recognized by trailing slash in the map.
 			if fi.IsDir() {
-				entry.GitStatus = gitRepoStatus[model.PathSeparator+fi.Name()+model.PathSeparator]
+				fmt.Println(fi.Name() + model.PathSeparator)
+				entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
 			} else {
-				entry.GitStatus = gitRepoStatus[model.PathSeparator+fi.Name()]
+				entry.GitStatus = gitRepoStatus[fi.Name()]
 			}
 		}
 

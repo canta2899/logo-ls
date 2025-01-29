@@ -1,122 +1,198 @@
 package git_utils
 
 import (
-	"os"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/go-git/go-git/v5"
+	"sync"
 )
-
-// gitStatus returns the status of modified files in the worktree. It will attempt to execute 'git status'
-// and will fall back to git.Worktree.Status() if that fails.
-func gitStatus(wt *git.Worktree) (git.Status, error) {
-	c := exec.Command("git", "status", "--porcelain", "-z")
-	c.Dir = wt.Filesystem.Root()
-	output, err := c.Output()
-	if err != nil {
-		stat, err := wt.Status()
-		return stat, err
-	}
-
-	lines := strings.Split(string(output), "\000")
-	stat := make(map[string]*git.FileStatus, len(lines))
-	for _, line := range lines {
-		if len(line) == 0 {
-			continue
-		}
-
-		// For copy/rename the output looks like
-		//   R  destination\000source
-		// Which means we can split on space and ignore anything with only one result
-		parts := strings.SplitN(strings.TrimLeft(line, " "), " ", 2)
-		if len(parts) == 2 {
-			stat[strings.Trim(parts[1], " ")] = &git.FileStatus{
-				Worktree: git.StatusCode([]byte(parts[0])[0]),
-			}
-		}
-	}
-	return stat, err
-}
 
 var (
-	gitRepo                git.Status
-	gitRoot                string
-	gitError               error
-	gitRepoComputedAlready = false
+	statusCache = make(map[string]map[string]string) // repoRoot -> (absPath -> status)
+	cacheMu     sync.Mutex
 )
 
-func getRepoStatus(path string) (git.Status, string, error) {
-	if !gitRepoComputedAlready {
-		gitRepoComputedAlready = true
-		op := git.PlainOpenOptions{DetectDotGit: true}
-		r, err := git.PlainOpenWithOptions(path, &op)
-		if err != nil {
-			gitError = err
-			return nil, "", err
-		}
-
-		w, err := r.Worktree()
-		if err != nil {
-			gitError = err
-			return nil, "", err
-		}
-
-		ws, err := gitStatus(w)
-		if err != nil {
-			gitError = err
-			return nil, "", err
-		}
-
-		gitRepo, gitRoot, gitError = ws, w.Filesystem.Root(), nil
+// ComputeGitRepo ensures we have the git status map cached for the repository containing startPath.
+// Returns:
+//   - A map of absolute path -> single-letter code (or '●' for directories).
+//   - The absolute repo root path
+//   - An error if not in a Git repo or if 'git' fails
+func ComputeGitRepo(startPath string) (map[string]string, string, error) {
+	root, err := getGitRoot(startPath)
+	if err != nil {
+		return nil, "", err // not a Git repo, or error
 	}
-	return gitRepo, gitRoot, gitError
+
+	cacheMu.Lock()
+	defer cacheMu.Unlock()
+
+	if cached, ok := statusCache[root]; ok {
+		return cached, root, nil
+	}
+
+	repoMap, err := computeStatusMap(root)
+	if err != nil {
+		return nil, "", err
+	}
+	statusCache[root] = repoMap
+	return repoMap, root, nil
 }
 
-// use this function when multiple dirs are given as input, to recalculate the git tree for each
-func GitRepoCompute() {
-	gitRepoComputedAlready = false
-}
-
+// GetFilesGitStatus returns a map of "relative path -> single-letter code"
+// specifically under directory p, adding the directory markers for each subdirectory.
+//
+// If you want the old behavior (where it returns absolute paths -> codes), just skip
+// the trimming step below.
 func GetFilesGitStatus(p string) map[string]string {
-	gitRepo, gitRoot, err := getRepoStatus(p)
-
-	if err != nil || len(gitRepo) == 0 {
-		return nil
+	repoMap, _, err := ComputeGitRepo(p)
+	if err != nil {
+		return nil // not a git repo
 	}
-	pAbs, err := filepath.Abs(p)
+
+	absP, err := filepath.Abs(p)
 	if err != nil {
 		return nil
 	}
+	absP = filepath.Clean(absP)
 
-	t := make(map[string]string)
-	for i, v := range gitRepo {
-		i = gitFilePath(filepath.Join(gitRoot, i), filepath.Clean(pAbs))
-		if i == "" {
-			continue
-		}
-		dirs := strings.SplitAfter(i, string(os.PathSeparator))
-		d := ""
-		for j, seg := range dirs {
-			if j == len(dirs)-1 {
-				if v.Worktree == '?' {
-					t[i] = "U"
-				} else {
-					t[i] = string(v.Worktree)
-				}
-			} else {
-				d += seg
-				t[d] = "●"
-			}
+	results := make(map[string]string)
+	for absFile, code := range repoMap {
+		if strings.HasPrefix(absFile, absP) {
+			// produce a relative path
+			rel := strings.TrimPrefix(absFile, absP)
+			rel = strings.TrimPrefix(rel, string(filepath.Separator))
+			results[rel] = code
 		}
 	}
-	return t
+	return results
 }
 
-func gitFilePath(gitpath, dirpath string) string {
-	if strings.HasPrefix(gitpath, dirpath) {
-		return strings.TrimPrefix(gitpath, dirpath)
+// ClearCache discards the entire git status cache (optional).
+func ClearCache() {
+	cacheMu.Lock()
+	defer cacheMu.Unlock()
+	statusCache = make(map[string]map[string]string)
+}
+
+// computeStatusMap runs `git status --porcelain -z` and constructs a map of
+//
+//	absoluteFilePath -> code
+//
+// for changed files. Additionally, it **also** populates parent directories with `"●"`.
+func computeStatusMap(repoRoot string) (map[string]string, error) {
+	out, err := runGitStatusPorcelain(repoRoot)
+	if err != nil {
+		return nil, err
 	}
-	return ""
+	lines := strings.Split(string(out), "\000")
+	result := make(map[string]string, len(lines))
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		// lines typically look like "?? file" or "M  file" or "R100 new\000old"
+		// We'll do a simple split:
+		parts := strings.SplitN(line, " ", 2)
+		if len(parts) < 2 {
+			continue
+		}
+		xy := strings.TrimSpace(parts[0]) // e.g. "??", "M", "A", "R", etc.
+		pathPart := parts[1]
+
+		statusChar := extractStatusChar(xy)
+
+		// Convert to an absolute path
+		absFilePath := filepath.Join(repoRoot, filepath.FromSlash(pathPart))
+		absFilePath = filepath.Clean(absFilePath)
+
+		// Store the actual file status
+		result[absFilePath] = statusChar
+
+		// Also mark all parent dirs within the repo, up to (but not including) repoRoot
+		for _, parentDir := range parentDirsWithinRepo(repoRoot, absFilePath) {
+			// Use trailing slash so we can differentiate "dir" from "file"
+			// E.g. "C:\repo\app\" -> "●"
+			if !strings.HasSuffix(parentDir, string(filepath.Separator)) {
+				parentDir += string(filepath.Separator)
+			}
+			// Only set "●" if we don't already have a stronger code (like M or ?).
+			// But typically, if it's a directory, we always want "●".
+			// Overwriting is safe in most use-cases.
+			result[parentDir] = "●"
+		}
+	}
+	return result, nil
+}
+
+// parentDirsWithinRepo returns a slice of all parent directories of absFilePath that
+// lie within the repoRoot. E.g. if absFilePath = /root/app/file.go, returns ["/root/app", "/root"].
+// But stops if it goes above the repoRoot.
+func parentDirsWithinRepo(repoRoot, absFilePath string) []string {
+	var parents []string
+
+	// Start from the directory portion
+	dir := filepath.Dir(absFilePath)
+	dir = filepath.Clean(dir)
+
+	// Keep going up until we reach or pass the repoRoot
+	for {
+		if dir == repoRoot {
+			break
+		}
+		// If somehow we reached "", "/" or "C:\", stop
+		if dir == "" || dir == string(filepath.Separator) {
+			break
+		}
+
+		parents = append(parents, dir)
+
+		newDir := filepath.Dir(dir)
+		if newDir == dir {
+			// Can't go further
+			break
+		}
+		dir = newDir
+	}
+	return parents
+}
+
+// getGitRoot finds the top-level .git directory via `git -C path rev-parse --show-toplevel`.
+func getGitRoot(path string) (string, error) {
+	cmd := exec.Command("git", "-C", path, "rev-parse", "--show-toplevel")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("not a git repository: %v", err)
+	}
+	root := strings.TrimSpace(string(out))
+	return root, nil
+}
+
+// runGitStatusPorcelain calls `git -C root status --porcelain -z`.
+func runGitStatusPorcelain(root string) ([]byte, error) {
+	cmd := exec.Command("git", "-C", root, "status", "--porcelain", "-z")
+	return cmd.Output()
+}
+
+// extractStatusChar picks a single status character from e.g. "??", "M", " A", etc.
+func extractStatusChar(xy string) string {
+	xy = strings.TrimSpace(xy)
+	if xy == "" {
+		return "?" // fallback if we get an empty code
+	}
+
+	// If Git porcelain code is "??", interpret as "U"
+	if xy == "??" {
+		return "U"
+	}
+
+	// Otherwise, return the first non-whitespace character (e.g. 'M', 'A', 'D')
+	for _, r := range xy {
+		if r != ' ' && r != '\t' {
+			return string(r)
+		}
+	}
+	return "?"
 }
