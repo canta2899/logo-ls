@@ -317,8 +317,11 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 			// Directories in Git can be recognized by trailing slash in the map.
 			if fi.IsDir() {
 				entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
-			} else {
-				entry.GitStatus = gitRepoStatus[fi.Name()]
+
+				if entry.GitStatus == "" {
+					entry.GitStatus = gitRepoStatus[fi.Name()]
+				}
+
 			}
 		}
 
