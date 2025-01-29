@@ -13,7 +13,6 @@ import (
 
 	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/git_utils"
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
 )
@@ -275,7 +274,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	var gitRepoStatus map[string]string
 	if a.Config.GitStatus {
 		// might be nil if not a git repo or no statuses found
-		gitRepoStatus = git_utils.GetFilesGitStatus(d.Name())
+		gitRepoStatus = format.GetFilesGitStatus(d.Name())
 		if len(gitRepoStatus) == 0 {
 			gitRepoStatus = nil
 		}
@@ -298,14 +297,17 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		entry.Indicator = format.GetIndicator(fullpath, isLong)
 
 		// Overwrite icons for symlinks to reflect target type
-		if !a.Config.DisableIcon && format.IsLink(fullpath) {
-			if s, err := filepath.EvalSymlinks(fullpath); err == nil {
-				realExt := filepath.Ext(s)
-				realName := s[0 : len(s)-len(realExt)]
-				realIndicator := format.GetIndicator(s, isLong)
-				entry.Icon, entry.IconColor = format.GetIcon(realName, realExt, realIndicator)
-				if a.Config.DisableColor {
-					entry.IconColor = ""
+		if !a.Config.DisableIcon {
+			entry.Icon, entry.IconColor = format.GetIcon(name, entry.Ext, entry.Indicator)
+			if format.IsLink(fullpath) {
+				if s, err := filepath.EvalSymlinks(fullpath); err == nil {
+					realExt := filepath.Ext(s)
+					realName := s[0 : len(s)-len(realExt)]
+					realIndicator := format.GetIndicator(s, isLong)
+					entry.Icon, entry.IconColor = format.GetIcon(realName, realExt, realIndicator)
+					if a.Config.DisableColor {
+						entry.IconColor = ""
+					}
 				}
 			}
 		}
@@ -386,15 +388,7 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 
 	// **FIX for directory icons**.
 	if !a.Config.DisableIcon {
-		if fi.IsDir() {
-			// Many themes/keymaps call this “dir”, “folder”, or “diropen”.
-			// Change "diropen" below to whichever key is correct in `icons.IconDef`.
-			entry.Icon = icons.IconDef["diropen"].GetGlyph()
-			entry.IconColor = icons.IconDef["diropen"].GetColor(1)
-		} else {
-			// Standard file icon logic
-			entry.Icon, entry.IconColor = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
-		}
+		entry.Icon, entry.IconColor = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
 
 		if a.Config.DisableColor {
 			entry.IconColor = ""
