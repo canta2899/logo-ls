@@ -183,7 +183,7 @@ func GetIcon(name, ext, indicator string) (icon, color string) {
 }
 
 func GetFormattedSize(b int64, humanReadable bool) string {
-	if humanReadable {
+	if !humanReadable {
 		return fmt.Sprintf("%d", b)
 	}
 
