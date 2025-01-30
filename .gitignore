@@ -21,3 +21,4 @@ dist
 testdata/dirEnv*
 
 .DS_Store
+bin/
