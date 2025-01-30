@@ -5,12 +5,12 @@ BUILD_FLAGS=-ldflags="-s -w" -tags=minimal -trimpath
 
 .PHONY: all bindir clean
 
-all: logols
+all: logo-ls
 
 bindir:
 	mkdir -p $(BIN_DIR)
 
-logols: bindir
+logo-ls: bindir
 	go build -o $(BIN_DIR)/$(APP_NAME) $(BUILD_FLAGS) $(SRC_DIR)
 
 clean:

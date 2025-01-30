@@ -38,18 +38,21 @@ Since no binary is available, you should compile yours by yourself (for now). Yo
 
 ```bash
 git clone https://github.com/canta2899/logo-ls
+cd logo-ls
 ```
 
 And install using
 
 ```bash
-cd logo-ls
 go install ./cmd/logo-ls
 ```
 
-If you want to build the binary only you can, instead, run
+If you want to build the binary you can either use `make` or directly run `go build`.
 
 ```bash
-cd logo-ls
-go build -o logo-ls ./cmd/logo-ls
+make logo-ls # outputs executable in bin/logo-ls
+```
+
+```bash
+go build -o logo-ls -ldflags="-s -w" -tags=minimal -trimpath ./cmd/logo-ls
 ```
