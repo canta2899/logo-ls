@@ -299,11 +299,9 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 
 		// If Git status is available, attach it.
 		if gitRepoStatus != nil {
-			if fi.IsDir() {
-				entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
-				if entry.GitStatus == "" {
-					entry.GitStatus = gitRepoStatus[fi.Name()]
-				}
+			entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
+			if entry.GitStatus == "" {
+				entry.GitStatus = gitRepoStatus[fi.Name()]
 			}
 		}
 
