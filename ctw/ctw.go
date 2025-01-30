@@ -2,20 +2,23 @@ package ctw
 
 import (
 	"bytes"
+	"os"
+	"strconv"
 
-	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
+	"golang.org/x/term"
 )
 
 type CTW interface {
 	AddRow(color string, args ...string)
 	Flush(buf *bytes.Buffer)
-	DisplayColor(b bool)
 	GetGitColor(gitStatus string) string
 	widthsSum(w [][4]int, p int) int
 }
 
-func NewCTW(longMode, oneFilePerLine, color, icon bool, terminalWidth int) CTW {
+const standardTerminalWidth = 80
+
+func NewCTW(longMode, oneFilePerLine, icon bool) CTW {
 	var out CTW
 
 	if longMode {
@@ -23,12 +26,7 @@ func NewCTW(longMode, oneFilePerLine, color, icon bool, terminalWidth int) CTW {
 	} else if oneFilePerLine {
 		out = NewLongCTW(4)
 	} else {
-		out = NewStandardCTW(terminalWidth)
-	}
-
-	if !color {
-		out.DisplayColor(false)
-		model.OpenDirIcon = icons.IconDef["diropen"].GetGlyph() + " "
+		out = NewStandardCTW(GetCustomTerminalWidth())
 	}
 
 	if !icon {
@@ -36,4 +34,21 @@ func NewCTW(longMode, oneFilePerLine, color, icon bool, terminalWidth int) CTW {
 	}
 
 	return out
+}
+
+func GetCustomTerminalWidth() int {
+
+	// screen width for custom tw
+	w, _, e := term.GetSize(int(os.Stdout.Fd()))
+
+	if e != nil {
+		return standardTerminalWidth
+	}
+
+	if w == 0 {
+		// for systems that don’t support ‘TIOCGWINSZ’.
+		w, _ = strconv.Atoi(os.Getenv("COLUMNS"))
+	}
+
+	return w
 }

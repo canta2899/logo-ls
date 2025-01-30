@@ -17,7 +17,7 @@ import (
 	"github.com/canta2899/logo-ls/model"
 )
 
-// App represents the main application that holds configuration, a writer, exit codes, and a logger.
+// Represents the main application that holds configuration, a writer, exit codes, and a logger.
 type App struct {
 	Config   *Config
 	Writer   io.Writer
@@ -25,25 +25,25 @@ type App struct {
 	Logger   *log.Logger
 }
 
-// Args stores the parsed command-line arguments as separate files and directories.
+// Stores the parsed command-line arguments as separate files and directories.
 type Args struct {
 	Files []model.FileEntry
 	Dirs  []model.DirectoryEntry
 }
 
-// Exit terminates the program with the current stored exit code.
+// Terminates the program with the current stored exit code.
 func (a *App) Exit() {
 	os.Exit(int(a.ExitCode))
 }
 
-// Write copies a buffer to the App's writer, panicking on error.
+// Copies a buffer to the App's writer, panicking on error.
 func (a *App) Write(buf *bytes.Buffer) {
 	if _, err := io.Copy(a.Writer, buf); err != nil {
 		panic(err)
 	}
 }
 
-// GetArguments parses the configured file list and categorizes them as files or directories.
+// Parses the configured file list and categorizes them as files or directories.
 // It also sets an error exit code for entries that are not accessible.
 func (a *App) GetArguments() *Args {
 	// Sort all user inputs.
@@ -92,11 +92,11 @@ func (a *App) GetArguments() *Args {
 	return args
 }
 
-// Run is the main entry point that orchestrates listing files/directories and printing results.
+// Main entry point that orchestrates listing files/directories and printing results.
 func (a *App) Run() {
 	args := a.GetArguments()
 
-	// 1. Process and display all files first.
+	// Process and display all files first.
 	if len(args.Files) > 0 {
 		filesDir := a.ProcessFiles(args.Files)
 		a.PrintDirectory(filesDir)
@@ -105,7 +105,7 @@ func (a *App) Run() {
 		}
 	}
 
-	// 2. Process and display all directories (recursively or not).
+	// Process and display all directories (recursively or not).
 	if a.Config.Recursive {
 		a.processDirsRecursively(args.Dirs)
 	} else {
@@ -113,7 +113,7 @@ func (a *App) Run() {
 	}
 }
 
-// processDirsRecursively prints each directory and its subdirectories.
+// Prints each directory and its subdirectories.
 func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 	currentAbs, _ := filepath.Abs(".")
 	openDirIcon := model.OpenDirIcon
@@ -137,7 +137,7 @@ func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 	}
 }
 
-// processDirsNonRecursively prints each directory (but not subdirectories).
+// Prints each directory (but not subdirectories).
 func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 	pName := len(dirs) > 1
 	openDirIcon := model.OpenDirIcon
@@ -164,8 +164,7 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 	}
 }
 
-// RecurseDirectory is the helper that processes a directory, prints it, and
-// recurses through subdirectories if any.
+// Processes a directory, prints it, and recurses through subdirectories if any.
 func (a *App) recurseDirectory(dir *model.DirectoryEntry, startingAbsolutePath string) {
 	d, err := a.ProcessDirectory(dir)
 	dir.Close()
@@ -176,14 +175,12 @@ func (a *App) recurseDirectory(dir *model.DirectoryEntry, startingAbsolutePath s
 
 	a.PrintDirectory(d)
 
-	// Recurse into subdirectories
 	if len(d.Dirs) == 0 {
 		return
 	}
 
 	sort.Strings(d.Dirs)
 	for _, subdir := range d.Dirs {
-		// Attempt to compute relative path for printing
 		childPath := filepath.Join(dir.Name(), subdir)
 		if rel, err := filepath.Rel(startingAbsolutePath, childPath); err == nil {
 			childPath = rel
@@ -208,7 +205,7 @@ func (a *App) recurseDirectory(dir *model.DirectoryEntry, startingAbsolutePath s
 	}
 }
 
-// ProcessFiles converts a slice of file entries into a *model.Directory for printing.
+// Converts a slice of file entries into a *model.Directory for printing.
 func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 	t := new(model.Directory)
 	isLong := a.Config.LongListingMode != model.LongListingNone
@@ -221,12 +218,11 @@ func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 	return t
 }
 
-// ProcessDirectory reads the contents of the given directory, builds a *model.Directory
+// Reads the contents of the given directory, builds a *model.Directory
 // that contains *model.Entry objects for each item, and returns it.
 func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error) {
 	defer func() {
-		// We defer the close in case 'Readdir' triggers partial reads.
-		// We manually call d.Close() in some error paths, but a double-close is no-op for os.File.
+		// Defer the close in case 'Readdir' triggers partial reads.
 		_ = d.Close()
 	}()
 
@@ -235,13 +231,12 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 		return nil, err
 	}
 
-	// Populate the directory structure (all internal files).
 	dirModel, err := a.populateDirectory(d, dirStat)
 	return dirModel, err
 }
 
-// populateDirectory reads directory contents (unless -d is set), creates *model.Entry objects,
-// adds special entries (.), (..) if needed, and sets up Git statuses if requested.
+// Reads directory contents, creates *model.Entry objects, adds special entries (.), (..)
+// and sets up Git statuses if requested.
 func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*model.Directory, error) {
 	t := new(model.Directory)
 	isLong := a.Config.LongListingMode != model.LongListingNone
@@ -257,23 +252,19 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		}
 	}
 
-	// If -d is set, we only show the directory itself, not its contents.
 	if a.Config.Directory {
 		t.Files = append(t.Files, t.Info)
 		return t, nil
 	}
 
-	// Perform Readdir
 	files, err := d.Readdir(0)
 	if err != nil {
-		// Return partial result + error
 		return t, err
 	}
 
 	// If Git status is requested, prepare the repository info map.
 	var gitRepoStatus map[string]string
 	if a.Config.GitStatus {
-		// might be nil if not a git repo or no statuses found
 		gitRepoStatus = format.GetFilesGitStatus(d.Name())
 		if len(gitRepoStatus) == 0 {
 			gitRepoStatus = nil
@@ -292,11 +283,8 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		fullpath := filepath.Join(d.Name(), name)
 		entry := a.buildEntry(fullpath, fi, isLong)
 
-		// Overwrite the name field if necessary
-		// (because buildEntry sets Name/Ext from fi.Name())
 		entry.Indicator = format.GetIndicator(fullpath, isLong)
 
-		// Overwrite icons for symlinks to reflect target type
 		if !a.Config.DisableIcon {
 			entry.Icon, entry.IconColor = format.GetIcon(name, entry.Ext, entry.Indicator)
 			if format.IsLink(fullpath) {
@@ -305,23 +293,17 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 					realName := s[0 : len(s)-len(realExt)]
 					realIndicator := format.GetIndicator(s, isLong)
 					entry.Icon, entry.IconColor = format.GetIcon(realName, realExt, realIndicator)
-					if a.Config.DisableColor {
-						entry.IconColor = ""
-					}
 				}
 			}
 		}
 
 		// If Git status is available, attach it.
 		if gitRepoStatus != nil {
-			// Directories in Git can be recognized by trailing slash in the map.
 			if fi.IsDir() {
 				entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
-
 				if entry.GitStatus == "" {
 					entry.GitStatus = gitRepoStatus[fi.Name()]
 				}
-
 			}
 		}
 
@@ -331,26 +313,24 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		}
 	}
 
-	// If -a (IncludeAll) is passed, add "." and ".." entries
 	if a.Config.AllMode == model.IncludeAll {
-		// t.Info is ".", so we add that to the Files if not already present
 		if t.Info != nil {
 			t.Files = append(t.Files, t.Info)
 		}
 
-		// Build ".." parent directory entry
 		pp := filepath.Dir(d.Name())
 		pStat, err2 := os.Lstat(pp)
+
 		if err2 == nil { // if we can't stat parent, skip adding
 			parentEntry := a.buildEntry(pp, pStat, isLong)
 			parentEntry.Name = ".."
+
 			// Overwrite icon for parent
 			if !a.Config.DisableIcon {
 				parentEntry.Icon = icons.IconDef["diropen"].GetGlyph()
-				if !a.Config.DisableColor {
-					parentEntry.IconColor = icons.IconDef["diropen"].GetColor(1)
-				}
+				parentEntry.IconColor = icons.IconDef["diropen"].GetColor(1)
 			}
+
 			t.Files = append(t.Files, parentEntry)
 			t.Parent = parentEntry
 		}
@@ -358,24 +338,21 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	return t, err
 }
 
-// buildEntry is a helper that constructs a *model.Entry from a given path, os.FileInfo, and
-// whether we are in a long-listing context.
+// Constructs a *model.Entry from a given path, os.FileInfo, and whether we are
+// in a long-listing context.
 func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.Entry {
 	entry := &model.Entry{}
 
-	// Basic name, extension, size, mod time
 	name := fi.Name()
 	entry.Ext = filepath.Ext(name)
 	entry.Name = name[0 : len(name)-len(entry.Ext)]
 	entry.Size = fi.Size()
 	entry.ModTime = fi.ModTime()
 
-	// Inode
 	if a.Config.ShowInodeNumber {
 		entry.InodeNumber = format.GetInodeNumber(fullPath)
 	}
 
-	// File mode/permissions
 	if isLong {
 		entry.Mode = fi.Mode().String()
 		entry.ModeBits = uint32(fi.Mode())
@@ -383,37 +360,28 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 		entry.Owner, entry.Group = model.GetOwnerGroupInfo(fi, a.Config.NoGroup, a.Config.LongListingMode)
 	}
 
-	// Block size
 	if a.Config.ShowBlockSize {
 		model.DirBlocks(entry, fi)
 	}
 
-	// **FIX for directory icons**.
 	if !a.Config.DisableIcon {
 		entry.Icon, entry.IconColor = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
-
-		if a.Config.DisableColor {
-			entry.IconColor = ""
-		}
 	}
 
 	return entry
 }
 
-// PrintDirectory sorts the directory's files according to the app config and prints them.
+// Sorts the directory's files according to the app config and prints them.
 func (a *App) PrintDirectory(d *model.Directory) {
 	if d == nil {
 		return
 	}
 
-	// Sort the directory contents
 	format.SetLessFunction(d, a.Config.SortMode)
 	d.Sort(a.Config.SortMode, a.Config.Reverse)
 
-	// Prepare the columnar text writer
 	lineCtw := a.getCTW()
 
-	// Decide printing format (long, single line, or multi-column)
 	switch {
 	case a.Config.LongListingMode != model.LongListingNone:
 		for _, f := range d.Files {
@@ -461,32 +429,13 @@ func (a *App) PrintDirectory(d *model.Directory) {
 	a.Write(buf)
 }
 
-// getCTW instantiates the proper ctw.CTW based on app config.
+// Instantiates the proper ctw.CTW based on app config.
 func (a *App) getCTW() ctw.CTW {
-	var out ctw.CTW
-
-	switch {
-	case a.Config.LongListingMode != model.LongListingNone:
-		out = ctw.NewLongCTW(10)
-	case a.Config.OneFilePerLine:
-		out = ctw.NewLongCTW(4)
-	default:
-		out = ctw.NewStandardCTW(a.Config.TerminalWidth)
-	}
-
-	if a.Config.DisableColor {
-		out.DisplayColor(false)
-		model.OpenDirIcon = icons.IconDef["diropen"].GetGlyph() + " "
-	}
-
-	if a.Config.DisableIcon {
-		model.OpenDirIcon = ""
-	}
-
-	return out
+	longMode := a.Config.LongListingMode != model.LongListingNone
+	return ctw.NewCTW(longMode, a.Config.OneFilePerLine, !a.Config.DisableIcon)
 }
 
-// blockSizeWithInode generates the block size and optional inode as a single string.
+// Generates the block size and optional inode as a single string.
 func (a *App) blockSizeWithInode(e *model.Entry) string {
 	var parts []string
 

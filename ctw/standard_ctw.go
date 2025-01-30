@@ -1,4 +1,3 @@
-// ctw is a custom tab writter package build to correctly display icons and colors for color-ls
 package ctw
 
 import (
@@ -7,173 +6,298 @@ import (
 	"math"
 )
 
+// StandardCTW is a specialized column-table-writer for a "standard" listing.
+// Unlike LongCTW, it tries to fit multiple columns of data in the available
+// terminal width, along with optional icons and Git status columns.
+//
+// Each row has up to 4 sub-columns in the following order:
+//  1. size
+//  2. icon
+//  3. name + extension + indicator
+//  4. gitStatus
 type StandardCTW struct {
 	*baseCtw
+
+	// Options:
 	humanReadableSize bool
 	showSize          bool
-	d                 [][]string // entire data passed to ctw
-	nw                []int      // widths of each fileName
-	gw                []int      // width of each git column
-	sw                []int      //width of each size column
-	ic                []string   // color of file icon of a row
-	cols              int        // zero based no of cols (or total cols -1)
-	showIcon          bool
-	termW             int
+
+	// Data for each row. Each inner slice must have 4 columns:
+	//   [0] -> size
+	//   [1] -> icon
+	//   [2] -> filename
+	//   [3] -> git status
+	rows [][]string
+
+	// Tracking maximum widths for each sub-column, for each row:
+	//   sizeWidths[i] is the length of rows[i][0]
+	//   nameWidths[i] is the length of rows[i][2]
+	//   gitWidths[i]  is the length of rows[i][3]
+	//
+	// The icon column has no "variable" width in the same sense, but
+	// we track showIcon below to determine if we need to render the icon column.
+	sizeWidths []int
+	nameWidths []int
+	gitWidths  []int
+
+	// iconColors[i] is the ANSI color code for rows[i][1] (the "icon" column).
+	iconColors []string
+
+	// Number of columns (zero-based) within one row. Usually 3 means we are
+	// expecting 4 sub-columns: size, icon, name, gitStatus.
+	numCols int
+
+	// Whether we have any icons in the dataset (i.e., if we need to print the icon column).
+	showIcon bool
+
+	// terminalWidth is the maximum width we can use for all columns combined.
+	terminalWidth int
 }
 
-/* each file comprises of 4 columns
-|<---->|<---->|<------------------>|<--------->|
-| size | icon | name+ext+indicator | gitStatus |
-*/
-
+// NewStandardCTW creates a new StandardCTW, specifying the
+// terminal width. The internal `numCols` is fixed at 3 (which
+// yields 4 sub-columns: size, icon, name, gitStatus).
 func NewStandardCTW(termW int) *StandardCTW {
-	t := new(StandardCTW)
-	t.cols = 3
-	t.termW = termW
-	t.baseCtw = newBaseCtw()
-
-	t.nw = make([]int, 0)
-	t.gw = make([]int, 0)
-	t.sw = make([]int, 0)
-	t.d = make([][]string, 0)
-	t.ic = make([]string, 0)
-
-	return t
+	ctw := &StandardCTW{
+		baseCtw:       newBaseCtw(),
+		numCols:       3, // corresponds to 4 sub-columns
+		terminalWidth: termW,
+		rows:          make([][]string, 0),
+		sizeWidths:    make([]int, 0),
+		nameWidths:    make([]int, 0),
+		gitWidths:     make([]int, 0),
+		iconColors:    make([]string, 0),
+	}
+	return ctw
 }
 
-func (w *StandardCTW) AddRow(color string, args ...string) {
-	// length checking for args
-	if len(args) != w.cols+1 {
+// AddRow appends a new row to the table, each row having exactly 4 pieces of data:
+//
+//	size, icon, name, gitStatus
+//
+// color is the ANSI color code for the icon column.
+func (s *StandardCTW) AddRow(color string, args ...string) {
+	// Verify correct number of columns
+	if len(args) != s.numCols+1 { // s.numCols=3 => expects 4 pieces
 		return
 	}
 
-	w.sw = append(w.sw, len(args[0]))
-	w.nw = append(w.nw, len(args[2]))
-	w.gw = append(w.gw, len(args[3]))
+	// Fill out max-width trackers for each sub-column
+	s.sizeWidths = append(s.sizeWidths, len(args[0]))
+	s.nameWidths = append(s.nameWidths, len(args[2]))
+	s.gitWidths = append(s.gitWidths, len(args[3]))
 
-	if !w.showIcon {
-		w.showIcon = len(args[1]) > 0
+	// If we haven't seen an icon yet, check if this row has one
+	if !s.showIcon && len(args[1]) > 0 {
+		s.showIcon = true
 	}
 
-	w.d = append(w.d, args)
-	w.ic = append(w.ic, color)
+	// Save the row data and the icon color
+	s.rows = append(s.rows, args)
+	s.iconColors = append(s.iconColors, color)
 }
 
-func (w *StandardCTW) Flush(buf *bytes.Buffer) {
-	dn := len(w.d)
-	if dn == 0 {
+// Flush calculates how to best fit columns into the given terminal width,
+// then prints them all to buf.
+func (s *StandardCTW) Flush(buf *bytes.Buffer) {
+	rowCount := len(s.rows)
+	if rowCount == 0 {
 		return
 	}
-	pad := 2
 
-	iw := make([][4]int, 0) // slice of widths of each column (don't use because it over run once)
-	var widths [][4]int
+	// We'll leave some spacing between columns:
+	columnPadding := 2
 
-	prevj := 0 // prevj is previous jump value (row value if you may)
+	// Compute the best multi-column layout that fits in terminalWidth.
+	optimalWidths := s.computeOptimalWidths(rowCount, columnPadding)
+
+	// Once we have our final multi-column layout, figure out how many rows
+	// we need for the entire data set. For example, if we ended up with
+	// 3 columns across, we group the data in sets of rowCount/3, etc.
+	columnsAcross := len(optimalWidths)
+	rowsDown := int(math.Ceil(float64(rowCount) / float64(columnsAcross)))
+
+	// Now, print all data in that multi-column layout
+	for rowIndex := 0; rowIndex < rowsDown; rowIndex++ {
+		// We'll reset spacing to columnPadding each time, except for the last column.
+		padding := columnPadding
+
+		for colIndex := 0; colIndex < columnsAcross; colIndex++ {
+			// The actual index in s.rows we want to print is rowIndex + colIndex * rowsDown
+			dataIndex := rowIndex + colIndex*rowsDown
+			if dataIndex >= rowCount {
+				continue // No more data in this "column"
+			}
+
+			// For the last column in a row, we do not add spacing after printing.
+			if colIndex == columnsAcross-1 {
+				padding = 0
+			}
+
+			s.printRowCell(buf, dataIndex, optimalWidths[colIndex])
+			fmt.Fprintf(buf, "%*s", padding, "")
+		}
+		fmt.Fprintln(buf)
+	}
+}
+
+// computeOptimalWidths iteratively tries to create "layouts" with
+// increasing column counts, checking total required width each time,
+// until it either exceeds the terminal width or it can place all
+// entries in a single row.
+//
+// Each iteration returns a slice of `[4]int`, each `[4]int]` specifying
+// the widths for size, icon, name, gitStatus.
+func (s *StandardCTW) computeOptimalWidths(rowCount, columnPadding int) [][4]int {
+	// This will be filled with sets of sub-column widths for each "layout"
+	// attempt. For example, iw[0] is the sub-column widths for column #0,
+	// iw[1] for column #1, etc.
+	intermediateWidths := make([][4]int, 0)
+
+	// We'll store the "best" set of widths that fit so far in `finalWidths`.
+	var finalWidths [][4]int
+
+	prevJumpValue := 0 // used to detect redundant calculations in loop
 
 	for {
-		cols := len(iw) + 1
-		iw = append(iw, [4]int{0, 0, 0, 0})
-		j := int(math.Ceil(float64(dn) / float64(cols))) // jump value corresponding to cols
-		if prevj == j {                                  // removes redundant calculations
+		colCount := len(intermediateWidths) + 1
+		intermediateWidths = append(intermediateWidths, [4]int{0, 0, 0, 0})
+
+		// jumpValue is how many rows go into each column, for this layout attempt
+		jumpValue := int(math.Ceil(float64(rowCount) / float64(colCount)))
+		if prevJumpValue == jumpValue {
+			// If we haven't changed jumpValue from the previous iteration,
+			// we're repeating ourselves, so skip to the next iteration.
 			continue
 		}
-		b := 0 // begining of column
-		e := j // end of column
-		// find optimal widths (width of each column and total no of columns)
-		for i := 0; i < cols && e <= dn; i++ {
-			iw[i] = w.colW(b, e)
-			b, e = e, e+j
+		prevJumpValue = jumpValue
+
+		// b -> beginning index of the next chunk
+		// e -> ending index of the next chunk
+		begin := 0
+		end := jumpValue
+
+		// Fill each "column" chunk from begin..end, calculating the max sub-col widths
+		for i := 0; i < colCount && end <= rowCount; i++ {
+			intermediateWidths[i] = s.calcSubColumnWidths(begin, end)
+			begin, end = end, end+jumpValue
 		}
 
-		// for last column if last column is not complete
-		if e-j < dn {
-			iw[cols-1] = w.colW(e-j, dn)
+		// If the last column is not "complete" but still has leftover rows, compute them
+		if end-jumpValue < rowCount {
+			intermediateWidths[colCount-1] = s.calcSubColumnWidths(end-jumpValue, rowCount)
 		}
 
-		prevj = j
-
-		totW := w.widthsSum(iw, pad) //total width of the ls block
-		if totW > w.termW {
-			// not even first iteration done print similar to logo-ls -1
-			if len(widths) == 0 {
-				widths = make([][4]int, len(iw))
-				copy(widths, iw)
+		// Now compute the total width of the entire layout for colCount columns
+		totalWidth := s.widthsSum(intermediateWidths, columnPadding)
+		switch {
+		case totalWidth > s.terminalWidth:
+			// Once we exceed the terminal width, we stop. If we don't already have
+			// a previously "good" layout, we keep the last best one we had.
+			if len(finalWidths) == 0 {
+				// We never found a layout that fit within the terminal, so we do a
+				// fallback to the first one (like logo-ls -1).
+				finalWidths = make([][4]int, len(intermediateWidths))
+				copy(finalWidths, intermediateWidths)
 			}
-			break
-		} else if totW >= w.termW/2 { // if total width of the ls block is more than half of terminal
-			// copy iw to widths
-			widths = make([][4]int, len(iw))
-			copy(widths, iw)
+			return finalWidths
+
+		case totalWidth >= s.terminalWidth/2:
+			// If the layout's total width is more than half the terminal width,
+			// we consider it a "good" layout and save it.
+			finalWidths = make([][4]int, len(intermediateWidths))
+			copy(finalWidths, intermediateWidths)
 		}
 
-		if cols == dn { // if content comes in one line of terminal
-			// copy widths to prevWidths
-			widths = make([][4]int, len(iw))
-			copy(widths, iw)
-			break
+		// If we have as many columns as rows, that means everything goes in one row.
+		if colCount == rowCount {
+			// We store the final widths to preserve them and then stop
+			finalWidths = make([][4]int, len(intermediateWidths))
+			copy(finalWidths, intermediateWidths)
+			return finalWidths
 		}
 	}
-
-	// total no of rows
-	rows := int(math.Ceil(float64(dn) / float64(len(widths))))
-
-	// loop to write entire ls block to buffer
-	for i := 0; i < rows; i++ {
-		p := pad
-		for j := 0; j < len(widths); j++ {
-			if i+j*rows >= dn { // checks for last column if incomplete
-				continue
-			}
-			if j == len(widths)-1 {
-				p = 0
-			}
-			w.printCell(buf, i+j*rows, widths[j])
-			fmt.Fprintf(buf, "%*s", p, "")
-		}
-		fmt.Fprintf(buf, "\n")
-	}
-
 }
 
-func (w *StandardCTW) colW(b, e int) [4]int {
-	s, n, g := 0, 0, 0 // max od size column, name column, gitStatus column
-	for i := b; i < e; i++ {
-		if w.sw[i] > s {
-			s = w.sw[i]
+// calcSubColumnWidths calculates the maximum needed widths (size, icon, name, gitstatus)
+// for the rows in the slice [begin, end).
+func (s *StandardCTW) calcSubColumnWidths(begin, end int) [4]int {
+	maxSizeWidth := 0
+	maxNameWidth := 0
+	maxGitWidth := 0
+
+	// For each row in [begin..end), update the max sub-column widths
+	for i := begin; i < end; i++ {
+		if s.sizeWidths[i] > maxSizeWidth {
+			maxSizeWidth = s.sizeWidths[i]
 		}
-		if w.nw[i] > n {
-			n = w.nw[i]
+		if s.nameWidths[i] > maxNameWidth {
+			maxNameWidth = s.nameWidths[i]
 		}
-		if w.gw[i] > g {
-			g = w.gw[i]
+		if s.gitWidths[i] > maxGitWidth {
+			maxGitWidth = s.gitWidths[i]
 		}
 	}
 
-	ans := [4]int{0, 0, 0, 0}
-	if s > 0 {
-		ans[0] = s + 1
+	result := [4]int{0, 0, 0, 0}
+
+	// If there's a size column to print
+	if maxSizeWidth > 0 {
+		// We add 1 to create a little space or alignment buffer
+		result[0] = maxSizeWidth + 1
 	}
-	if w.showIcon {
-		ans[1] = 2
+
+	// If we are showing icons at all, we reserve 2 spaces for them
+	if s.showIcon {
+		result[1] = 2
 	}
-	ans[2] = n
-	if g > 0 {
-		ans[3] = 2
+
+	// The filename column is assigned the maximum needed name width
+	result[2] = maxNameWidth
+
+	// For Git status, we also set it to 2 if there's anything to print
+	if maxGitWidth > 0 {
+		result[3] = 2
 	}
-	return ans
+
+	return result
 }
 
-func (w *StandardCTW) printCell(buf *bytes.Buffer, i int, cs [4]int) {
-	if cs[0] > 0 {
-		fmt.Fprintf(buf, "%-*s%s", cs[0]-1, w.d[i][0], w.empty)
+// printRowCell writes a single row to the buffer based on the 4 sub-columns
+// described by colSizes: [sizeColumnWidth, iconColumnWidth, nameColumnWidth, gitStatusColumnWidth].
+func (s *StandardCTW) printRowCell(buf *bytes.Buffer, rowIndex int, colSizes [4]int) {
+	// Sub-column 0: size
+	if colSizes[0] > 0 {
+		// %-*s left-justifies within colSizes[0]-1
+		// then prints an extra space from s.empty
+		fmt.Fprintf(buf, "%-*s%s", colSizes[0]-1, s.rows[rowIndex][0], s.empty)
 	}
-	if w.showIcon {
-		fmt.Fprintf(buf, "%s%1s%s%s", w.ic[i], w.d[i][1], w.noColor, w.empty)
-	}
-	fmt.Fprintf(buf, "%s%-*s%s", w.GetGitColor(w.d[i][3]), cs[2], w.d[i][2], w.noColor)
 
-	if cs[3] > 0 {
-		fmt.Fprintf(buf, "%s%s%1s%s", w.empty, w.GetGitColor(w.d[i][3]), w.d[i][3], w.noColor)
+	// Sub-column 1: icon (only if showIcon is true)
+	if s.showIcon {
+		fmt.Fprintf(buf, "%s%1s%s%s",
+			s.iconColors[rowIndex],
+			s.rows[rowIndex][1],
+			s.noColor,
+			s.empty,
+		)
+	}
+
+	// Sub-column 2: file name + indicator, color-coded by Git status
+	fmt.Fprintf(buf, "%s%-*s%s",
+		s.GetGitColor(s.rows[rowIndex][3]),
+		colSizes[2],
+		s.rows[rowIndex][2],
+		s.noColor,
+	)
+
+	// Sub-column 3: Git status
+	if colSizes[3] > 0 {
+		fmt.Fprintf(buf, "%s%s%1s%s",
+			s.empty,
+			s.GetGitColor(s.rows[rowIndex][3]),
+			s.rows[rowIndex][3],
+			s.noColor,
+		)
 	}
 }

@@ -3,15 +3,11 @@ package app
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/pborman/getopt/v2"
-	"golang.org/x/term"
 )
-
-const standardTerminalWidth = 80
 
 func GetConfigFromCli() *Config {
 
@@ -37,7 +33,6 @@ func GetConfigFromCli() *Config {
 	reverse := getopt.BoolLong("reverse", 'r', "reverse order while sorting")
 	recursive := getopt.BoolLong("recursive", 'R', "list subdirectories recursively")
 	gitStatus := getopt.BoolLong("git-status", 'D', "print git status of files")
-	disableColor := getopt.BoolLong("disable-color", 'c', "don't color icons, filenames and git status (use this to print to a file)")
 	disableIcon := getopt.BoolLong("disable-icon", 'e', "don't print icons of the files")
 	showInodeNumber := getopt.BoolLong("inode", 'i', "print the index number of each file")
 	oneFilePerLine := getopt.Bool('1', "list one file per line.")
@@ -105,7 +100,6 @@ func GetConfigFromCli() *Config {
 	c.Reverse = *reverse
 	c.Recursive = *recursive
 	c.GitStatus = *gitStatus
-	c.DisableColor = *disableColor
 	c.DisableIcon = *disableIcon
 	c.OneFilePerLine = *oneFilePerLine
 	c.Directory = *directory
@@ -121,12 +115,6 @@ func GetConfigFromCli() *Config {
 		c.FileList = append(c.FileList, ".")
 	}
 
-	if c.LongListingMode == model.LongListingNone {
-		c.TerminalWidth = getCustomTerminalWidth()
-	} else {
-		c.TerminalWidth = standardTerminalWidth
-	}
-
 	return c
 }
 
@@ -136,41 +124,9 @@ func printVersion() {
 
 func printHelpMessage() {
 	fmt.Println("List information about the FILEs with ICONS and GIT STATUS (the current dir \nby default). Sort entries alphabetically if none of -tvSUX is specified.")
-
 	getopt.PrintUsage(os.Stdout)
-
-	fmt.Println("\nPossible value for --time-style (-T)")
-	fmt.Printf(" %-11s %-32q\n", "ANSIC", "Mon Jan _2 15:04:05 2006")
-	fmt.Printf(" %-11s %-32q\n", "UnixDate", "Mon Jan _2 15:04:05 MST 2006")
-	fmt.Printf(" %-11s %-32q\n", "RubyDate", "Mon Jan 02 15:04:05 -0700 2006")
-	fmt.Printf(" %-11s %-32q\n", "RFC822", "02 Jan 06 15:04 MST")
-	fmt.Printf(" %-11s %-32q\n", "RFC822Z", "02 Jan 06 15:04 -0700")
-	fmt.Printf(" %-11s %-32q\n", "RFC850", "Monday, 02-Jan-06 15:04:05 MST")
-	fmt.Printf(" %-11s %-32q\n", "RFC1123", "Mon, 02 Jan 2006 15:04:05 MST")
-	fmt.Printf(" %-11s %-32q\n", "RFC1123Z", "Mon, 02 Jan 2006 15:04:05 -0700")
-	fmt.Printf(" %-11s %-32q\n", "RFC3339", "2006-01-02T15:04:05Z07:00")
-	fmt.Printf(" %-11s %-32q\n", "Kitchen", "3:04PM")
-	fmt.Printf(" %-11s %-32q [Default]\n", "Stamp", "Mon Jan _2 15:04:05")
-	fmt.Printf(" %-11s %-32q\n", "StampMilli", "Jan _2 15:04:05.000")
-
 	fmt.Println("\nExit status:")
 	fmt.Println(" 0  if OK,")
 	fmt.Println(" 1  if minor problems (e.g., cannot access subdirectory),")
 	fmt.Println(" 2  if serious trouble (e.g., cannot access command-line argument).")
-}
-
-func getCustomTerminalWidth() int {
-	// screen width for custom tw
-	w, _, e := term.GetSize(int(os.Stdout.Fd()))
-
-	if e != nil {
-		return standardTerminalWidth
-	}
-
-	if w == 0 {
-		// for systems that don’t support ‘TIOCGWINSZ’.
-		w, _ = strconv.Atoi(os.Getenv("COLUMNS"))
-	}
-
-	return w
 }

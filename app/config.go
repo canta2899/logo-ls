@@ -14,14 +14,12 @@ type Config struct {
 	Recursive       bool
 	GitStatus       bool
 	Reverse         bool
-	DisableColor    bool
 	DisableIcon     bool
 	OneFilePerLine  bool
 	Directory       bool
 	NoGroup         bool
 	HumanReadable   bool
 	ShowBlockSize   bool
-	TerminalWidth   int
 	ShowInodeNumber bool
 }
 
@@ -34,7 +32,6 @@ func NewConfig() *Config {
 		Recursive:       false,
 		GitStatus:       false,
 		Reverse:         false,
-		DisableColor:    false,
 		DisableIcon:     false,
 		OneFilePerLine:  false,
 		Directory:       false,
@@ -42,7 +39,6 @@ func NewConfig() *Config {
 		HumanReadable:   false,
 		ShowBlockSize:   false,
 		ShowInodeNumber: false,
-		TerminalWidth:   80,
 		TimeFormatter:   nil,
 		FileList:        []string{},
 	}

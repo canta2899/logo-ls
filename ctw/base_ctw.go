@@ -20,14 +20,6 @@ func newBaseCtw() *baseCtw {
 	}
 }
 
-func (c *baseCtw) DisplayColor(b bool) {
-	if !b {
-		c.noColor = ""
-		c.green = ""
-		c.brown = ""
-	}
-}
-
 func (c *baseCtw) GetGitColor(gitStatus string) string {
 	switch strings.Trim(gitStatus, " ") {
 	case "":
