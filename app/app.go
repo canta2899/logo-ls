@@ -244,9 +244,14 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	// If we need to show the current directory as an entry
 	if a.Config.AllMode == model.IncludeAll || a.Config.Directory {
 		t.Info = a.buildEntry(d.Name(), dirStat, isLong)
-		t.Info.Name = "." // override the name to "."
 
-		if !a.Config.DisableIcon && !a.Config.Directory {
+		if pwd, err := os.Getwd(); err == nil {
+			if d.Name() == pwd {
+				t.Info.Name = "."
+			}
+		}
+
+		if !a.Config.DisableIcon {
 			t.Info.Icon = icons.IconDef["diropen"].GetGlyph()
 			t.Info.IconColor = icons.IconDef["diropen"].GetColor(1)
 		}
