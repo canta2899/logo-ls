@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 func GetInodeNumber(path string) string {
@@ -37,4 +39,19 @@ func GetHardLinkCount(absPath string) uint64 {
 	}
 
 	return uint64(stat.Nlink)
+}
+
+func GetModeExtended(fi *os.FileInfo, fullPath string) string {
+
+	mode := (*fi).Mode()
+	modeStr := mode.String()
+
+	// Check of extended attributes
+	count, err := unix.Listxattr(fullPath, nil)
+
+	if err == nil && count > 0 {
+		modeStr += "@"
+	}
+
+	return modeStr
 }

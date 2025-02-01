@@ -357,10 +357,11 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 	}
 
 	if isLong {
-		entry.Mode = fi.Mode().String()
+		entry.Mode = format.GetModeExtended(&fi, fullPath)
 		entry.ModeBits = uint32(fi.Mode())
 		entry.NumHardLinks = format.GetHardLinkCount(fullPath)
-		entry.Owner, entry.Group = model.GetOwnerGroupInfo(fi, a.Config.NoGroup, a.Config.LongListingMode)
+		owner, group := model.GetOwnerGroupInfo(fi, a.Config.NoGroup, a.Config.LongListingMode)
+		entry.Owner, entry.Group = owner, group
 	}
 
 	if a.Config.ShowBlockSize {

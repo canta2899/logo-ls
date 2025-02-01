@@ -127,6 +127,10 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 			case skipCols[l.numCols] && colIdx == l.numCols-1:
 				fmt.Fprintf(buf, "%-*s", l.columnWidths[colIdx], cellValue)
 
+			// Permission column in long mode is aligned to left
+			case !skipCols[l.numCols] && colIdx == 1:
+				fmt.Fprintf(buf, "%-*s", l.columnWidths[colIdx], cellValue)
+
 			// Normal column
 			default:
 				fmt.Fprintf(buf, "%*s", l.columnWidths[colIdx], cellValue)

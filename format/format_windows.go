@@ -4,6 +4,7 @@
 package format
 
 import (
+	"os"
 	"strconv"
 
 	"golang.org/x/sys/windows"
@@ -39,7 +40,7 @@ func GetInodeNumber(path string) string {
 }
 
 // GetHardLinkCount returns the number of hard links that a file or directory on
-// Windows has, by calling GetFileInformationByHandle on the file handle.
+// Windows %has, by calling GetFileInformationByHandle on the file handle.
 //
 // Note that it returns 0 on any error (e.g., if the file cannot be opened).
 func GetHardLinkCount(absPath string) uint64 {
@@ -67,4 +68,8 @@ func GetHardLinkCount(absPath string) uint64 {
 
 	// The NumberOfLinks field is a WORD (16-bit) in the BY_HANDLE_FILE_INFORMATION struct.
 	return uint64(fileInfo.NumberOfLinks)
+}
+
+func GetModeExtended(fi *os.FileInfo, fullPath string) string {
+	return (*fi).Mode().String()
 }

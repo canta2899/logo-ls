@@ -4,6 +4,7 @@
 package model
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 	"strconv"
@@ -40,13 +41,13 @@ func GetOwnerGroupInfo(fi os.FileInfo, noGroup bool, longListingMode Listing) (o
 		if !noGroup && (longListingMode == LongListingDefault || longListingMode == LongListingGroup) {
 			GID := strconv.Itoa(int(stat.Gid))
 			if n, ok := grpMap[GID]; ok {
-				g = n
+				g = fmt.Sprintf(" %v  ", n)
 			} else {
 				grp, err := user.LookupGroupId(GID)
 				if err != nil {
 					g = ""
 				} else {
-					g = grp.Name
+					g = fmt.Sprintf(" %v  ", grp.Name)
 					grpMap[GID] = grp.Name
 				}
 			}
