@@ -13,6 +13,7 @@ var IconExt = map[string]*IconInfo{
 	"ags":               IconSet["assembly"],
 	"ahk":               IconSet["autohotkey"],
 	"aiff":              IconSet["audio"],
+	"aif":               IconSet["audio"],
 	"ami":               IconSet["image"],
 	"amx":               IconSet["pawn"],
 	"apib":              IconSet["apiblueprint"],
