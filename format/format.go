@@ -145,13 +145,8 @@ func GetIcon(name, ext, indicator string) (icon, color string) {
 			break
 		}
 
-		// a special admiration for goLang
-		if ext == ".go" && strings.HasSuffix(name, "_test") {
-			i = icons.IconSet["go-test"]
-			break
-		}
-
 		t := strings.Split(name, ".")
+
 		if len(t) > 1 && t[0] != "" {
 			i, ok = icons.IconSubExt[strings.ToLower(t[len(t)-1]+ext)]
 			if ok {

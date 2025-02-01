@@ -48,6 +48,7 @@ var IconFileName = map[string]*IconInfo{
 	".esmrc":                              IconSet["nodejs"],
 	".firebaserc":                         IconSet["firebase"],
 	".gcloudignore":                       IconSet["gcp"],
+	".git":                                IconSet["git"], // absorbed submodules
 	".gitattributes":                      IconSet["git"],
 	".gitconfig":                          IconSet["git"],
 	".gitignore":                          IconSet["git"],

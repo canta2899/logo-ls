@@ -288,10 +288,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		fullpath := filepath.Join(d.Name(), name)
 		entry := a.buildEntry(fullpath, fi, isLong)
 
-		entry.Indicator = format.GetIndicator(fullpath, isLong)
-
 		if !a.Config.DisableIcon {
-			entry.Icon, entry.IconColor = format.GetIcon(name, entry.Ext, entry.Indicator)
 			if format.IsLink(fullpath) {
 				if s, err := filepath.EvalSymlinks(fullpath); err == nil {
 					realExt := filepath.Ext(s)
@@ -351,6 +348,7 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 	entry.Name = name[0 : len(name)-len(entry.Ext)]
 	entry.Size = fi.Size()
 	entry.ModTime = fi.ModTime()
+	entry.Indicator = format.GetIndicator(fullPath, isLong)
 
 	if a.Config.ShowInodeNumber {
 		entry.InodeNumber = format.GetInodeNumber(fullPath)
