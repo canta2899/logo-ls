@@ -3,7 +3,7 @@ BIN_DIR=bin
 SRC_DIR=./cmd/logo-ls
 BUILD_FLAGS=-ldflags="-s -w" -tags=minimal -trimpath
 
-.PHONY: all bindir clean
+.PHONY: all bindir clean test
 
 all: logo-ls
 
@@ -15,3 +15,6 @@ logo-ls: bindir
 
 clean:
 	rm -rf $(BIN_DIR)/$(APP_NAME)
+
+test:
+	go test ./...
