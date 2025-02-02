@@ -30,6 +30,11 @@ type Args struct {
 	Dirs  []model.DirectoryEntry
 }
 
+type RecursiveLookupFrame struct {
+	entry  *model.DirectoryEntry
+	header string // if non-empty, printed as: "\n<icon><header>:\n"
+}
+
 // Terminates the program with the current stored exit code.
 func (a *App) Exit() {
 	os.Exit(int(a.ExitCode))
@@ -164,43 +169,57 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 }
 
 // Processes a directory, prints it, and recurses through subdirectories if any.
-func (a *App) recurseDirectory(dir *model.DirectoryEntry, startingAbsolutePath string) {
-	d, err := a.ProcessDirectory(dir)
-	dir.Close()
-	if err != nil {
-		a.Logger.Printf("partial access to %q: %v\n", dir.Name(), err)
-		a.ExitCode.SetMinor()
-	}
+func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath string) {
 
-	a.PrintDirectory(d)
+	stack := []*RecursiveLookupFrame{{entry: start, header: ""}}
 
-	if len(d.Dirs) == 0 {
-		return
-	}
+	for len(stack) > 0 {
+		idx := len(stack) - 1
+		current := stack[idx]
+		stack = stack[:idx]
 
-	sort.Strings(d.Dirs)
-	for _, subdir := range d.Dirs {
-		childPath := filepath.Join(dir.Name(), subdir)
-		if rel, err := filepath.Rel(startingAbsolutePath, childPath); err == nil {
-			childPath = rel
+		if current.header != "" {
+			fmt.Printf("\n%s:\n", model.OpenDirIcon+current.header)
 		}
 
-		fmt.Printf("\n%s:\n", model.OpenDirIcon+childPath)
-
-		f, err := os.Open(filepath.Join(dir.Name(), subdir))
+		d, err := a.ProcessDirectory(current.entry)
+		current.entry.Close()
 		if err != nil {
-			a.Logger.Printf("cannot access %q: %v\n", childPath, err)
+			a.Logger.Printf("partial access to %q: %v\n", current.entry.Name(), err)
 			a.ExitCode.SetMinor()
+		}
+
+		a.PrintDirectory(d)
+
+		if len(d.Dirs) == 0 {
 			continue
 		}
-		abs, err := filepath.Abs(filepath.Join(dir.Name(), subdir))
-		if err != nil {
-			a.Logger.Println("Cannot compute abs path for:", childPath)
-			f.Close()
-			continue
+
+		sort.Strings(d.Dirs)
+
+		for i := len(d.Dirs) - 1; i >= 0; i-- {
+			subdir := d.Dirs[i]
+			childPath := filepath.Join(current.entry.Name(), subdir)
+			if rel, err := filepath.Rel(startingAbsolutePath, childPath); err == nil {
+				childPath = rel
+			}
+
+			subdirFullPath := filepath.Join(current.entry.Name(), subdir)
+			f, err := os.Open(subdirFullPath)
+			if err != nil {
+				a.Logger.Printf("cannot access %q: %v\n", childPath, err)
+				a.ExitCode.SetMinor()
+				continue
+			}
+			abs, err := filepath.Abs(subdirFullPath)
+			if err != nil {
+				a.Logger.Println("Cannot compute abs path for:", childPath)
+				f.Close()
+				continue
+			}
+			nextEntry := &model.DirectoryEntry{File: *f, AbsPath: abs}
+			stack = append(stack, &RecursiveLookupFrame{entry: nextEntry, header: childPath})
 		}
-		next := &model.DirectoryEntry{File: *f, AbsPath: abs}
-		a.recurseDirectory(next, startingAbsolutePath)
 	}
 }
 
