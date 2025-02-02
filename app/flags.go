@@ -13,48 +13,46 @@ func GetConfigFromCli() *Config {
 
 	c := NewConfig()
 
-	getopt.AllowAnyOrder(true)
-	getopt.SetParameters("[files ...]")
+	opt := getopt.New()
 
-	help := getopt.BoolLong("help", '?', "display this help and exit")
-	version := getopt.BoolLong("version", 'V', "output version information and exit")
+	opt.AllowAnyOrder(true)
+	opt.SetParameters("[files ...]")
 
-	includeAll := getopt.BoolLong("all", 'a', "do not ignore entries starting with .")
-	includeAlmost := getopt.BoolLong("almost-all", 'A', "do not list implied . and ..")
+	help := opt.BoolLong("help", '?', "display this help and exit")
+	version := opt.BoolLong("version", 'V', "output version information and exit")
+
+	includeAll := opt.BoolLong("all", 'a', "do not ignore entries starting with .")
+	includeAlmost := opt.BoolLong("almost-all", 'A', "do not list implied . and ..")
 
 	c.SortMode = model.SortAlphabetical
 
-	sortNone := getopt.Bool('U', "do not sort; list entries in directory order")
-	sortNatural := getopt.Bool('v', "natural sort of (version) numbers within text")
-	sortExtension := getopt.Bool('X', "sort alphabetically by entry extension")
-	sortModTime := getopt.Bool('t', "sort by modification time, newest first")
-	sortSize := getopt.Bool('S', "sort by file size, largest first")
+	sortNone := opt.Bool('U', "do not sort; list entries in directory order")
+	sortNatural := opt.Bool('v', "natural sort of (version) numbers within text")
+	sortExtension := opt.Bool('X', "sort alphabetically by entry extension")
+	sortModTime := opt.Bool('t', "sort by modification time, newest first")
+	sortSize := opt.Bool('S', "sort by file size, largest first")
 
-	reverse := getopt.BoolLong("reverse", 'r', "reverse order while sorting")
-	recursive := getopt.BoolLong("recursive", 'R', "list subdirectories recursively")
-	gitStatus := getopt.BoolLong("git-status", 'D', "print git status of files")
-	disableIcon := getopt.BoolLong("disable-icon", 'e', "don't print icons of the files")
-	showInodeNumber := getopt.BoolLong("inode", 'i', "print the index number of each file")
-	oneFilePerLine := getopt.Bool('1', "list one file per line.")
-	directory := getopt.BoolLong("directory", 'd', "list directories themselves, not their contents")
-	noGroup := getopt.BoolLong("no-group", 'G', "in a long listing, don't print group names")
-	humanReadable := getopt.BoolLong("human-readable", 'h', "with -l and -s, print sizes like 1K 234M 2G etc.")
-	showBlockSize := getopt.BoolLong("size", 's', "print the allocated size of each file, in blocks")
+	reverse := opt.BoolLong("reverse", 'r', "reverse order while sorting")
+	recursive := opt.BoolLong("recursive", 'R', "list subdirectories recursively")
+	gitStatus := opt.BoolLong("git-status", 'D', "print git status of files")
+	disableIcon := opt.BoolLong("disable-icon", 'e', "don't print icons of the files")
+	showInodeNumber := opt.BoolLong("inode", 'i', "print the index number of each file")
+	oneFilePerLine := opt.Bool('1', "list one file per line.")
+	directory := opt.BoolLong("directory", 'd', "list directories themselves, not their contents")
+	noGroup := opt.BoolLong("no-group", 'G', "in a long listing, don't print group names")
+	humanReadable := opt.BoolLong("human-readable", 'h', "with -l and -s, print sizes like 1K 234M 2G etc.")
+	showBlockSize := opt.BoolLong("size", 's', "print the allocated size of each file, in blocks")
 
-	completeTimeInformation := getopt.BoolLong("time-style", 'T', "display complete time information")
+	completeTimeInformation := opt.BoolLong("time-style", 'T', "display complete time information")
 
 	c.LongListingMode = model.LongListingNone
 
-	longListingMode := getopt.Bool('o', "like -l, but do not list group information")
-	longListingGroup := getopt.Bool('g', "\nlike -l, but do not list owner")
-	longListingDefault := getopt.Bool('l', "use a long listing format")
+	longListingMode := opt.Bool('o', "like -l, but do not list group information")
+	longListingGroup := opt.Bool('g', "\nlike -l, but do not list owner")
+	longListingDefault := opt.Bool('l', "use a long listing format")
 
-	// using getopt.Getopt instead of parse to provide custom err
-	err := getopt.Getopt(nil)
-	if err != nil {
-		fmt.Printf("%v\nTry 'logo-ls -?' for more information.", err)
-		os.Exit(1)
-	}
+	// using opt.Getopt instead of parse to provide custom err
+	opt.Parse(os.Args)
 
 	if *help {
 		printHelpMessage()
@@ -108,7 +106,7 @@ func GetConfigFromCli() *Config {
 	c.ShowBlockSize = *showBlockSize
 	c.ShowInodeNumber = *showInodeNumber
 
-	args := getopt.Args()
+	args := opt.Args()
 	if len(args) > 0 {
 		c.FileList = append(c.FileList, args...)
 	} else {
