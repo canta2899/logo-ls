@@ -34,22 +34,22 @@ func TestFileIcons(t *testing.T) {
 			i := icons.IconSet[v]
 			fmt.Fprintln(os.Stderr)
 			buf := bytes.NewBuffer([]byte(""))
-			log.Println("Printing files of type", i.GetColor(1)+v+"\033[0m")
+			log.Println("Printing files of type", i.GetColor()+v+"\033[0m")
 			w := ctw.NewStandardCTW(terminalWidth)
 			for f, d := range icons.IconFileName {
 				if d == i {
-					w.AddRow(d.GetColor(1), "    ", d.GetGlyph(), f, "")
+					w.AddRow(d.GetColor(), "    ", d.GetGlyph(), f, "")
 				}
 			}
 			w.Flush(buf)
 			io.Copy(os.Stderr, buf)
 
 			buf = bytes.NewBuffer([]byte(""))
-			log.Println("Printing extentions of type", i.GetColor(1)+v+"\033[0m")
+			log.Println("Printing extentions of type", i.GetColor()+v+"\033[0m")
 			w = ctw.NewStandardCTW(terminalWidth)
 			for e, d := range icons.IconExt {
 				if d == i {
-					w.AddRow(d.GetColor(1), "    ", d.GetGlyph(), e, "")
+					w.AddRow(d.GetColor(), "    ", d.GetGlyph(), e, "")
 				}
 			}
 			w.Flush(buf)
@@ -80,7 +80,7 @@ func TestIconDisplay(t *testing.T) {
 			buf := bytes.NewBuffer([]byte("\n"))
 			w := ctw.NewStandardCTW(terminalWidth)
 			for _, v := range ks {
-				w.AddRow(set[v].GetColor(1), "    ", set[v].GetGlyph(), v, "")
+				w.AddRow(set[v].GetColor(), "    ", set[v].GetGlyph(), v, "")
 			}
 			w.Flush(buf)
 			io.Copy(os.Stdout, buf)

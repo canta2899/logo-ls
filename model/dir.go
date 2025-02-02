@@ -8,7 +8,7 @@ import (
 	"github.com/canta2899/logo-ls/icons"
 )
 
-var OpenDirIcon = icons.IconDef["diropen"].GetColor(1) + icons.IconDef["diropen"].GetGlyph() + "\033[0m" + " "
+var OpenDirIcon = icons.IconDef["diropen"].GetColor() + icons.IconDef["diropen"].GetGlyph() + "\033[0m" + " "
 var PathSeparator string = string(os.PathSeparator)
 
 type FileEntry struct {

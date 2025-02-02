@@ -253,7 +253,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 
 		if !a.Config.DisableIcon {
 			t.Info.Icon = icons.IconDef["diropen"].GetGlyph()
-			t.Info.IconColor = icons.IconDef["diropen"].GetColor(1)
+			t.Info.IconColor = icons.IconDef["diropen"].GetColor()
 		}
 	}
 
@@ -328,7 +328,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 			// Overwrite icon for parent
 			if !a.Config.DisableIcon {
 				parentEntry.Icon = icons.IconDef["diropen"].GetGlyph()
-				parentEntry.IconColor = icons.IconDef["diropen"].GetColor(1)
+				parentEntry.IconColor = icons.IconDef["diropen"].GetColor()
 			}
 
 			t.Files = append(t.Files, parentEntry)

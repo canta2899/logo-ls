@@ -174,7 +174,7 @@ func GetIcon(name, ext, indicator string) (icon, color string) {
 		i.MakeExe()
 	}
 
-	return i.GetGlyph(), i.GetColor(1)
+	return i.GetGlyph(), i.GetColor()
 }
 
 func GetFormattedSize(b int64, humanReadable bool) string {
