@@ -14,7 +14,7 @@ logo-ls: bindir
 	go build -o $(BIN_DIR)/$(APP_NAME) $(BUILD_FLAGS) $(SRC_DIR)
 
 clean:
-	rm -rf $(BIN_DIR)/$(APP_NAME)
+	rm -rf $(BIN_DIR)
 
 test:
 	go test ./...
