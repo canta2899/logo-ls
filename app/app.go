@@ -13,7 +13,6 @@ import (
 
 	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -252,8 +251,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		}
 
 		if !a.Config.DisableIcon {
-			t.Info.Icon = icons.IconDef["diropen"].GetGlyph()
-			t.Info.IconColor = icons.IconDef["diropen"].GetColor()
+			t.Info.Icon = format.GetOpenDirIcon()
 		}
 	}
 
@@ -294,7 +292,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 					realExt := filepath.Ext(s)
 					realName := s[0 : len(s)-len(realExt)]
 					realIndicator := format.GetIndicator(s, isLong)
-					entry.Icon, entry.IconColor = format.GetIcon(realName, realExt, realIndicator)
+					entry.Icon = format.GetIcon(realName, realExt, realIndicator)
 				}
 			}
 		}
@@ -327,8 +325,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 
 			// Overwrite icon for parent
 			if !a.Config.DisableIcon {
-				parentEntry.Icon = icons.IconDef["diropen"].GetGlyph()
-				parentEntry.IconColor = icons.IconDef["diropen"].GetColor()
+				parentEntry.Icon = format.GetOpenDirIcon()
 			}
 
 			t.Files = append(t.Files, parentEntry)
@@ -367,7 +364,7 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 	}
 
 	if !a.Config.DisableIcon {
-		entry.Icon, entry.IconColor = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
+		entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
 	}
 
 	return entry
@@ -388,7 +385,7 @@ func (a *App) PrintDirectory(d *model.Directory) {
 	case a.Config.LongListingMode != model.LongListingNone:
 		for _, f := range d.Files {
 			lineCtw.AddRow(
-				f.IconColor,
+				f.Icon.GetColor(),
 				a.blockSizeWithInode(f),
 				f.Mode,
 				strconv.Itoa(int(f.NumHardLinks)),
@@ -396,7 +393,7 @@ func (a *App) PrintDirectory(d *model.Directory) {
 				f.Group,
 				format.GetFormattedSize(f.Size, a.Config.HumanReadable),
 				a.Config.TimeFormatter.Format(&f.ModTime),
-				f.Icon,
+				f.Icon.GetGlyph(),
 				f.Name+f.Ext+f.Indicator,
 				f.GitStatus,
 			)
@@ -405,9 +402,9 @@ func (a *App) PrintDirectory(d *model.Directory) {
 	case a.Config.OneFilePerLine:
 		for _, f := range d.Files {
 			lineCtw.AddRow(
-				f.IconColor,
+				f.Icon.GetColor(),
 				a.blockSizeWithInode(f),
-				f.Icon,
+				f.Icon.GetGlyph(),
 				f.Name+f.Ext+f.Indicator,
 				f.GitStatus,
 			)
@@ -416,9 +413,9 @@ func (a *App) PrintDirectory(d *model.Directory) {
 	default:
 		for _, f := range d.Files {
 			lineCtw.AddRow(
-				f.IconColor,
+				f.Icon.GetColor(),
 				a.blockSizeWithInode(f),
-				f.Icon,
+				f.Icon.GetGlyph(),
 				f.Name+f.Ext+f.Indicator,
 				f.GitStatus,
 			)

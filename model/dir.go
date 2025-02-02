@@ -31,8 +31,7 @@ type Entry struct {
 	Owner, Group         string
 	Blocks               int64
 	GitStatus            string
-	Icon                 string
-	IconColor            string
+	Icon                 *icons.IconInfo
 	InodeNumber          string
 }
 

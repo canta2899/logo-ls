@@ -124,7 +124,11 @@ func GetSymlinkIndicator(name string, isLongMode bool) string {
 	return ""
 }
 
-func GetIcon(name, ext, indicator string) (icon, color string) {
+func GetOpenDirIcon() *icons.IconInfo {
+	return icons.IconDef["diropen"]
+}
+
+func GetIcon(name, ext, indicator string) *icons.IconInfo {
 	var i *icons.IconInfo
 	var ok bool
 
@@ -174,7 +178,7 @@ func GetIcon(name, ext, indicator string) (icon, color string) {
 		i.MakeExe()
 	}
 
-	return i.GetGlyph(), i.GetColor()
+	return i
 }
 
 func GetFormattedSize(b int64, humanReadable bool) string {
