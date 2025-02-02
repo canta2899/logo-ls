@@ -149,6 +149,14 @@ func parentDirsWithinRepo(repoRoot, absFilePath string) []string {
 
 // Finds the top-level .git directory via `git -C path rev-parse --show-toplevel`.
 func getGitRoot(path string) (string, error) {
+
+	// Checking for cached git roots first
+	for key, _ := range statusCache {
+		if strings.HasPrefix(path, key) {
+			return key, nil
+		}
+	}
+
 	cmd := exec.Command("git", "-C", path, "rev-parse", "--show-toplevel")
 	out, err := cmd.Output()
 	if err != nil {
