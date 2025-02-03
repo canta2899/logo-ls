@@ -11,10 +11,18 @@ type IconInfo struct {
 }
 
 func (i *IconInfo) GetGlyph() string {
+	if i == nil {
+		return ""
+	}
+
 	return i.Glyph
 }
 
 func (i *IconInfo) GetColor() string {
+	if i == nil {
+		return ""
+	}
+
 	if i.IsExecutable {
 		return "\033[38;2;76;175;080m"
 	}
