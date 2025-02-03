@@ -263,10 +263,9 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	if a.Config.AllMode == model.IncludeAll || a.Config.Directory {
 		t.Info = a.buildEntry(d.Name(), dirStat, isLong)
 
-		if pwd, err := os.Getwd(); err == nil {
-			if d.Name() == pwd {
-				t.Info.Name = "."
-			}
+		if !a.Config.Directory {
+			t.Info.Name = "."
+			t.Info.Ext = ""
 		}
 
 		if !a.Config.DisableIcon {
@@ -341,6 +340,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		if err2 == nil { // if we can't stat parent, skip adding
 			parentEntry := a.buildEntry(pp, pStat, isLong)
 			parentEntry.Name = ".."
+			parentEntry.Ext = ""
 
 			// Overwrite icon for parent
 			if !a.Config.DisableIcon {
@@ -360,8 +360,13 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 	entry := &model.Entry{}
 
 	name := fi.Name()
-	entry.Ext = filepath.Ext(name)
-	entry.Name = name[0 : len(name)-len(entry.Ext)]
+	if strings.HasPrefix(name, ".") && !strings.Contains(name[1:], ".") {
+		entry.Name = name
+		entry.Ext = ""
+	} else {
+		entry.Ext = filepath.Ext(name)
+		entry.Name = name[0 : len(name)-len(entry.Ext)]
+	}
 	entry.Size = fi.Size()
 	entry.ModTime = fi.ModTime()
 	entry.Indicator = format.GetIndicator(fullPath, isLong)
