@@ -35,167 +35,168 @@ func (i *IconInfo) MakeExe() {
 }
 
 var IconSet = map[string]*IconInfo{
-	"3d":               {Glyph: "\U0000e79b", Color: [3]uint8{40, 182, 246}},  // 3d
-	"actionscript":     {Glyph: "\U0000fb25", Color: [3]uint8{244, 68, 62}},   // actionscript (Not supported by nerdFont)
-	"alpine":           {Glyph: "\U0000f300", Color: [3]uint8{14, 87, 123}},   // alpine
-	"android":          {Glyph: "\U000f0032", Color: [3]uint8{139, 195, 74}},  // android
-	"apiblueprint":     {Glyph: "\U0000f031", Color: [3]uint8{66, 165, 245}},  // apiblueprint (Not supported by nerdFont)
-	"applescript":      {Glyph: "\U0000f302", Color: [3]uint8{120, 144, 156}}, // applescript
-	"arch":             {Glyph: "\U0000f303", Color: [3]uint8{33, 142, 202}},  // arch
-	"arduino":          {Glyph: "\U0000f34b", Color: [3]uint8{35, 151, 156}},  // arduino
-	"asciidoc":         {Glyph: "\U000f0219", Color: [3]uint8{244, 68, 62}},   // asciidoc
-	"assembly":         {Glyph: "\U0000f471", Color: [3]uint8{250, 109, 63}},  // assembly
-	"audio":            {Glyph: "\U000f0388", Color: [3]uint8{239, 83, 80}},   // audio
-	"authors":          {Glyph: "\U0000f0c0", Color: [3]uint8{244, 68, 62}},   // authors
-	"autohotkey":       {Glyph: "\U000f0313", Color: [3]uint8{76, 175, 80}},   // autohotkey (Not supported by nerdFont)
-	"azure":            {Glyph: "\U0000fd03", Color: [3]uint8{31, 136, 229}},  // azure
-	"azure-pipelines":  {Glyph: "\U0000f427", Color: [3]uint8{20, 101, 192}},  // azure-pipelines
-	"babel":            {Glyph: "\U000f0a25", Color: [3]uint8{253, 217, 59}},  // babel
-	"bitbucket":        {Glyph: "\U0000f171", Color: [3]uint8{31, 136, 229}},  // bitbucket
-	"blink":            {Glyph: "\U000f022b", Color: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
-	"bower":            {Glyph: "\U0000e61a", Color: [3]uint8{239, 88, 60}},   // bower
-	"bun":              {Glyph: "\U000f0685", Color: [3]uint8{249, 241, 225}}, // bun
-	"c":                {Glyph: "\U000f0671", Color: [3]uint8{2, 119, 189}},   // c
-	"cake":             {Glyph: "\U000f00eb", Color: [3]uint8{250, 111, 66}},  // cake
-	"centOS":           {Glyph: "\U0000f304", Color: [3]uint8{157, 83, 135}},  // centOS
-	"certificate":      {Glyph: "\U000f0124", Color: [3]uint8{249, 89, 63}},   // certificate
-	"changelog":        {Glyph: "\U000f099b", Color: [3]uint8{139, 195, 74}},  // changelog
-	"clojure":          {Glyph: "\U0000e76a", Color: [3]uint8{100, 221, 23}},  // clojure
-	"cmake":            {Glyph: "\U0000f425", Color: [3]uint8{178, 178, 179}}, // cmake (Not supported by nerdFont)
-	"coconut":          {Glyph: "\U000f00d3", Color: [3]uint8{141, 110, 99}},  // coconut
-	"code-climate":     {Glyph: "\U000f0509", Color: [3]uint8{238, 238, 238}}, // code-climate
-	"codecov":          {Glyph: "\U0000e37c", Color: [3]uint8{237, 80, 122}},  // codecov (Not supported by nerdFont)
-	"codeowners":       {Glyph: "\U000f0008", Color: [3]uint8{175, 180, 43}},  // codeowners
-	"coffee":           {Glyph: "\U000f0176", Color: [3]uint8{66, 165, 245}},  // coffee
-	"command":          {Glyph: "\U000f0633", Color: [3]uint8{175, 188, 194}}, // command
-	"commitlint":       {Glyph: "\U000f0718", Color: [3]uint8{43, 150, 137}},  // commitlint
-	"conduct":          {Glyph: "\U000f014e", Color: [3]uint8{205, 220, 57}},  // conduct
-	"console":          {Glyph: "\U000f018d", Color: [3]uint8{250, 111, 66}},  // console
-	"contributing":     {Glyph: "\U000f014d", Color: [3]uint8{255, 202, 61}},  // contributing
-	"cpp":              {Glyph: "\U000f0672", Color: [3]uint8{2, 119, 189}},   // cpp
-	"credits":          {Glyph: "\U000f0260", Color: [3]uint8{156, 204, 101}}, // credits
-	"csharp":           {Glyph: "\U000f031b", Color: [3]uint8{2, 119, 189}},   // csharp
-	"css":              {Glyph: "\U000f031c", Color: [3]uint8{66, 165, 245}},  // css
-	"css-map":          {Glyph: "\U0000e749", Color: [3]uint8{66, 165, 245}},  // css-map
-	"d":                {Glyph: "\U0000e7af", Color: [3]uint8{244, 68, 62}},   // d
-	"dart":             {Glyph: "\U0000e798", Color: [3]uint8{87, 182, 240}},  // dart
-	"database":         {Glyph: "\U0000e706", Color: [3]uint8{255, 202, 61}},  // database
-	"debian":           {Glyph: "\U0000f306", Color: [3]uint8{211, 61, 76}},   // debian
-	"denizenscript":    {Glyph: "\U000f0af1", Color: [3]uint8{255, 213, 79}},  // denizenscript (Not supported by nerdFont)
-	"dhall":            {Glyph: "\U0000f448", Color: [3]uint8{120, 144, 156}}, // dhall
-	"disc":             {Glyph: "\U0000e271", Color: [3]uint8{176, 190, 197}}, // disc
-	"django":           {Glyph: "\U0000e71d", Color: [3]uint8{67, 160, 71}},   // django
-	"docker":           {Glyph: "\U0000f308", Color: [3]uint8{1, 135, 201}},   // docker
-	"document":         {Glyph: "\U000f0219", Color: [3]uint8{66, 165, 245}},  // document
-	"dune":             {Glyph: "\U000f0509", Color: [3]uint8{244, 127, 61}},  // dune
-	"edge":             {Glyph: "\U000f0065", Color: [3]uint8{239, 111, 60}},  // edge
-	"editorconfig":     {Glyph: "\U0000e652", Color: [3]uint8{255, 242, 242}}, // editorconfig
-	"ejs":              {Glyph: "\U0000e618", Color: [3]uint8{255, 202, 61}},  // ejs
-	"elixir":           {Glyph: "\U0000e62d", Color: [3]uint8{149, 117, 205}}, // elixir
-	"elm":              {Glyph: "\U0000e62c", Color: [3]uint8{96, 181, 204}},  // elm
-	"email":            {Glyph: "\U000f01ee", Color: [3]uint8{66, 165, 245}},  // email
-	"erlang":           {Glyph: "\U0000e7b1", Color: [3]uint8{244, 68, 62}},   // erlang
-	"eslint":           {Glyph: "\U000f0c7a", Color: [3]uint8{121, 134, 203}}, // eslint
-	"exe":              {Glyph: "\U0000f2d0", Color: [3]uint8{229, 77, 58}},   // exe
-	"fastlane":         {Glyph: "\U000f0700", Color: [3]uint8{149, 119, 232}}, // fastlane (Not supported by nerdFont)
-	"favicon":          {Glyph: "\U0000e623", Color: [3]uint8{255, 213, 79}},  // favicon
-	"fedora":           {Glyph: "\U0000f30a", Color: [3]uint8{52, 103, 172}},  // fedora
-	"firebase":         {Glyph: "\U000f0967", Color: [3]uint8{251, 193, 60}},  // firebase
-	"flash":            {Glyph: "\U000f0241", Color: [3]uint8{198, 52, 54}},   // flash (Not supported by nerdFont)
-	"font":             {Glyph: "\U0000f031", Color: [3]uint8{244, 68, 62}},   // font
-	"fortran":          {Glyph: "\U000f121a", Color: [3]uint8{250, 111, 66}},  // fortran
-	"freebsd":          {Glyph: "\U0000f30c", Color: [3]uint8{175, 44, 42}},   // freebsd
-	"fsharp":           {Glyph: "\U0000e7a7", Color: [3]uint8{55, 139, 186}},  // fsharp
-	"gatsby":           {Glyph: "\U000f0e43", Color: [3]uint8{70, 0, 130}},    // gatsby
-	"gcp":              {Glyph: "\U000f0163", Color: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
-	"gemfile":          {Glyph: "\U0000e21e", Color: [3]uint8{229, 61, 58}},   // gemfile
-	"gentoo":           {Glyph: "\U0000f30d", Color: [3]uint8{148, 141, 211}}, // gentoo
-	"gnu":              {Glyph: "\U0000e779", Color: [3]uint8{229, 61, 58}},   // GNU
-	"git":              {Glyph: "\U0000e702", Color: [3]uint8{229, 77, 58}},   // git
-	"gitlab":           {Glyph: "\U0000f296", Color: [3]uint8{226, 69, 57}},   // gitlab
-	"go":               {Glyph: "\U000f07d3", Color: [3]uint8{32, 173, 194}},  // go
-	"go-mod":           {Glyph: "\U000f07d3", Color: [3]uint8{237, 80, 122}},  // go-mod
-	"go-test":          {Glyph: "\U000f07d3", Color: [3]uint8{255, 213, 79}},  // go-test
-	"godot":            {Glyph: "\U0000e65f", Color: [3]uint8{79, 195, 247}},  // godot
-	"godot-assets":     {Glyph: "\U0000e65f", Color: [3]uint8{129, 199, 132}}, // godot-assets
-	"gradle":           {Glyph: "\U0000e660", Color: [3]uint8{29, 151, 167}},  // gradle
-	"graphql":          {Glyph: "\U000f0877", Color: [3]uint8{237, 80, 122}},  // graphql
-	"groovy":           {Glyph: "\U0000f2a6", Color: [3]uint8{41, 198, 218}},  // groovy
-	"grunt":            {Glyph: "\U0000e611", Color: [3]uint8{251, 170, 61}},  // grunt
-	"gulp":             {Glyph: "\U0000e763", Color: [3]uint8{229, 61, 58}},   // gulp
-	"h":                {Glyph: "\U000f0c00", Color: [3]uint8{2, 119, 189}},   // h (Not supported by nerdFont)
-	"handlebars":       {Glyph: "\U0000e60f", Color: [3]uint8{250, 111, 66}},  // handlebars
-	"haskell":          {Glyph: "\U0000e61f", Color: [3]uint8{254, 168, 62}},  // haskell
-	"haxe":             {Glyph: "\U0000e666", Color: [3]uint8{246, 137, 61}},  // haxe
-	"helm":             {Glyph: "\U000f0833", Color: [3]uint8{32, 173, 194}},  // helm (Not supported by nerdFont)
-	"heroku":           {Glyph: "\U0000e607", Color: [3]uint8{105, 99, 185}},  // heroku
-	"hpp":              {Glyph: "\U000f0b0f", Color: [3]uint8{2, 119, 189}},   // hpp (Not supported by nerdFont)
-	"html":             {Glyph: "\U0000f13b", Color: [3]uint8{228, 79, 57}},   // html
-	"http":             {Glyph: "\U0000f484", Color: [3]uint8{66, 165, 245}},  // http
-	"husky":            {Glyph: "\U000f03e9", Color: [3]uint8{229, 229, 229}}, // husky
-	"i18n":             {Glyph: "\U000f05ca", Color: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
-	"image":            {Glyph: "\U000f021f", Color: [3]uint8{48, 166, 154}},  // image
-	"ionic":            {Glyph: "\U0000e7a9", Color: [3]uint8{79, 143, 247}},  // ionic
-	"java":             {Glyph: "\U000f0176", Color: [3]uint8{244, 68, 62}},   // java
-	"javascript":       {Glyph: "\U0000e74e", Color: [3]uint8{255, 202, 61}},  // javascript
-	"javascript-map":   {Glyph: "\U0000e781", Color: [3]uint8{255, 202, 61}},  // javascript-map
-	"jenkins":          {Glyph: "\U0000e767", Color: [3]uint8{240, 214, 183}}, // jenkins
-	"jest":             {Glyph: "\U000f0af7", Color: [3]uint8{244, 85, 62}},   // jest (Not supported by nerdFont)
-	"jinja":            {Glyph: "\U0000e66f", Color: [3]uint8{174, 44, 42}},   // jinja
-	"json":             {Glyph: "\U0000e60b", Color: [3]uint8{251, 193, 60}},  // json
-	"julia":            {Glyph: "\U0000e624", Color: [3]uint8{134, 82, 159}},  // julia
-	"karma":            {Glyph: "\U0000e622", Color: [3]uint8{60, 190, 174}},  // karma
-	"key":              {Glyph: "\U000f0306", Color: [3]uint8{48, 166, 154}},  // key
-	"kotlin":           {Glyph: "\U0000e634", Color: [3]uint8{139, 195, 74}},  // kotlin
-	"laravel":          {Glyph: "\U0000e73f", Color: [3]uint8{248, 80, 81}},   // laravel
-	"less":             {Glyph: "\U0000e60b", Color: [3]uint8{2, 119, 189}},   // less
-	"lib":              {Glyph: "\U0000f831", Color: [3]uint8{139, 195, 74}},  // lib
-	"linux":            {Glyph: "\U0000e712", Color: [3]uint8{238, 207, 55}},  // linux
-	"liquid":           {Glyph: "\U0000e275", Color: [3]uint8{40, 182, 246}},  // liquid
-	"lock":             {Glyph: "\U000f033e", Color: [3]uint8{255, 213, 79}},  // lock
-	"log":              {Glyph: "\U0000f719", Color: [3]uint8{175, 180, 43}},  // log
-	"lua":              {Glyph: "\U0000e620", Color: [3]uint8{66, 165, 245}},  // lua
-	"makefile":         {Glyph: "\U000f0229", Color: [3]uint8{239, 83, 80}},   // makefile
-	"manjaro":          {Glyph: "\U0000f312", Color: [3]uint8{73, 185, 90}},   // manjaro
-	"markdown":         {Glyph: "\U0000eb1d", Color: [3]uint8{66, 165, 245}},  // markdown
-	"markojs":          {Glyph: "\U0000f13b", Color: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
-	"mdx":              {Glyph: "\U0000f853", Color: [3]uint8{255, 202, 61}},  // mdx
-	"merlin":           {Glyph: "\U0000f136", Color: [3]uint8{66, 165, 245}},  // merlin (Not supported by nerdFont)
-	"midi":             {Glyph: "\U000f08f2", Color: [3]uint8{66, 165, 245}},  // midi
-	"mint":             {Glyph: "\U0000f30f", Color: [3]uint8{125, 190, 58}},  // mint
-	"mjml":             {Glyph: "\U0000e714", Color: [3]uint8{249, 89, 63}},   // mjml (Not supported by nerdFont)
-	"mocha":            {Glyph: "\U000f01aa", Color: [3]uint8{161, 136, 127}}, // mocha (Not supported by nerdFont)
-	"modernizr":        {Glyph: "\U0000e720", Color: [3]uint8{234, 72, 99}},   // modernizr
-	"moonscript":       {Glyph: "\U0000f186", Color: [3]uint8{251, 193, 60}},  // moonscript
-	"mxml":             {Glyph: "\U0000f72d", Color: [3]uint8{254, 168, 62}},  // mxml
-	"mysql":            {Glyph: "\U0000e704", Color: [3]uint8{1, 94, 134}},    // mysql
-	"nim":              {Glyph: "\U000f01a5", Color: [3]uint8{255, 202, 61}},  // nim
-	"nix":              {Glyph: "\U0000f313", Color: [3]uint8{80, 117, 193}},  // nix
-	"nodejs":           {Glyph: "\U000f0399", Color: [3]uint8{139, 195, 74}},  // nodejs
-	"npm":              {Glyph: "\U0000e71e", Color: [3]uint8{203, 56, 55}},   // npm
-	"nuget":            {Glyph: "\U0000e77f", Color: [3]uint8{3, 136, 209}},   // nuget (Not supported by nerdFont)
-	"nuxt":             {Glyph: "\U000f1106", Color: [3]uint8{65, 184, 131}},  // nuxt
-	"ocaml":            {Glyph: "\U0000e67a", Color: [3]uint8{253, 154, 62}},  // ocaml
-	"opam":             {Glyph: "\U0000f1ce", Color: [3]uint8{255, 213, 79}},  // opam (Not supported by nerdFont)
-	"opensuse":         {Glyph: "\U0000f314", Color: [3]uint8{111, 180, 36}},  // opensuse
-	"pascal":           {Glyph: "\U000f03db", Color: [3]uint8{3, 136, 209}},   // pascal (Not supported by nerdFont)
-	"pawn":             {Glyph: "\U0000e261", Color: [3]uint8{239, 111, 60}},  // pawn
-	"pdf":              {Glyph: "\U0000e67d", Color: [3]uint8{244, 68, 62}},   // pdf
-	"perl":             {Glyph: "\U0000e769", Color: [3]uint8{149, 117, 205}}, // perl
-	"php":              {Glyph: "\U0000e608", Color: [3]uint8{65, 129, 190}},  // php
-	"postcss":          {Glyph: "\U000f031c", Color: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
-	"postgresql":       {Glyph: "\U0000e76e", Color: [3]uint8{49, 99, 140}},   // postgresql
-	"powerpoint":       {Glyph: "\U000f0227", Color: [3]uint8{209, 71, 51}},   // powerpoint
-	"powershell":       {Glyph: "\U000f0a0a", Color: [3]uint8{5, 169, 244}},   // powershell
-	"prettier":         {Glyph: "\U0000e6b4", Color: [3]uint8{86, 179, 180}},  // prettier
-	"prisma":           {Glyph: "\U0000e684", Color: [3]uint8{229, 56, 150}},  // prisma
-	"prolog":           {Glyph: "\U0000e7a1", Color: [3]uint8{239, 83, 80}},   // prolog
-	"protractor":       {Glyph: "\U0000f288", Color: [3]uint8{229, 61, 58}},   // protractor (Not supported by nerdFont)
-	"pug":              {Glyph: "\U0000e686", Color: [3]uint8{239, 204, 163}}, // pug
-	"puppet":           {Glyph: "\U0000e631", Color: [3]uint8{251, 193, 60}},  // puppet
-	"purescript":       {Glyph: "\U0000e630", Color: [3]uint8{66, 165, 245}},  // purescript
-	"python":           {Glyph: "\U000f0320", Color: [3]uint8{52, 102, 143}},  // python
-	"python-misc":      {Glyph: "\U0000f820", Color: [3]uint8{130, 61, 28}},   // python-misc
+	"3d":              {Glyph: "\U0000e79b", Color: [3]uint8{40, 182, 246}},  // 3d
+	"actionscript":    {Glyph: "\U0000fb25", Color: [3]uint8{244, 68, 62}},   // actionscript (Not supported by nerdFont)
+	"alpine":          {Glyph: "\U0000f300", Color: [3]uint8{14, 87, 123}},   // alpine
+	"android":         {Glyph: "\U000f0032", Color: [3]uint8{139, 195, 74}},  // android
+	"apiblueprint":    {Glyph: "\U0000f031", Color: [3]uint8{66, 165, 245}},  // apiblueprint (Not supported by nerdFont)
+	"applescript":     {Glyph: "\U0000f302", Color: [3]uint8{120, 144, 156}}, // applescript
+	"arch":            {Glyph: "\U0000f303", Color: [3]uint8{33, 142, 202}},  // arch
+	"arduino":         {Glyph: "\U0000f34b", Color: [3]uint8{35, 151, 156}},  // arduino
+	"asciidoc":        {Glyph: "\U000f0219", Color: [3]uint8{244, 68, 62}},   // asciidoc
+	"assembly":        {Glyph: "\U0000f471", Color: [3]uint8{250, 109, 63}},  // assembly
+	"audio":           {Glyph: "\U000f0388", Color: [3]uint8{239, 83, 80}},   // audio
+	"authors":         {Glyph: "\U0000f0c0", Color: [3]uint8{244, 68, 62}},   // authors
+	"autohotkey":      {Glyph: "\U000f0313", Color: [3]uint8{76, 175, 80}},   // autohotkey (Not supported by nerdFont)
+	"azure":           {Glyph: "\U0000fd03", Color: [3]uint8{31, 136, 229}},  // azure
+	"azure-pipelines": {Glyph: "\U0000f427", Color: [3]uint8{20, 101, 192}},  // azure-pipelines
+	"babel":           {Glyph: "\U000f0a25", Color: [3]uint8{253, 217, 59}},  // babel
+	"bitbucket":       {Glyph: "\U0000f171", Color: [3]uint8{31, 136, 229}},  // bitbucket
+	"blink":           {Glyph: "\U000f022b", Color: [3]uint8{249, 169, 60}},  // blink (The Foundry Nuke) (Not supported by nerdFont)
+	"bower":           {Glyph: "\U0000e61a", Color: [3]uint8{239, 88, 60}},   // bower
+	"bun":             {Glyph: "\U000f0685", Color: [3]uint8{249, 241, 225}}, // bun
+	"c":               {Glyph: "\U000f0671", Color: [3]uint8{2, 119, 189}},   // c
+	"cake":            {Glyph: "\U000f00eb", Color: [3]uint8{250, 111, 66}},  // cake
+	"centOS":          {Glyph: "\U0000f304", Color: [3]uint8{157, 83, 135}},  // centOS
+	"certificate":     {Glyph: "\U000f0124", Color: [3]uint8{249, 89, 63}},   // certificate
+	"changelog":       {Glyph: "\U000f099b", Color: [3]uint8{139, 195, 74}},  // changelog
+	"clojure":         {Glyph: "\U0000e76a", Color: [3]uint8{100, 221, 23}},  // clojure
+	"cmake":           {Glyph: "\U0000f425", Color: [3]uint8{178, 178, 179}}, // cmake (Not supported by nerdFont)
+	"coconut":         {Glyph: "\U000f00d3", Color: [3]uint8{141, 110, 99}},  // coconut
+	"code-climate":    {Glyph: "\U000f0509", Color: [3]uint8{238, 238, 238}}, // code-climate
+	"codecov":         {Glyph: "\U0000e37c", Color: [3]uint8{237, 80, 122}},  // codecov (Not supported by nerdFont)
+	"codeowners":      {Glyph: "\U000f0008", Color: [3]uint8{175, 180, 43}},  // codeowners
+	"coffee":          {Glyph: "\U000f0176", Color: [3]uint8{66, 165, 245}},  // coffee
+	"command":         {Glyph: "\U000f0633", Color: [3]uint8{175, 188, 194}}, // command
+	"commitlint":      {Glyph: "\U000f0718", Color: [3]uint8{43, 150, 137}},  // commitlint
+	"conduct":         {Glyph: "\U000f014e", Color: [3]uint8{205, 220, 57}},  // conduct
+	"console":         {Glyph: "\U000f018d", Color: [3]uint8{250, 111, 66}},  // console
+	"contributing":    {Glyph: "\U000f014d", Color: [3]uint8{255, 202, 61}},  // contributing
+	"cpp":             {Glyph: "\U000f0672", Color: [3]uint8{2, 119, 189}},   // cpp
+	"credits":         {Glyph: "\U000f0260", Color: [3]uint8{156, 204, 101}}, // credits
+	"csharp":          {Glyph: "\U000f031b", Color: [3]uint8{2, 119, 189}},   // csharp
+	"css":             {Glyph: "\U000f031c", Color: [3]uint8{66, 165, 245}},  // css
+	"css-map":         {Glyph: "\U0000e749", Color: [3]uint8{66, 165, 245}},  // css-map
+	"d":               {Glyph: "\U0000e7af", Color: [3]uint8{244, 68, 62}},   // d
+	"dart":            {Glyph: "\U0000e798", Color: [3]uint8{87, 182, 240}},  // dart
+	"database":        {Glyph: "\U0000e706", Color: [3]uint8{255, 202, 61}},  // database
+	"debian":          {Glyph: "\U0000f306", Color: [3]uint8{211, 61, 76}},   // debian
+	"denizenscript":   {Glyph: "\U000f0af1", Color: [3]uint8{255, 213, 79}},  // denizenscript (Not supported by nerdFont)
+	"dhall":           {Glyph: "\U0000f448", Color: [3]uint8{120, 144, 156}}, // dhall
+	"disc":            {Glyph: "\U0000e271", Color: [3]uint8{176, 190, 197}}, // disc
+	"django":          {Glyph: "\U0000e71d", Color: [3]uint8{67, 160, 71}},   // django
+	"docker":          {Glyph: "\U0000f308", Color: [3]uint8{1, 135, 201}},   // docker
+	"document":        {Glyph: "\U000f0219", Color: [3]uint8{66, 165, 245}},  // document
+	"dune":            {Glyph: "\U000f0509", Color: [3]uint8{244, 127, 61}},  // dune
+	"edge":            {Glyph: "\U000f0065", Color: [3]uint8{239, 111, 60}},  // edge
+	"editorconfig":    {Glyph: "\U0000e652", Color: [3]uint8{255, 242, 242}}, // editorconfig
+	"ejs":             {Glyph: "\U0000e618", Color: [3]uint8{255, 202, 61}},  // ejs
+	"elixir":          {Glyph: "\U0000e62d", Color: [3]uint8{149, 117, 205}}, // elixir
+	"elm":             {Glyph: "\U0000e62c", Color: [3]uint8{96, 181, 204}},  // elm
+	"email":           {Glyph: "\U000f01ee", Color: [3]uint8{66, 165, 245}},  // email
+	"erlang":          {Glyph: "\U0000e7b1", Color: [3]uint8{244, 68, 62}},   // erlang
+	"eslint":          {Glyph: "\U000f0c7a", Color: [3]uint8{121, 134, 203}}, // eslint
+	"exe":             {Glyph: "\U0000f2d0", Color: [3]uint8{229, 77, 58}},   // exe
+	"fastlane":        {Glyph: "\U000f0700", Color: [3]uint8{149, 119, 232}}, // fastlane (Not supported by nerdFont)
+	"favicon":         {Glyph: "\U0000e623", Color: [3]uint8{255, 213, 79}},  // favicon
+	"fedora":          {Glyph: "\U0000f30a", Color: [3]uint8{52, 103, 172}},  // fedora
+	"firebase":        {Glyph: "\U000f0967", Color: [3]uint8{251, 193, 60}},  // firebase
+	"flash":           {Glyph: "\U000f0241", Color: [3]uint8{198, 52, 54}},   // flash (Not supported by nerdFont)
+	"font":            {Glyph: "\U0000f031", Color: [3]uint8{244, 68, 62}},   // font
+	"fortran":         {Glyph: "\U000f121a", Color: [3]uint8{250, 111, 66}},  // fortran
+	"freebsd":         {Glyph: "\U0000f30c", Color: [3]uint8{175, 44, 42}},   // freebsd
+	"fsharp":          {Glyph: "\U0000e7a7", Color: [3]uint8{55, 139, 186}},  // fsharp
+	"gatsby":          {Glyph: "\U000f0e43", Color: [3]uint8{70, 0, 130}},    // gatsby
+	"gcp":             {Glyph: "\U000f0163", Color: [3]uint8{70, 136, 250}},  // gcp (Not supported by nerdFont)
+	"gemfile":         {Glyph: "\U0000e21e", Color: [3]uint8{229, 61, 58}},   // gemfile
+	"gentoo":          {Glyph: "\U0000f30d", Color: [3]uint8{148, 141, 211}}, // gentoo
+	"gnu":             {Glyph: "\U0000e779", Color: [3]uint8{229, 61, 58}},   // GNU
+	"git":             {Glyph: "\U0000e702", Color: [3]uint8{229, 77, 58}},   // git
+	"gitlab":          {Glyph: "\U0000f296", Color: [3]uint8{226, 69, 57}},   // gitlab
+	"go":              {Glyph: "\U000f07d3", Color: [3]uint8{32, 173, 194}},  // go
+	"go-mod":          {Glyph: "\U000f07d3", Color: [3]uint8{237, 80, 122}},  // go-mod
+	"go-test":         {Glyph: "\U000f07d3", Color: [3]uint8{255, 213, 79}},  // go-test
+	"godot":           {Glyph: "\U0000e65f", Color: [3]uint8{79, 195, 247}},  // godot
+	"godot-assets":    {Glyph: "\U0000e65f", Color: [3]uint8{129, 199, 132}}, // godot-assets
+	"gradle":          {Glyph: "\U0000e660", Color: [3]uint8{29, 151, 167}},  // gradle
+	"graphql":         {Glyph: "\U000f0877", Color: [3]uint8{237, 80, 122}},  // graphql
+	"groovy":          {Glyph: "\U0000f2a6", Color: [3]uint8{41, 198, 218}},  // groovy
+	"grunt":           {Glyph: "\U0000e611", Color: [3]uint8{251, 170, 61}},  // grunt
+	"gulp":            {Glyph: "\U0000e763", Color: [3]uint8{229, 61, 58}},   // gulp
+	"h":               {Glyph: "\U000f0c00", Color: [3]uint8{2, 119, 189}},   // h (Not supported by nerdFont)
+	"handlebars":      {Glyph: "\U0000e60f", Color: [3]uint8{250, 111, 66}},  // handlebars
+	"haskell":         {Glyph: "\U0000e61f", Color: [3]uint8{254, 168, 62}},  // haskell
+	"haxe":            {Glyph: "\U0000e666", Color: [3]uint8{246, 137, 61}},  // haxe
+	"helm":            {Glyph: "\U000f0833", Color: [3]uint8{32, 173, 194}},  // helm (Not supported by nerdFont)
+	"heroku":          {Glyph: "\U0000e607", Color: [3]uint8{105, 99, 185}},  // heroku
+	"hpp":             {Glyph: "\U000f0b0f", Color: [3]uint8{2, 119, 189}},   // hpp (Not supported by nerdFont)
+	"html":            {Glyph: "\U0000f13b", Color: [3]uint8{228, 79, 57}},   // html
+	"http":            {Glyph: "\U0000f484", Color: [3]uint8{66, 165, 245}},  // http
+	"husky":           {Glyph: "\U000f03e9", Color: [3]uint8{229, 229, 229}}, // husky
+	"i18n":            {Glyph: "\U000f05ca", Color: [3]uint8{121, 134, 203}}, // i18n (Not supported by nerdFont)
+	"image":           {Glyph: "\U000f021f", Color: [3]uint8{48, 166, 154}},  // image
+	"ionic":           {Glyph: "\U0000e7a9", Color: [3]uint8{79, 143, 247}},  // ionic
+	"java":            {Glyph: "\U000f0176", Color: [3]uint8{244, 68, 62}},   // java
+	"javascript":      {Glyph: "\U0000e74e", Color: [3]uint8{255, 202, 61}},  // javascript
+	"javascript-map":  {Glyph: "\U0000e781", Color: [3]uint8{255, 202, 61}},  // javascript-map
+	"jenkins":         {Glyph: "\U0000e767", Color: [3]uint8{240, 214, 183}}, // jenkins
+	"jest":            {Glyph: "\U000f0af7", Color: [3]uint8{244, 85, 62}},   // jest (Not supported by nerdFont)
+	"jinja":           {Glyph: "\U0000e66f", Color: [3]uint8{174, 44, 42}},   // jinja
+	"json":            {Glyph: "\U0000e60b", Color: [3]uint8{251, 193, 60}},  // json
+	"julia":           {Glyph: "\U0000e624", Color: [3]uint8{134, 82, 159}},  // julia
+	"karma":           {Glyph: "\U0000e622", Color: [3]uint8{60, 190, 174}},  // karma
+	"key":             {Glyph: "\U000f0306", Color: [3]uint8{48, 166, 154}},  // key
+	"kotlin":          {Glyph: "\U0000e634", Color: [3]uint8{139, 195, 74}},  // kotlin
+	"laravel":         {Glyph: "\U0000e73f", Color: [3]uint8{248, 80, 81}},   // laravel
+	"less":            {Glyph: "\U0000e60b", Color: [3]uint8{2, 119, 189}},   // less
+	"lib":             {Glyph: "\U0000f831", Color: [3]uint8{139, 195, 74}},  // lib
+	"linux":           {Glyph: "\U0000e712", Color: [3]uint8{238, 207, 55}},  // linux
+	"liquid":          {Glyph: "\U0000e275", Color: [3]uint8{40, 182, 246}},  // liquid
+	"lock":            {Glyph: "\U000f033e", Color: [3]uint8{255, 213, 79}},  // lock
+	"log":             {Glyph: "\U0000f719", Color: [3]uint8{175, 180, 43}},  // log
+	"lua":             {Glyph: "\U0000e620", Color: [3]uint8{66, 165, 245}},  // lua
+	"makefile":        {Glyph: "\U000f0229", Color: [3]uint8{239, 83, 80}},   // makefile
+	"manjaro":         {Glyph: "\U0000f312", Color: [3]uint8{73, 185, 90}},   // manjaro
+	"markdown":        {Glyph: "\U0000eb1d", Color: [3]uint8{66, 165, 245}},  // markdown
+	"markojs":         {Glyph: "\U0000f13b", Color: [3]uint8{2, 119, 189}},   // markojs (Not supported by nerdFont)
+	"mdx":             {Glyph: "\U0000f853", Color: [3]uint8{255, 202, 61}},  // mdx
+	"merlin":          {Glyph: "\U0000f136", Color: [3]uint8{66, 165, 245}},  // merlin (Not supported by nerdFont)
+	"midi":            {Glyph: "\U000f08f2", Color: [3]uint8{66, 165, 245}},  // midi
+	"mint":            {Glyph: "\U0000f30f", Color: [3]uint8{125, 190, 58}},  // mint
+	"mjml":            {Glyph: "\U0000e714", Color: [3]uint8{249, 89, 63}},   // mjml (Not supported by nerdFont)
+	"mocha":           {Glyph: "\U000f01aa", Color: [3]uint8{161, 136, 127}}, // mocha (Not supported by nerdFont)
+	"modernizr":       {Glyph: "\U0000e720", Color: [3]uint8{234, 72, 99}},   // modernizr
+	"moonscript":      {Glyph: "\U0000f186", Color: [3]uint8{251, 193, 60}},  // moonscript
+	"mxml":            {Glyph: "\U0000f72d", Color: [3]uint8{254, 168, 62}},  // mxml
+	"mysql":           {Glyph: "\U0000e704", Color: [3]uint8{1, 94, 134}},    // mysql
+	"nim":             {Glyph: "\U000f01a5", Color: [3]uint8{255, 202, 61}},  // nim
+	"nix":             {Glyph: "\U0000f313", Color: [3]uint8{80, 117, 193}},  // nix
+	"nodejs":          {Glyph: "\U000f0399", Color: [3]uint8{139, 195, 74}},  // nodejs
+	"npm":             {Glyph: "\U0000e71e", Color: [3]uint8{203, 56, 55}},   // npm
+	"nuget":           {Glyph: "\U0000e77f", Color: [3]uint8{3, 136, 209}},   // nuget (Not supported by nerdFont)
+	"nuxt":            {Glyph: "\U000f1106", Color: [3]uint8{65, 184, 131}},  // nuxt
+	"ocaml":           {Glyph: "\U0000e67a", Color: [3]uint8{253, 154, 62}},  // ocaml
+	"opam":            {Glyph: "\U0000f1ce", Color: [3]uint8{255, 213, 79}},  // opam (Not supported by nerdFont)
+	"opensuse":        {Glyph: "\U0000f314", Color: [3]uint8{111, 180, 36}},  // opensuse
+	"pascal":          {Glyph: "\U000f03db", Color: [3]uint8{3, 136, 209}},   // pascal (Not supported by nerdFont)
+	"pawn":            {Glyph: "\U0000e261", Color: [3]uint8{239, 111, 60}},  // pawn
+	"pdf":             {Glyph: "\U0000e67d", Color: [3]uint8{244, 68, 62}},   // pdf
+	"perl":            {Glyph: "\U0000e769", Color: [3]uint8{149, 117, 205}}, // perl
+	"php":             {Glyph: "\U0000e608", Color: [3]uint8{65, 129, 190}},  // php
+	"postcss":         {Glyph: "\U000f031c", Color: [3]uint8{244, 68, 62}},   // postcss (Not supported by nerdFont)
+	"postgresql":      {Glyph: "\U0000e76e", Color: [3]uint8{49, 99, 140}},   // postgresql
+	"powerpoint":      {Glyph: "\U000f0227", Color: [3]uint8{209, 71, 51}},   // powerpoint
+	"powershell":      {Glyph: "\U000f0a0a", Color: [3]uint8{5, 169, 244}},   // powershell
+	"prettier":        {Glyph: "\U0000e6b4", Color: [3]uint8{86, 179, 180}},  // prettier
+	"prisma":          {Glyph: "\U0000e684", Color: [3]uint8{229, 56, 150}},  // prisma
+	"prolog":          {Glyph: "\U0000e7a1", Color: [3]uint8{239, 83, 80}},   // prolog
+	"protractor":      {Glyph: "\U0000f288", Color: [3]uint8{229, 61, 58}},   // protractor (Not supported by nerdFont)
+	"pug":             {Glyph: "\U0000e686", Color: [3]uint8{239, 204, 163}}, // pug
+	"puppet":          {Glyph: "\U0000e631", Color: [3]uint8{251, 193, 60}},  // puppet
+	"purescript":      {Glyph: "\U0000e630", Color: [3]uint8{66, 165, 245}},  // purescript
+	"python":          {Glyph: "\U000f0320", Color: [3]uint8{52, 102, 143}},  // python
+	"python-misc":     {Glyph: "\U0000e606", Color: [3]uint8{130, 61, 28}},   // python-misc
+
 	"qsharp":           {Glyph: "\U0000f292", Color: [3]uint8{251, 193, 60}},  // qsharp (Not supported by nerdFont)
 	"r":                {Glyph: "\U000f07d4", Color: [3]uint8{25, 118, 210}},  // r
 	"raml":             {Glyph: "\U0000e60b", Color: [3]uint8{66, 165, 245}},  // raml
