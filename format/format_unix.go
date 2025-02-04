@@ -4,6 +4,7 @@
 package format
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"syscall"
@@ -65,5 +66,5 @@ func GetModeExtended(fi *os.FileInfo, fullPath string) string {
 		modeStr += "@"
 	}
 
-	return modeStr
+	return fmt.Sprintf("%-*s", 11, modeStr)
 }
