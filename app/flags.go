@@ -55,7 +55,7 @@ func GetConfigFromCli() *Config {
 	opt.Parse(os.Args)
 
 	if *help {
-		printHelpMessage()
+		printHelpMessage(opt)
 		os.Exit(0)
 	}
 
@@ -120,9 +120,9 @@ func printVersion() {
 	fmt.Printf("logo-ls %s\nLicense MIT <https://opensource.org/licenses/MIT>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n", "v1.3.7")
 }
 
-func printHelpMessage() {
+func printHelpMessage(opt *getopt.Set) {
 	fmt.Println("List information about the FILEs with ICONS and GIT STATUS (the current dir \nby default). Sort entries alphabetically if none of -tvSUX is specified.")
-	getopt.PrintUsage(os.Stdout)
+	opt.PrintUsage(os.Stdout)
 	fmt.Println("\nExit status:")
 	fmt.Println(" 0  if OK,")
 	fmt.Println(" 1  if minor problems (e.g., cannot access subdirectory),")
