@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
@@ -37,15 +37,11 @@ jobs:
           path: .
       - name: Create Release
         id: create_release
-        uses: comnoco/create-release@v2
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: CHANGELOG.md.tmp
-          draft: false
-          prerelease: false
+          bodyFile: CHANGELOG.md.tmp
 
   publish-assets:
     needs: create-release
