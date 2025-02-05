@@ -52,11 +52,22 @@ You can map an icon to a specific file name (i.e. `tsconfig.json`) by editing `i
 
 ## Installation
 
-Since no binary is available, you should compile yours by yourself (for now). You have to [install go](https://go.dev/doc/install), then run:
+### You don't want to build it yourself
+
+You can go to the [releases page](https://github.com/canta2899/logo-ls/releases/) of this repository and download the binary for your platform. Then, you can extract the archive (md5 checksums are provided in case you want to verify the integrity of the file). The extracted archive will contain a copy of the license file and the executable binary of logo-ls. You can then move the binary to a directory in your `$PATH` or symlink it.
+
+In case you want to replace the original `ls` command with `logo-ls`, I would suggest creating an alias to avoid breaking scripts that rely on the original `ls` command. You can do this by adding the following line to your shell configuration file (i.e. `~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+alias ls="logo-ls"
+```
+
+### You have go installed and want to build it yourself
+
+Clone the repository
 
 ```bash
 git clone https://github.com/canta2899/logo-ls
-cd logo-ls
 ```
 
 If you want to install directly to your `$GOPATH` you can use `go install`.
@@ -65,14 +76,16 @@ If you want to install directly to your `$GOPATH` you can use `go install`.
 go install ./cmd/logo-ls
 ```
 
-If you want to build the binary you can use `make`.
+If you want to build the binary you can use `make`:
 
 ```bash
-make logo-ls # outputs executable in bin/logo-ls
+# outputs executable 'logo-ls' in the root directory
+make logo-ls
 ```
-
-If you are not able to run make (i.e. you are on Windows) you can build the binary using the following command:
 
 ```bash
-go build -o logo-ls -ldflags="-s -w" -tags=minimal -trimpath ./cmd/logo-ls
+# cleans up the executable from the repo
+make clean
 ```
+
+
