@@ -1,0 +1,27 @@
+name: Docker Example
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/canta2899/logo-ls
+          docker build . --tag $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:latest
