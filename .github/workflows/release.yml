@@ -1,0 +1,70 @@
+name: Release 
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  extract-changelog:
+    name: Extract Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Extract Release Notes
+        run: awk '/^## /{if (p++) exit} p' CHANGELOG.md > CHANGELOG.md.tmp
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG.md.tmp
+          retention_days: 1
+
+  create-release:
+    name: Create Release
+    needs: extract-changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: .
+      - name: Create Release
+        id: create_release
+        uses: comnoco/create-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: CHANGELOG.md.tmp
+          draft: false
+          prerelease: false
+
+  publish-assets:
+    needs: create-release
+    name: Publish assets 
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64, arm64]
+        exclude:
+          - goarch: "386"
+            goos: darwin
+    steps:
+      - uses: actions/checkout@v2
+      - uses: wangyoucao577/go-release-action@v1.53
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          project_path: "."
+          build_command: "make"
+          extra_files: LICENSE

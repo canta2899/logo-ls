@@ -22,3 +22,5 @@ testdata/dirEnv*
 
 .DS_Store
 bin/
+logo-ls
+CHANGELOG.md.tmp

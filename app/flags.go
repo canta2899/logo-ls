@@ -9,6 +9,8 @@ import (
 	"github.com/pborman/getopt/v2"
 )
 
+var Version = ""
+
 func GetConfigFromCli() *Config {
 
 	c := NewConfig()
@@ -117,7 +119,7 @@ func GetConfigFromCli() *Config {
 }
 
 func printVersion() {
-	fmt.Printf("logo-ls %s\nLicense MIT <https://opensource.org/licenses/MIT>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n", "v1.3.7")
+	fmt.Printf("logo-ls %s\nLicense MIT <https://opensource.org/licenses/MIT>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n", Version)
 }
 
 func printHelpMessage(opt *getopt.Set) {
