@@ -54,9 +54,15 @@ You can map an icon to a specific file name (i.e. `tsconfig.json`) by editing `i
 
 ### You don't want to build it yourself
 
-You can go to the [releases page](https://github.com/canta2899/logo-ls/releases/) of this repository and download the binary for your platform. Then, you can extract the archive (md5 checksums are provided in case you want to verify the integrity of the file). The extracted archive will contain a copy of the license file and the executable binary of logo-ls. You can then move the binary to a directory in your `$PATH` or symlink it.
+If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to /usr/local/bin (might require sudo priviledges for that):
 
-In case you want to replace the original `ls` command with `logo-ls`, I would suggest creating an alias to avoid breaking scripts that rely on the original `ls` command. You can do this by adding the following line to your shell configuration file (i.e. `~/.bashrc`, `~/.zshrc`, etc.):
+```bash
+curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
+```
+
+Otherwise, you can manually download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/). Then, you have to extract the archive (md5 checksums are provided in case you want to verify the integrity of the file) and move the executable binary of logo-ls to a directory in your `$PATH` (or symlink it).
+
+In case you want to replace the original `ls` command with `logo-ls`, I would suggest **adding an alias**:
 
 ```bash
 alias ls="logo-ls"
@@ -87,5 +93,3 @@ make logo-ls
 # cleans up the executable from the repo
 make clean
 ```
-
-
