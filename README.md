@@ -1,29 +1,10 @@
 # logo-ls
 
-This is a fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago.
-
-My primary goals have been:
-
-- Correct output (I should see all the files /bin/ls would show me)
-- Informative output (I should see at least what /bin/ls would show me)
-- MacOS / Linux / Windows compatibility (I mainly develop on OSX but I want to use logo-ls everywhere)
-
-The modifications I made involved:
+This is a fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Check the [Installation Guide](#installation) if you want to install it.
 
 ## What I did
 
-- A lot of refactoring, at the point where the codebase is very different from the original one
-- Removing files with case sensitive naming which where causing issues when cloning the repo on Windows/MacOs
-- Changing UTF-8 space character in order to properly render the output on every terminal
-- Fixing a bug on path separators that caused issues with the git status flag on Windows machines
-- Implementing a symlink resolution that behaves like the one of the original [ls(coreutils)](https://www.gnu.org/software/coreutils/manual/html_node/ls-invocation.html#ls-invocation).
-- Nerd Fonts Version 3 migration (this breaks compatibility with codepoints of previous versions)
-- Added hard link count
-- Added inode numbers
-- Updated CLI args parsing so that it mostly behaves like the one of ls(coreutils)
-- Re-implemented the git status feature from scratch reducing build size and improving performance
-- Added extended attributes support
-- Added sticky bit support
+I fixed several bugs and implemented some additional features, including Nerd Fonts v3 migration and symlinks count. You can check a complete list of features and fixes on the `CHANGELOG.md` file.
 
 ## What I plan to do
 
@@ -38,7 +19,7 @@ Feel free to contribute and I'll be more than happy to merge your changes. In ca
 
 ---
 
-# Adding Icons
+## Adding Icons
 
 In order to add new icons you need to:
 
