@@ -35,7 +35,7 @@ You can map an icon to a specific file name (i.e. `tsconfig.json`) by editing `i
 
 ### You don't want to build it yourself
 
-If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to /usr/local/bin (might require sudo priviledges for that):
+If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to ~/.local/bin:
 
 ```bash
 curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
