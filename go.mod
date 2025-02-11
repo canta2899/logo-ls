@@ -13,4 +13,4 @@ require (
 
 require github.com/mattn/go-isatty v0.0.20 // indirect
 
-replace github.com/pborman/getopt/v2 => github.com/rkennedy/getopt/v2 v2.0.0-20231113214939-8e2a55a5c3b3
+replace github.com/pborman/getopt/v2 => github.com/canta2899/getopt/v2 v2.1.0
