@@ -41,12 +41,27 @@ If you are on Linux or OSX you can run this script on your shell to download the
 curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
 ```
 
+You can do the same on Windows by running the following command in powershell
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+irm https://raw.githubusercontent.com/canta2899/logo-ls/main/get.ps1 | iex
+```
+
 Otherwise, you can manually download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/). Then, you have to extract the archive (md5 checksums are provided in case you want to verify the integrity of the file) and move the executable binary of logo-ls to a directory in your `$PATH` (or symlink it).
 
 In case you want to replace the original `ls` command with `logo-ls`, I would suggest **adding an alias**:
 
+On OSX/Linux
+
 ```bash
 alias ls="logo-ls"
+```
+
+On Windows (powershell)
+ 
+```powershell
+Set-Alias ls logo-ls
 ```
 
 ### You have go installed and want to build it yourself
