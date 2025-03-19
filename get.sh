@@ -17,3 +17,5 @@ if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
 fi
 
 curl -sL ${DOWNLOAD_URL} | tar -xzf - logo-ls && mv logo-ls $INSTALL_DIR
+
+echo "logo-ls installed succesfully to $INSTALL_DIR"
