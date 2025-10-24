@@ -33,6 +33,8 @@ You can map an icon to a specific file name (i.e. `tsconfig.json`) by editing `i
 
 ## Installation
 
+You can either use the install script to download the latest binary release or build it yourself (requires having go installed). In both cases, you should be using Nerd Fonts in your terminal to see the icons properly. The configuration depends on your terminal emulator, but generally it simply involves entering the settings and changing the font. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads).
+
 ### You don't want to build it yourself
 
 If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to ~/.local/bin:
