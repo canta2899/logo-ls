@@ -37,7 +37,7 @@ You can either use the install script to download the latest binary release or b
 
 ### You don't want to build it yourself
 
-If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to ~/.local/bin:
+If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to ~/.local/bin. The same command can be used also to update your current installation of logo-ls to the latest version:
 
 ```bash
 curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
