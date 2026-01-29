@@ -1,8 +1,6 @@
 module github.com/canta2899/logo-ls
 
-go 1.22.0
-
-toolchain go1.23.2
+go 1.25.6
 
 require (
 	github.com/mattn/go-colorable v0.1.14
