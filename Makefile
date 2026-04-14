@@ -5,7 +5,7 @@ BUILD_FLAGS=-ldflags="-s -w -X 'github.com/canta2899/logo-ls/app.Version=$(VERSI
 
 OUTPUT_NAME=$(APP_NAME)$(if $(findstring windows,$(GOOS)),.exe,)
 
-.PHONY: all bindir clean test install
+.PHONY: all bindir clean test install logo-ls
 
 all: logo-ls
 

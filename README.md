@@ -10,7 +10,6 @@ I fixed several bugs and implemented some additional features, including Nerd Fo
 
 - Implement custom time stamp formatting
 - Implement filter by regex pattern to avoid listing unwanted files or subdirectories
-- Show size of directories as the sum of the sizes of their contents (this would be different than the behavior of _ls(coreutils)_)
 - Add more tests
 - Deploy to package managers
 - Introduce a configuration file to customize the output

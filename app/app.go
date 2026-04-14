@@ -1,3 +1,4 @@
+// Package app
 package app
 
 import (
@@ -7,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -16,7 +18,7 @@ import (
 	"github.com/canta2899/logo-ls/model"
 )
 
-// Represents the main application that holds configuration, a writer, exit codes, and a logger.
+// App represents the main application that holds configuration, a writer, exit codes, and a logger.
 type App struct {
 	Config   *Config
 	Writer   io.Writer
@@ -24,7 +26,7 @@ type App struct {
 	Logger   *log.Logger
 }
 
-// Stores the parsed command-line arguments as separate files and directories.
+// Args stores the parsed command-line arguments as separate files and directories.
 type Args struct {
 	Files []model.FileEntry
 	Dirs  []model.DirectoryEntry
@@ -35,25 +37,23 @@ type RecursiveLookupFrame struct {
 	header string // if non-empty, printed as: "\n<icon><header>:\n"
 }
 
-// Terminates the program with the current stored exit code.
+// Exit terminates the program with the current stored exit code.
 func (a *App) Exit() {
 	os.Exit(int(a.ExitCode))
 }
 
-// Copies a buffer to the App's writer, panicking on error.
+// Write copies a buffer to the App's writer, panicking on error.
 func (a *App) Write(buf *bytes.Buffer) {
 	if _, err := io.Copy(a.Writer, buf); err != nil {
 		panic(err)
 	}
 }
 
-// Parses the configured file list and categorizes them as files or directories.
+// GetArguments parses the configured file list and categorizes them as files or directories.
 // It also sets an error exit code for entries that are not accessible.
 func (a *App) GetArguments() *Args {
 	// Sort all user inputs.
-	sort.Slice(a.Config.FileList, func(i, j int) bool {
-		return a.Config.FileList[i] < a.Config.FileList[j]
-	})
+	slices.Sort(a.Config.FileList)
 
 	args := &Args{}
 
@@ -96,7 +96,7 @@ func (a *App) GetArguments() *Args {
 	return args
 }
 
-// Main entry point that orchestrates listing files/directories and printing results.
+// Run is the main entry point that orchestrates listing files/directories and printing results.
 func (a *App) Run() {
 	args := a.GetArguments()
 
@@ -170,7 +170,6 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 
 // Processes a directory, prints it, and recurses through subdirectories if any.
 func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath string) {
-
 	stack := []*RecursiveLookupFrame{{entry: start, header: ""}}
 
 	for len(stack) > 0 {

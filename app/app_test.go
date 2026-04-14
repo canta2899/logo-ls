@@ -129,7 +129,7 @@ func TestProcessDirectory(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	filePath := filepath.Join(tempDir, "file.txt")
-	err = os.WriteFile(filePath, []byte("hello world"), 0644)
+	err = os.WriteFile(filePath, []byte("hello world"), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create file in temporary directory: %v", err)
 	}

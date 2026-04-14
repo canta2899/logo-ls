@@ -5,17 +5,15 @@ import (
 	"testing"
 
 	"github.com/canta2899/logo-ls/model"
-	"github.com/pborman/getopt/v2"
 )
 
-// reset os.Args and the getopt state before calling GetConfigFromCli.
+// reset os.Args before calling GetConfigFromCli.
 func parseArgs(args []string) *Config {
 	// Save original os.Args so we can restore it later.
 	origArgs := os.Args
 	defer func() { os.Args = origArgs }()
 
 	os.Args = args
-	getopt.Reset() // Reset the flag parser between tests.
 	return GetConfigFromCli()
 }
 
@@ -129,5 +127,30 @@ func TestIncludeAlmost(t *testing.T) {
 	cfg := parseArgs([]string{"app", "-A"})
 	if cfg.AllMode != model.IncludeAlmost {
 		t.Errorf("expected AllMode to be IncludeAlmost, got %v", cfg.AllMode)
+	}
+}
+
+// Verifies that path can be between flags.
+func TestMixedArgs(t *testing.T) {
+	cfg := parseArgs([]string{"app", "-a", "something", "-l"})
+	if cfg.AllMode != model.IncludeAll {
+		t.Errorf("expected AllMode to be IncludeAll, got %v", cfg.AllMode)
+	}
+	if cfg.LongListingMode != model.LongListingDefault {
+		t.Errorf("expected LongListingMode to be LongListingDefault, got %v", cfg.LongListingMode)
+	}
+	if len(cfg.FileList) != 1 || cfg.FileList[0] != "something" {
+		t.Errorf("expected FileList to be [\"something\"], got %v", cfg.FileList)
+	}
+
+	cfg = parseArgs([]string{"app", "something", "-al"})
+	if cfg.AllMode != model.IncludeAll {
+		t.Errorf("expected AllMode to be IncludeAll, got %v", cfg.AllMode)
+	}
+	if cfg.LongListingMode != model.LongListingDefault {
+		t.Errorf("expected LongListingMode to be LongListingDefault, got %v", cfg.LongListingMode)
+	}
+	if len(cfg.FileList) != 1 || cfg.FileList[0] != "something" {
+		t.Errorf("expected FileList to be [\"something\"], got %v", cfg.FileList)
 	}
 }
