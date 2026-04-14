@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## logo-ls [1.4.1]
 
-## Fixes
+### Fixes
 
 - Migrated to internal args parser with no external dependencies
 - Improved error handling
