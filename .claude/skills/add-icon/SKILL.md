@@ -1,0 +1,1 @@
+/Users/andrea/development/projects/logo-ls/.agents/skills/add-icon/SKILL.md
