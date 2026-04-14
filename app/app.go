@@ -157,7 +157,7 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 		d, err := a.ProcessDirectory(&dirEntry)
 		dirEntry.Close()
 		if err != nil {
-			a.Logger.Printf("partial access to %q: %v\n", dirEntry.Name(), err)
+			a.Logger.Printf("cannot access %q: %v\n", dirEntry.Name(), err)
 			a.ExitCode.SetSerious()
 		}
 
@@ -184,13 +184,13 @@ func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath
 		d, err := a.ProcessDirectory(current.entry)
 		current.entry.Close()
 		if err != nil {
-			a.Logger.Printf("partial access to %q: %v\n", current.entry.Name(), err)
+			a.Logger.Printf("cannot access %q: %v\n", current.entry.Name(), err)
 			a.ExitCode.SetMinor()
 		}
 
 		a.PrintDirectory(d)
 
-		if len(d.Dirs) == 0 {
+		if d == nil || len(d.Dirs) == 0 {
 			continue
 		}
 
@@ -277,10 +277,8 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		return t, nil
 	}
 
-	files, err := d.Readdir(0)
-	if err != nil {
-		return t, err
-	}
+	entries, err := d.ReadDir(0)
+	// We proceed even if err != nil, as entries may contain a partial list.
 
 	// If Git status is requested, prepare the repository info map.
 	var gitRepoStatus map[string]string
@@ -294,36 +292,55 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	showHidden := a.Config.AllMode != model.IncludeDefault
 
 	// Build entries for each file
-	for _, fi := range files {
-		name := fi.Name()
+	for _, de := range entries {
+		name := de.Name()
 		if !showHidden && strings.HasPrefix(name, ".") {
 			continue
 		}
 
 		fullpath := filepath.Join(d.Name(), name)
+		fi, err := de.Info() // fi might be nil on error
+		if err != nil {
+			a.Logger.Printf("cannot access %q: %v\n", fullpath, err)
+			a.ExitCode.SetMinor()
+		}
+
 		entry := a.buildEntry(fullpath, fi, isLong)
 
+		// If we couldn't get full info but we have type from DirEntry, use it.
+		if fi == nil {
+			entry.Mode = "???????????"
+			if de.IsDir() {
+				entry.Indicator = "/"
+			} else if de.Type()&os.ModeSymlink != 0 {
+				entry.Indicator = "@"
+			}
+		}
+
 		if !a.Config.DisableIcon {
-			if format.IsLink(fullpath) {
+			if fi != nil && format.IsLink(fullpath) {
 				if s, err := filepath.EvalSymlinks(fullpath); err == nil {
 					realExt := filepath.Ext(s)
 					realName := s[0 : len(s)-len(realExt)]
 					realIndicator := format.GetIndicator(s, isLong)
 					entry.Icon = format.GetIcon(realName, realExt, realIndicator)
 				}
+			} else if fi == nil {
+				// Re-evaluate icon based on what we know
+				entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
 			}
 		}
 
 		// If Git status is available, attach it.
 		if gitRepoStatus != nil {
-			entry.GitStatus = gitRepoStatus[fi.Name()+model.PathSeparator]
+			entry.GitStatus = gitRepoStatus[name+model.PathSeparator]
 			if entry.GitStatus == "" {
-				entry.GitStatus = gitRepoStatus[fi.Name()]
+				entry.GitStatus = gitRepoStatus[name]
 			}
 		}
 
 		t.Files = append(t.Files, entry)
-		if fi.IsDir() {
+		if de.IsDir() {
 			t.Dirs = append(t.Dirs, name+"/")
 		}
 	}
@@ -334,21 +351,19 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		}
 
 		pp := filepath.Dir(d.Name())
-		pStat, err2 := os.Lstat(pp)
+		pStat, _ := os.Lstat(pp)
 
-		if err2 == nil { // if we can't stat parent, skip adding
-			parentEntry := a.buildEntry(pp, pStat, isLong)
-			parentEntry.Name = ".."
-			parentEntry.Ext = ""
+		parentEntry := a.buildEntry(pp, pStat, isLong)
+		parentEntry.Name = ".."
+		parentEntry.Ext = ""
 
-			// Overwrite icon for parent
-			if !a.Config.DisableIcon {
-				parentEntry.Icon = format.GetOpenDirIcon()
-			}
-
-			t.Files = append(t.Files, parentEntry)
-			t.Parent = parentEntry
+		// Overwrite icon for parent
+		if !a.Config.DisableIcon {
+			parentEntry.Icon = format.GetOpenDirIcon()
 		}
+
+		t.Files = append(t.Files, parentEntry)
+		t.Parent = parentEntry
 	}
 	return t, err
 }
@@ -357,6 +372,16 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 // in a long-listing context.
 func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.Entry {
 	entry := &model.Entry{}
+
+	if fi == nil {
+		entry.Name = filepath.Base(fullPath)
+		entry.Ext = filepath.Ext(entry.Name)
+		entry.Name = entry.Name[0 : len(entry.Name)-len(entry.Ext)]
+		entry.Mode = "???????????"
+		entry.Owner = "?"
+		entry.Group = "?"
+		return entry
+	}
 
 	name := fi.Name()
 	if strings.HasPrefix(name, ".") && !strings.Contains(name[1:], ".") {

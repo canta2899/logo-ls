@@ -171,11 +171,15 @@ func GetIcon(name, ext, indicator string) *icons.IconInfo {
 	}
 
 	// change icon color if the file is executable
-	if indicator == "*" {
+	if indicator == "*" && i != nil {
 		if i.GetGlyph() == "\uf723" {
 			i = icons.IconDef["exe"]
 		}
 		i.MakeExe()
+	}
+
+	if i == nil {
+		i = icons.IconDef["file"]
 	}
 
 	return i
