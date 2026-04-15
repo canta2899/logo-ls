@@ -11,17 +11,52 @@ import (
 )
 
 func MainSort(a, b string) bool {
-	switch a {
-	case ".", "..":
-	default:
+	// "." and ".." always come first
+	if a == "." || a == ".." {
+		if b == "." || b == ".." {
+			return a < b
+		}
+		return true
+	}
+	if b == "." || b == ".." {
+		return false
+	}
+
+	aDot := strings.HasPrefix(a, ".")
+	bDot := strings.HasPrefix(b, ".")
+
+	// Dotfiles come before non-dotfiles
+	if aDot != bDot {
+		return aDot
+	}
+
+	// Within the same group, sort by name without the dot prefix (case-insensitive)
+	if aDot {
 		a = strings.TrimPrefix(a, ".")
 	}
-	switch b {
-	case ".", "..":
-	default:
+	if bDot {
 		b = strings.TrimPrefix(b, ".")
 	}
 	return strings.ToLower(a) < strings.ToLower(b)
+}
+
+// DotFileOrder checks whether dotfile grouping determines the order.
+// Returns (result, decided): if decided is true, use result as the less value.
+func DotFileOrder(a, b string) (bool, bool) {
+	aSpecial := a == "." || a == ".."
+	bSpecial := b == "." || b == ".."
+	if aSpecial || bSpecial {
+		if aSpecial && bSpecial {
+			return a < b, true
+		}
+		return aSpecial, true
+	}
+	aDot := strings.HasPrefix(a, ".")
+	bDot := strings.HasPrefix(b, ".")
+	if aDot != bDot {
+		return aDot, true
+	}
+	return false, false
 }
 
 // Custom less functions
@@ -35,10 +70,15 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	case model.SortSize:
 		// sort by file.Size, largest first
 		d.LessFn = func(i, j int) bool {
+			a := d.Files[i].Name + d.Files[i].Ext
+			b := d.Files[j].Name + d.Files[j].Ext
+			if res, ok := DotFileOrder(a, b); ok {
+				return res
+			}
 			if d.Files[i].Size > d.Files[j].Size {
 				return true
 			} else if d.Files[i].Size == d.Files[j].Size {
-				return MainSort(d.Files[i].Name+d.Files[i].Ext, d.Files[j].Name+d.Files[j].Ext)
+				return MainSort(a, b)
 			} else {
 				return false
 			}
@@ -52,10 +92,15 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	case model.SortExtension:
 		// sort alphabetically by entry extension
 		d.LessFn = func(i, j int) bool {
+			a := d.Files[i].Name + d.Files[i].Ext
+			b := d.Files[j].Name + d.Files[j].Ext
+			if res, ok := DotFileOrder(a, b); ok {
+				return res
+			}
 			if MainSort(d.Files[i].Ext, d.Files[j].Ext) {
 				return true
 			} else if strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
-				return MainSort(d.Files[i].Name+d.Files[i].Ext, d.Files[j].Name+d.Files[j].Ext)
+				return MainSort(a, b)
 			} else {
 				return false
 			}
@@ -63,7 +108,12 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	case model.SortNatural:
 		// natural sort of (version) numbers within text
 		d.LessFn = func(i, j int) bool {
-			return d.Files[i].Name+d.Files[i].Ext < d.Files[j].Name+d.Files[j].Ext
+			a := d.Files[i].Name + d.Files[i].Ext
+			b := d.Files[j].Name + d.Files[j].Ext
+			if res, ok := DotFileOrder(a, b); ok {
+				return res
+			}
+			return a < b
 		}
 	case model.SortNone:
 		fallthrough
