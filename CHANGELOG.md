@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## logo-ls [1.4.2]
+
+### Fixes
+
+- logo-ls now keeps dotfiles and dotfolders on top of the list regardless of the sorting method used, except "none" and "mod time"
+
 ## logo-ls [1.4.1]
 
 ### Fixes
