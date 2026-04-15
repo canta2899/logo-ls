@@ -31,9 +31,13 @@ case "$OS" in
     ;;
 esac
 
-LATEST_VERSION=$(curl -s https://api.github.com/repos/canta2899/logo-ls/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+if [ -z "$LOGO_LS_VERSION" ]; then
+  VERSION=$(curl -s https://api.github.com/repos/canta2899/logo-ls/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+else
+  VERSION="$LOGO_LS_VERSION"
+fi
 
-DOWNLOAD_URL="https://github.com/canta2899/logo-ls/releases/download/${LATEST_VERSION}/logo-ls-${LATEST_VERSION}-${OS}-${ARCH}.tar.gz"
+DOWNLOAD_URL="https://github.com/canta2899/logo-ls/releases/download/${VERSION}/logo-ls-${VERSION}-${OS}-${ARCH}.tar.gz"
 
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"

@@ -6,10 +6,14 @@ $arch = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture 
 
 $os = "windows"
 
-$latestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/canta2899/logo-ls/releases/latest").tag_name
+if ($env:LOGO_LS_VERSION) {
+    $version = $env:LOGO_LS_VERSION
+} else {
+    $version = (Invoke-RestMethod -Uri "https://api.github.com/repos/canta2899/logo-ls/releases/latest").tag_name
+}
 
 # Download URL
-$downloadUrl = "https://github.com/canta2899/logo-ls/releases/download/$latestVersion/logo-ls-$latestVersion-$os-$arch.zip"
+$downloadUrl = "https://github.com/canta2899/logo-ls/releases/download/$version/logo-ls-$version-$os-$arch.zip"
 
 $installDir = "$env:USERPROFILE\.local\bin"
 
@@ -24,7 +28,7 @@ if (-Not ($env:PATH -split ";" | Where-Object { $_ -eq $installDir })) {
 
 $tempZip = [System.IO.Path]::Combine($env:TEMP, "logo-ls.zip")
 
-Write-Host "Downloading logo-ls $latestVersion for $os-$arch..."
+Write-Host "Downloading logo-ls $version for $os-$arch..."
 Invoke-WebRequest -Uri $downloadUrl -OutFile $tempZip
 
 Write-Host "Extracting to $installDir..."
