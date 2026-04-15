@@ -2,6 +2,10 @@
 
 This is a fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Check the [Installation Guide](#installation) if you want to install it.
 
+<div align="center">
+<img src="./.github/assets/screen.png" alt="logo-ls screenshot" width="600"/>
+</div>
+
 ## What I did
 
 I fixed several bugs and implemented some additional features, including Nerd Fonts v3 migration and symlinks count. You can check a complete list of features and fixes on the `CHANGELOG.md` file.
