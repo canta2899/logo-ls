@@ -21,7 +21,7 @@ type FS interface {
 	Rel(base, target string) (string, error)
 	FromSlash(path string) string
 
-	// Indicator returns the suffix character appended to a name ("/", "@",
+	// Indicator returns the suffix character appended to a name ("/", "@", etc.).
 	Indicator(path string, longMode bool) string
 
 	IsLink(path string) bool
