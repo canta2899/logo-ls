@@ -103,7 +103,15 @@ func (o *osFS) symlinkIndicator(name string, longMode bool) string {
 		return "@"
 	}
 	if s, err := filepath.EvalSymlinks(name); err == nil {
-		return " ~> " + strings.Replace(s, os.Getenv("HOME"), "~", 1)
+		home := os.Getenv("HOME")
+		if home != "" {
+			if s == home {
+				s = "~"
+			} else if strings.HasPrefix(s, home+string(filepath.Separator)) {
+				s = "~" + strings.TrimPrefix(s, home)
+			}
+		}
+		return " ~> " + s
 	}
 	return ""
 }
