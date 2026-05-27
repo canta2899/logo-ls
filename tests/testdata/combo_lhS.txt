@@ -1,0 +1,6 @@
+-rw-r--r--  1 alice  staff   999 2026-01-10 10:00 zebra.txt
+-rw-r--r--  1 alice  staff   500 2026-01-15 10:00 file2.go
+-rw-r--r--  1 alice  staff   200 2026-03-01 10:00 Makefile
+-rw-r--r--  1 alice  staff    50 2026-01-20 10:00 file10.go
+-rw-r--r--  1 alice  staff    10 2026-02-01 10:00 README.md
+-rw-r--r--  1 alice  staff     5 2026-04-01 10:00 alpha.txt

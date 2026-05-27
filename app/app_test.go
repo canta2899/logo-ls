@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/canta2899/logo-ls/ctw"
+	"github.com/canta2899/logo-ls/fs/osfs"
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
 )
@@ -19,15 +20,17 @@ import (
 type DummyTimeFormatter struct{}
 
 func (d DummyTimeFormatter) Format(t *time.Time) string {
-	// Fixed layout for testing.
 	return t.Format("2006-01-02 15:04:05")
 }
 
-// dummyIcon is used in place of a real icon when testing PrintDirectory.
-type dummyIcon struct{}
-
-func (d dummyIcon) GetColor() string { return "" }
-func (d dummyIcon) GetGlyph() string { return "" }
+func newTestApp(conf *Config, logger *log.Logger, writer io.Writer) *App {
+	return &App{
+		Config: conf,
+		Writer: writer,
+		Logger: logger,
+		FS:     osfs.New(),
+	}
+}
 
 // TestGetArguments creates a temporary file, a temporary directory,
 // and passes a non-existent path. It then checks that GetArguments
@@ -56,12 +59,7 @@ func TestGetArguments(t *testing.T) {
 
 	var logBuf bytes.Buffer
 	logger := log.New(&logBuf, "", 0)
-
-	appInstance := &App{
-		Config: conf,
-		Writer: new(bytes.Buffer),
-		Logger: logger,
-	}
+	appInstance := newTestApp(conf, logger, new(bytes.Buffer))
 
 	args := appInstance.GetArguments()
 	if len(args.Files) != 1 {
@@ -71,12 +69,10 @@ func TestGetArguments(t *testing.T) {
 		t.Errorf("Expected 1 directory entry, got %d", len(args.Dirs))
 	}
 
-	// Check that a log message was emitted for the non-existent entry.
 	if !strings.Contains(logBuf.String(), "cannot access") && !strings.Contains(logBuf.String(), "cannot get absolute path") {
 		t.Error("Expected log output for non-existent path, got none")
 	}
 
-	// Check that the exit code was flagged (assuming zero means success).
 	if int(appInstance.ExitCode) == 0 {
 		t.Error("Expected non-zero exit code due to error, got 0")
 	}
@@ -92,25 +88,21 @@ func TestProcessFiles(t *testing.T) {
 	tempFile.Close()
 	defer os.Remove(tempFileName)
 
-	fi, err := os.Stat(tempFileName)
-	if err != nil {
-		t.Fatalf("Failed to stat temporary file: %v", err)
-	}
-
-	fileEntry := model.FileEntry{
-		FileInfo: fi,
-		AbsPath:  tempFileName,
-	}
-
 	conf := &Config{
 		LongListingMode: model.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		DisableIcon:     true,
 	}
-	appInstance := &App{
-		Config: conf,
-		Writer: new(bytes.Buffer),
-		Logger: log.New(io.Discard, "", 0),
+	appInstance := newTestApp(conf, log.New(io.Discard, "", 0), new(bytes.Buffer))
+
+	fi, err := appInstance.FS.Stat(tempFileName)
+	if err != nil {
+		t.Fatalf("Failed to stat temporary file: %v", err)
+	}
+
+	fileEntry := model.FileEntry{
+		Info:    fi,
+		AbsPath: tempFileName,
 	}
 
 	dirModel := appInstance.ProcessFiles([]model.FileEntry{fileEntry})
@@ -129,20 +121,8 @@ func TestProcessDirectory(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	filePath := filepath.Join(tempDir, "file.txt")
-	err = os.WriteFile(filePath, []byte("hello world"), 0o644)
-	if err != nil {
+	if err := os.WriteFile(filePath, []byte("hello world"), 0o644); err != nil {
 		t.Fatalf("Failed to create file in temporary directory: %v", err)
-	}
-
-	f, err := os.Open(tempDir)
-	if err != nil {
-		t.Fatalf("Failed to open temporary directory: %v", err)
-	}
-
-	// ProcessDirectory will call Close() on the directory.
-	dirEntry := &model.DirectoryEntry{
-		File:    *f,
-		AbsPath: tempDir,
 	}
 
 	conf := &Config{
@@ -151,11 +131,13 @@ func TestProcessDirectory(t *testing.T) {
 		TimeFormatter:   DummyTimeFormatter{},
 		DisableIcon:     true,
 	}
-	appInstance := &App{
-		Config: conf,
-		Writer: new(bytes.Buffer),
-		Logger: log.New(io.Discard, "", 0),
+	appInstance := newTestApp(conf, log.New(io.Discard, "", 0), new(bytes.Buffer))
+
+	f, err := appInstance.FS.Open(tempDir)
+	if err != nil {
+		t.Fatalf("Failed to open temporary directory: %v", err)
 	}
+	dirEntry := &model.DirectoryEntry{File: f, AbsPath: tempDir}
 
 	dirModel, err := appInstance.ProcessDirectory(dirEntry)
 	if err != nil {
@@ -183,11 +165,6 @@ func TestBuildEntry(t *testing.T) {
 	tempFile.Close()
 	defer os.Remove(tempFileName)
 
-	fi, err := os.Stat(tempFileName)
-	if err != nil {
-		t.Fatalf("Failed to stat temporary file: %v", err)
-	}
-
 	conf := &Config{
 		LongListingMode: model.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
@@ -195,17 +172,17 @@ func TestBuildEntry(t *testing.T) {
 		ShowBlockSize:   false,
 		DisableIcon:     true,
 	}
-	appInstance := &App{
-		Config: conf,
-		Writer: new(bytes.Buffer),
-		Logger: log.New(io.Discard, "", 0),
+	appInstance := newTestApp(conf, log.New(io.Discard, "", 0), new(bytes.Buffer))
+
+	fi, err := appInstance.FS.Stat(tempFileName)
+	if err != nil {
+		t.Fatalf("Failed to stat temporary file: %v", err)
 	}
 
 	entry := appInstance.buildEntry(tempFileName, fi, false)
 	if entry.Name == "" {
 		t.Error("buildEntry returned an empty name")
 	}
-	// Expect no extension if the file name has none.
 	if entry.Ext != "" {
 		t.Errorf("Expected empty extension, got %q", entry.Ext)
 	}
@@ -213,7 +190,6 @@ func TestBuildEntry(t *testing.T) {
 
 // TestPrintDirectory builds a dummy directory model and then verifies that PrintDirectory writes output.
 func TestPrintDirectory(t *testing.T) {
-	// Create a dummy file entry.
 	dummyEntry := &model.Entry{
 		Icon:      &icons.IconInfo{Glyph: "dummy", Color: [3]uint8{0, 0, 0}, IsExecutable: false},
 		Name:      "dummy",
@@ -222,7 +198,6 @@ func TestPrintDirectory(t *testing.T) {
 		Size:      456,
 		ModTime:   time.Now(),
 	}
-	// Create a dummy directory model.
 	dirModel := &model.Directory{
 		Files: []*model.Entry{dummyEntry},
 	}
@@ -235,11 +210,7 @@ func TestPrintDirectory(t *testing.T) {
 		TimeFormatter:   DummyTimeFormatter{},
 	}
 	var buf bytes.Buffer
-	appInstance := &App{
-		Config: conf,
-		Writer: &buf,
-		Logger: log.New(io.Discard, "", 0),
-	}
+	appInstance := newTestApp(conf, log.New(io.Discard, "", 0), &buf)
 
 	appInstance.PrintDirectory(dirModel)
 	if buf.Len() == 0 {
@@ -253,14 +224,11 @@ func TestBlockSizeWithInode(t *testing.T) {
 		ShowInodeNumber: true,
 		ShowBlockSize:   true,
 	}
-	appInstance := &App{
-		Config: conf,
-	}
+	appInstance := &App{Config: conf}
 
-	// Create a dummy entry with an inode number and block count.
 	dummyEntry := &model.Entry{
 		InodeNumber: "98765",
-		Blocks:      16, // Assuming Blocks is an integer type.
+		Blocks:      16,
 	}
 
 	result := appInstance.blockSizeWithInode(dummyEntry)
@@ -276,14 +244,11 @@ func TestGetCTW(t *testing.T) {
 		OneFilePerLine:  false,
 		DisableIcon:     false,
 	}
-	appInstance := &App{
-		Config: conf,
-	}
+	appInstance := &App{Config: conf}
 	ctwInstance := appInstance.getCTW()
 	if ctwInstance == nil {
 		t.Error("getCTW returned nil")
 	}
-
 	if _, ok := ctwInstance.(ctw.CTW); !ok {
 		t.Error("getCTW did not return an instance that implements ctw.CTW")
 	}

@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/canta2899/logo-ls/app"
+	"github.com/canta2899/logo-ls/fs/osfs"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/mattn/go-colorable"
 )
@@ -22,11 +23,14 @@ func main() {
 
 	logger := log.New(writer, "logo-ls: ", 0)
 
+	model.PathSeparator = string(os.PathSeparator)
+
 	app := &app.App{
 		Config:   command,
 		Writer:   writer,
 		Logger:   logger,
 		ExitCode: model.CodeOk,
+		FS:       osfs.New(),
 	}
 
 	app.Run()

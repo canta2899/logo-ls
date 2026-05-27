@@ -40,8 +40,8 @@ func ComputeGitRepo(startPath string) (map[string]string, string, error) {
 	return repoMap, root, nil
 }
 
-// Returns a map of "relative path -> single-letter code" specifically under directory p
-// adding the directory markers for each subdirectory.
+// GetFilesGitStatus is a helper that calls ComputeGitRepo and then filters the results
+// to only include files under p, returning relative paths. If p is not in a git repo, returns nil.
 func GetFilesGitStatus(p string) map[string]string {
 	repoMap, _, err := ComputeGitRepo(p)
 	if err != nil {
@@ -56,9 +56,9 @@ func GetFilesGitStatus(p string) map[string]string {
 
 	results := make(map[string]string)
 	for absFile, code := range repoMap {
-		if strings.HasPrefix(absFile, absP) {
+		if after, ok := strings.CutPrefix(absFile, absP); ok {
 			// produce a relative path
-			rel := strings.TrimPrefix(absFile, absP)
+			rel := after
 			rel = strings.TrimPrefix(rel, string(filepath.Separator))
 			results[rel] = code
 		}
@@ -66,7 +66,7 @@ func GetFilesGitStatus(p string) map[string]string {
 	return results
 }
 
-// Discards the entire git status cache.
+// ClearCache discards the entire git status cache.
 func ClearCache() {
 	cacheMu.Lock()
 	defer cacheMu.Unlock()
@@ -127,10 +127,8 @@ func parentDirsWithinRepo(repoRoot, absFilePath string) []string {
 	dir = filepath.Clean(dir)
 
 	// Keep going up until we reach or pass the repoRoot
-	for {
-		if dir == repoRoot {
-			break
-		}
+	for dir != repoRoot {
+
 		if dir == "" || dir == string(filepath.Separator) {
 			break
 		}
@@ -149,9 +147,8 @@ func parentDirsWithinRepo(repoRoot, absFilePath string) []string {
 
 // Finds the top-level .git directory via `git -C path rev-parse --show-toplevel`.
 func getGitRoot(path string) (string, error) {
-
 	// Checking for cached git roots first
-	for key, _ := range statusCache {
+	for key := range statusCache {
 		if strings.HasPrefix(path, key) {
 			return key, nil
 		}

@@ -18,10 +18,6 @@ import (
 type StandardCTW struct {
 	*baseCtw
 
-	// Options:
-	humanReadableSize bool
-	showSize          bool
-
 	// Data for each row. Each inner slice must have 4 columns:
 	//   [0] -> size
 	//   [1] -> icon
@@ -118,11 +114,11 @@ func (s *StandardCTW) Flush(buf *bytes.Buffer) {
 	rowsDown := int(math.Ceil(float64(rowCount) / float64(columnsAcross)))
 
 	// Now, print all data in that multi-column layout
-	for rowIndex := 0; rowIndex < rowsDown; rowIndex++ {
+	for rowIndex := range rowsDown {
 		// We'll reset spacing to columnPadding each time, except for the last column.
 		padding := columnPadding
 
-		for colIndex := 0; colIndex < columnsAcross; colIndex++ {
+		for colIndex := range columnsAcross {
 			// The actual index in s.rows we want to print is rowIndex + colIndex * rowsDown
 			dataIndex := rowIndex + colIndex*rowsDown
 			if dataIndex >= rowCount {

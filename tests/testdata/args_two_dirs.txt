@@ -1,0 +1,5 @@
+/root/alpha:
+a.txt
+
+/root/beta:
+b.txt

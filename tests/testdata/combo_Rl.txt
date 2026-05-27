@@ -1,0 +1,10 @@
+/root:
+drwxr-xr-x  2 alice  staff    0 2026-01-01 00:00 level1/
+-rw-r--r--  1 alice  staff   10 2026-01-01 10:00 top.txt
+
+/root/level1:
+-rw-r--r--  1 alice  staff   11 2026-01-02 10:00 a.txt
+drwxr-xr-x  2 alice  staff    0 2026-01-01 00:00 level2/
+
+/root/level1/level2:
+-rw-r--r--  1 alice  staff   12 2026-01-03 10:00 deep.txt

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -10,11 +11,22 @@ import (
 
 var Version = ""
 
-func GetConfigFromCli() *Config {
+// ErrHelp and ErrVersionRequested are returned by BuildConfig when the user
+// requested --help or --version.
+var (
+	ErrHelp             = errors.New("help requested")
+	ErrVersionRequested = errors.New("version requested")
+)
+
+// BuildConfig parses the given arg list (including argv[0]) and returns a
+// Config and the parser used to build it. It never calls os.Exit, making it
+// safe to use from tests.
+//
+// On --help or --version, it returns the sentinel errors above so the caller
+// can choose how to render them. The parser is returned in all cases.
+func BuildConfig(argv []string) (*Config, *Parser, error) {
 	c := NewConfig()
-
 	opt := NewParser()
-
 	opt.Parameters = "[files ...]"
 
 	help := opt.Bool('?', "help", "display this help and exit")
@@ -50,19 +62,15 @@ func GetConfigFromCli() *Config {
 	longListingGroup := opt.Bool('g', "", "like -l, but do not list owner")
 	longListingDefault := opt.Bool('l', "", "use a long listing format")
 
-	if err := opt.Parse(os.Args); err != nil {
-		fmt.Fprintf(os.Stderr, "logo-ls: %v\nTry 'logo-ls --help' for more information.\n", err)
-		os.Exit(2)
+	if err := opt.Parse(argv); err != nil {
+		return nil, opt, err
 	}
 
 	if *help {
-		printHelpMessage(opt)
-		os.Exit(0)
+		return nil, opt, ErrHelp
 	}
-
 	if *version {
-		printVersion()
-		os.Exit(0)
+		return nil, opt, ErrVersionRequested
 	}
 
 	switch {
@@ -107,13 +115,32 @@ func GetConfigFromCli() *Config {
 	c.ShowBlockSize = *showBlockSize
 	c.ShowInodeNumber = *showInodeNumber
 
-	args := opt.Args
-	if len(args) > 0 {
-		c.FileList = append(c.FileList, args...)
+	if len(opt.Args) > 0 {
+		c.FileList = append(c.FileList, opt.Args...)
 	} else {
 		c.FileList = append(c.FileList, ".")
 	}
 
+	return c, opt, nil
+}
+
+// GetConfigFromCli parses os.Args. On --help/--version it prints to stdout
+// and exits 0; on parse errors it prints to stderr and exits 2.
+func GetConfigFromCli() *Config {
+	c, opt, err := BuildConfig(os.Args)
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrHelp):
+			printHelpMessage(opt)
+			os.Exit(0)
+		case errors.Is(err, ErrVersionRequested):
+			printVersion()
+			os.Exit(0)
+		default:
+			fmt.Fprintf(os.Stderr, "logo-ls: %v\nTry 'logo-ls --help' for more information.\n", err)
+			os.Exit(2)
+		}
+	}
 	return c
 }
 
@@ -126,5 +153,7 @@ func printHelpMessage(opt *Parser) {
 	fmt.Println("Lists information about the FILEs (the current directory by default).")
 	fmt.Println("Sorts entries alphabetically if none of -tvSUX is specified.")
 	fmt.Println()
-	opt.PrintUsage()
+	if opt != nil {
+		opt.PrintUsage()
+	}
 }

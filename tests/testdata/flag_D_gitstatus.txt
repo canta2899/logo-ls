@@ -1,0 +1,4 @@
+clean.txt
+modified.txt  M
+staged.txt    A
+untracked.txt U
