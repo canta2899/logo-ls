@@ -92,11 +92,20 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	case model.SortExtension:
 		// sort alphabetically by entry extension
 		d.LessFn = func(i, j int) bool {
+			// dotfiles first
 			a := d.Files[i].Name + d.Files[i].Ext
 			b := d.Files[j].Name + d.Files[j].Ext
 			if res, ok := DotFileOrder(a, b); ok {
 				return res
 			}
+			// directories and files with no extension second
+			if d.Files[i].Ext == "" && d.Files[j].Ext != "" {
+				return true
+			}
+			if d.Files[i].Ext != "" && d.Files[j].Ext == "" {
+				return false
+			}
+			// then, all the rest
 			if MainSort(d.Files[i].Ext, d.Files[j].Ext) {
 				return true
 			} else if strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
