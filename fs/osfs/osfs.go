@@ -167,8 +167,8 @@ type osDirEntry struct {
 
 func (d *osDirEntry) Info() (fs.FileInfo, error) {
 	fi, err := d.DirEntry.Info()
-	if err != nil {
-		return &osFileInfo{FileInfo: fi}, err
+	if fi == nil {
+		return nil, err
 	}
-	return &osFileInfo{FileInfo: fi}, nil
+	return &osFileInfo{FileInfo: fi}, err
 }
