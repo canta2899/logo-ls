@@ -1,4 +1,6 @@
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Version](https://img.shields.io/github/v/release/canta2899/logo-ls?style=for-the-badge)
+![Tests](https://github.com/canta2899/logo-ls/actions/workflows/test.yml/badge.svg?style=for-the-badge)
 
 <div align="center">
 <img src="./.github/assets/screen.png" alt="logo-ls screenshot" width="600"/>
@@ -73,7 +75,7 @@ Then you can move the binary to a directory in your `$PATH` (or symlink it).
 
 ## Adding Icons
 
-If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a built in skill called `/add-icon` which you can use to let your agent do the job for you. If you want to do it manually, you can read the skill instructions inside `.agents/skills/add-icon/SKILL.md`.
+If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a built in skill called `/add-icon` which you can use to let your agent do the job for you. If you want to do it manually, you can pretend to be a coding agent and read the skill file yourself.
 
 > **Note for Windows contributors:** the skill file lives at `add-icon-skill.md` in the repo root, and the paths under `.agents/skills/add-icon/SKILL.md` and `.claude/skills/add-icon/SKILL.md` are symlinks to it. Git for Windows does not create real symlinks by default, so these may be checked out as plain text files containing the link target. To get working symlinks, enable Developer Mode (or run as admin) and set `git config --global core.symlinks true` before cloning.
 
