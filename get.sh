@@ -39,7 +39,11 @@ fi
 
 DOWNLOAD_URL="https://github.com/canta2899/logo-ls/releases/download/${VERSION}/logo-ls-${VERSION}-${OS}-${ARCH}.tar.gz"
 
-INSTALL_DIR="$HOME/.local/bin"
+if [ -z "$LOGO_LS_INSTALL_DIR" ]; then
+  INSTALL_DIR="$HOME/.local/bin"
+else
+  INSTALL_DIR="$LOGO_LS_INSTALL_DIR"
+fi
 mkdir -p "$INSTALL_DIR"
 
 if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then

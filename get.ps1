@@ -15,7 +15,11 @@ if ($env:LOGO_LS_VERSION) {
 # Download URL
 $downloadUrl = "https://github.com/canta2899/logo-ls/releases/download/$version/logo-ls-$version-$os-$arch.zip"
 
-$installDir = "$env:USERPROFILE\.local\bin"
+if ($env:LOGO_LS_INSTALL_DIR) {
+    $installDir = $env:LOGO_LS_INSTALL_DIR
+} else {
+    $installDir = "$env:USERPROFILE\.local\bin"
+}
 
 if (-Not (Test-Path -Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir | Out-Null
