@@ -1,24 +1,73 @@
-# logo-ls
-
-This is a fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Check the [Installation Guide](#installation) if you want to install it.
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 <div align="center">
 <img src="./.github/assets/screen.png" alt="logo-ls screenshot" width="600"/>
 </div>
 
-## What I did
+<h1 align="center">
+    logo-ls
+</h1>
 
-I fixed several bugs and implemented some additional features, including Nerd Fonts v3 migration and symlinks count. You can check a complete list of features and fixes on the `CHANGELOG.md` file.
+A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Feel free to open an issue or a pull request if you have any questions or want to contribute. If you want to add icons, check the [Adding Icons](#adding-icons) section below for instructions on how to do so.
 
-## What I plan to do
+---
 
-- Implement custom time stamp formatting
-- Implement filter by regex pattern to avoid listing unwanted files or subdirectories
-- Add more tests
-- Deploy to package managers
-- Introduce a configuration file to customize the output
+## Installation
 
-Feel free to contribute and I'll be more than happy to merge your changes. In case you want to add some new icons, please make a PR so that we can all benefit from that. The following sections explains how to do it.
+### Prerequisites
+
+- Ensure your terminal is using a Nerd Font to see the icons properly. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads). Some terminal emulators such as [Ghostty](https://ghostty.org) come with built in support for Nerd Fonts, so you don't have to worry about it.
+
+### Linux and OSX
+
+The following script downloads the latest release of logo-ls to `~/.local/bin` and can be used to install or update logo-ls.
+
+```bash
+curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
+```
+
+Optionally, you can set the variables `LOGO_LS_INSTALL_DIR` and/or `LOGO_LS_VERSION` to specify a custom installation directory and/or version to install.
+
+If you want to alias `logo-ls` to `ls` you can add the following line to your shell configuration file:
+
+```bash
+alias ls="logo-ls"
+```
+
+### Windows
+
+Windows installation works exactly the same as Linux and OSX, you just have to run the following command in powershell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+irm https://raw.githubusercontent.com/canta2899/logo-ls/main/get.ps1 | iex
+```
+
+And, optionally, you can set the alias for `ls` to `logo-ls` by running the following command in powershell:
+
+```powershell
+Set-Alias ls logo-ls
+```
+
+### Manual installation
+
+You can manually download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/). Then, you have to extract the archive, check the integrity of the file and move the executable binary of logo-ls to a directory in your `$PATH` (or symlink it).
+
+### Build from source
+
+Clone the repository
+
+```bash
+git clone https://github.com/canta2899/logo-ls
+```
+
+Build the binary, which is outputted to the root directory of the repository:
+
+```bash
+make logo-ls
+```
+
+Then you can move the binary to a directory in your `$PATH` (or symlink it).
 
 ---
 
@@ -28,65 +77,3 @@ If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a 
 
 > **Note for Windows contributors:** the skill file lives at `add-icon-skill.md` in the repo root, and the paths under `.agents/skills/add-icon/SKILL.md` and `.claude/skills/add-icon/SKILL.md` are symlinks to it. Git for Windows does not create real symlinks by default, so these may be checked out as plain text files containing the link target. To get working symlinks, enable Developer Mode (or run as admin) and set `git config --global core.symlinks true` before cloning.
 
----
-
-## Installation
-
-You can either use the install script to download the latest binary release or build it yourself (requires having go installed). In both cases, you should be using Nerd Fonts in your terminal to see the icons properly. The configuration depends on your terminal emulator, but generally it simply involves entering the settings and changing the font. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads).
-
-### You don't want to build it yourself
-
-If you are on Linux or OSX you can run this script on your shell to download the latest version and move it to ~/.local/bin. The same command can be used also to update your current installation of logo-ls to the latest version:
-
-```bash
-curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
-```
-
-You can do the same on Windows by running the following command in powershell
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-irm https://raw.githubusercontent.com/canta2899/logo-ls/main/get.ps1 | iex
-```
-
-Otherwise, you can manually download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/). Then, you have to extract the archive (md5 checksums are provided in case you want to verify the integrity of the file) and move the executable binary of logo-ls to a directory in your `$PATH` (or symlink it).
-
-In case you want to replace the original `ls` command with `logo-ls`, I would suggest **adding an alias**:
-
-On OSX/Linux
-
-```bash
-alias ls="logo-ls"
-```
-
-On Windows (powershell)
- 
-```powershell
-Set-Alias ls logo-ls
-```
-
-### You have go installed and want to build it yourself
-
-Clone the repository
-
-```bash
-git clone https://github.com/canta2899/logo-ls
-```
-
-If you want to install directly to your `$GOPATH` you can use `go install`.
-
-```bash
-go install ./cmd/logo-ls
-```
-
-If you want to build the binary you can use `make`:
-
-```bash
-# outputs executable 'logo-ls' in the root directory
-make logo-ls
-```
-
-```bash
-# cleans up the executable from the repo
-make clean
-```
