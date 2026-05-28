@@ -3,24 +3,56 @@ package format
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
 )
 
-func MainSort(a, b string) bool {
-	// "." and ".." always come first
-	if a == "." || a == ".." {
-		if b == "." || b == ".." {
-			return a < b
-		}
-		return true
+// compareName orders two names the way system ls does, honouring the active
+// collation locale (LC_ALL -> LC_COLLATE -> LANG, read at call time). In the
+// C/POSIX locale, comparison is by byte/ASCII order (uppercase before
+// lowercase); in any other locale it falls back to case-insensitive order,
+// matching the en_US.UTF-8 behaviour
+func compareName(a, b string) bool {
+	if cLocaleCollation() {
+		return a < b
 	}
-	if b == "." || b == ".." {
-		return false
-	}
+	return strings.ToLower(a) < strings.ToLower(b)
+}
 
+// cLocaleCollation reports whether the effective collation locale is the
+// C/POSIX locale (or unset), in which case byte-order comparison applies.
+func cLocaleCollation() bool {
+	loc := ""
+	for _, k := range []string{"LC_ALL", "LC_COLLATE", "LANG"} {
+		if v := os.Getenv(k); v != "" {
+			loc = v
+			break
+		}
+	}
+	// Strip any codeset suffix, e.g. "C.UTF-8" → "C".
+	if i := strings.IndexByte(loc, '.'); i >= 0 {
+		loc = loc[:i]
+	}
+	return loc == "" || loc == "C" || loc == "POSIX"
+}
+
+// extGroupRank ranks an entry for -X (sort by extension) into one of three
+// contiguous groups: 0 = extensionless non-dotfiles (dirs, LICENSE, Makefile),
+// 1 = dotfiles (kept grouped, incl. "." and ".."), 2 = files with an extension.
+func extGroupRank(name, ext string) int {
+	if strings.HasPrefix(name, ".") {
+		return 1
+	}
+	if ext == "" {
+		return 0
+	}
+	return 2
+}
+
+func MainSort(a, b string) bool {
 	aDot := strings.HasPrefix(a, ".")
 	bDot := strings.HasPrefix(b, ".")
 
@@ -36,20 +68,14 @@ func MainSort(a, b string) bool {
 	if bDot {
 		b = strings.TrimPrefix(b, ".")
 	}
-	return strings.ToLower(a) < strings.ToLower(b)
+	return compareName(a, b)
 }
 
 // DotFileOrder checks whether dotfile grouping determines the order.
 // Returns (result, decided): if decided is true, use result as the less value.
+// "." and ".." are ordinary dotfiles here, sorted within the dotfile group by
+// the caller's comparison rather than force-pinned to the top.
 func DotFileOrder(a, b string) (bool, bool) {
-	aSpecial := a == "." || a == ".."
-	bSpecial := b == "." || b == ".."
-	if aSpecial || bSpecial {
-		if aSpecial && bSpecial {
-			return a < b, true
-		}
-		return aSpecial, true
-	}
 	aDot := strings.HasPrefix(a, ".")
 	bDot := strings.HasPrefix(b, ".")
 	if aDot != bDot {
@@ -88,29 +114,26 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 			return d.Files[i].ModTime.After(d.Files[j].ModTime)
 		}
 	case model.SortExtension:
-		// sort alphabetically by entry extension
+		// extensionless files/dirs first, then dotfiles (kept grouped), then
+		// files sorted by extension. "." and ".." are ordinary dotfiles, sorted
+		// within the dotfile group rather than force-pinned to the top.
 		d.LessFn = func(i, j int) bool {
-			// dotfiles first
 			a := d.Files[i].Name + d.Files[i].Ext
 			b := d.Files[j].Name + d.Files[j].Ext
-			if res, ok := DotFileOrder(a, b); ok {
-				return res
+			ra := extGroupRank(d.Files[i].Name, d.Files[i].Ext)
+			rb := extGroupRank(d.Files[j].Name, d.Files[j].Ext)
+			if ra != rb {
+				return ra < rb
 			}
-			// directories and files with no extension second
-			if d.Files[i].Ext == "" && d.Files[j].Ext != "" {
-				return true
+			if ra == 2 {
+				if compareName(d.Files[i].Ext, d.Files[j].Ext) {
+					return true
+				}
+				if compareName(d.Files[j].Ext, d.Files[i].Ext) {
+					return false
+				}
 			}
-			if d.Files[i].Ext != "" && d.Files[j].Ext == "" {
-				return false
-			}
-			// then, all the rest
-			if MainSort(d.Files[i].Ext, d.Files[j].Ext) {
-				return true
-			} else if strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
-				return MainSort(a, b)
-			} else {
-				return false
-			}
+			return MainSort(a, b)
 		}
 	case model.SortNatural:
 		// natural sort of (version) numbers within text

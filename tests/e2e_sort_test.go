@@ -13,6 +13,11 @@ import (
 // output, the fixture is too tame and we should change it.
 
 func TestSort_AlphabeticalIsDefault(t *testing.T) {
+	// Pin to the C locale so collation is deterministic across systems
+	// (uppercase before lowercase, byte order).
+	t.Setenv("LC_ALL", "")
+	t.Setenv("LC_COLLATE", "C")
+	t.Setenv("LANG", "")
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1e", "/root")
 	assertGolden(t, "sort_alphabetical", r.Stdout)
@@ -51,12 +56,12 @@ func TestSort_AllModesAreDistinct(t *testing.T) {
 
 func TestSort_DotfilesAlwaysFirst(t *testing.T) {
 	// For sort modes that apply dotfile grouping (alphabetical, size,
-	// extension, natural), .hidden must lead. Mtime sort and -U intentionally
-	// do not regroup dotfiles, so they are excluded here.
+	// natural), .hidden must lead. Mtime sort and -U intentionally do not
+	// regroup dotfiles; -X groups dotfiles after extensionless files (not
+	// necessarily first), so all of these are excluded here.
 	for _, args := range [][]string{
 		{"-1Ae", "/root"},
 		{"-1ASe", "/root"},
-		{"-1AXe", "/root"},
 		{"-1Ave", "/root"},
 	} {
 		vfs := fakefs.New(sortFixture())
@@ -65,6 +70,53 @@ func TestSort_DotfilesAlwaysFirst(t *testing.T) {
 		if len(got) == 0 || got[0] != ".hidden" {
 			t.Errorf("args %v: expected .hidden first, got %v", args, got)
 		}
+	}
+}
+
+func TestSort_ExtensionDotfilesByExt(t *testing.T) {
+	// With -X, dotfiles stay grouped: extensionless non-dotfiles first, then
+	// the dotfile group, then files sorted by extension. Dotfiles are neither
+	// interleaved by extension nor force-pinned to the top.
+	vfs := fakefs.New(dotfileExtTree())
+	r := runApp(t, vfs, "-1AXe", "/root")
+	assertExitCode(t, model.CodeOk, r.ExitCode)
+	got := lines(r.Stdout)
+	// Makefile (no ext), then .hidden (dotfile group), then a.go, README.md.
+	want := []string{"Makefile", ".hidden", "a.go", "README.md"}
+	if !equalSlice(got, want) {
+		t.Errorf("-AX order:\nwant %v\ngot  %v", want, got)
+	}
+	// .hidden must not lead: extensionless non-dotfiles come first.
+	if got[0] == ".hidden" {
+		t.Errorf("expected extensionless files before the dotfile group: %v", got)
+	}
+}
+
+func TestSort_ExtensionDotfilesStayGrouped(t *testing.T) {
+	// -X groups dotfiles together as a contiguous block: extensionless
+	// non-dotfiles (dirs, Makefile) first, then every dotfile (including
+	// ".config.json", which must NOT sort among the regular .json files), then
+	// the remaining files by extension. "." and ".." are ordinary dotfiles and
+	// sort within the dotfile group, not force-pinned to the very top.
+	t.Setenv("LC_ALL", "")
+	t.Setenv("LC_COLLATE", "C")
+	t.Setenv("LANG", "")
+	vfs := fakefs.New(dotfileGroupTree())
+	r := runApp(t, vfs, "-1aXe", "/root")
+	assertExitCode(t, model.CodeOk, r.ExitCode)
+	got := lines(r.Stdout)
+
+	want := []string{
+		"Makefile", "src/", // extensionless non-dotfiles
+		"./", "../", ".config.json", ".hidden", // dotfile group
+		"main.go", "app.json", // by extension: go < json
+	}
+	if !equalSlice(got, want) {
+		t.Fatalf("-aX grouping:\nwant %v\ngot  %v", want, got)
+	}
+	// "." / ".." must not be force-pinned: extensionless files lead.
+	if got[0] == "./" || got[0] == "../" {
+		t.Errorf("expected extensionless files before . and .., got %v", got)
 	}
 }
 

@@ -156,6 +156,34 @@ func mixedExtTree() *fakefs.Entry {
 	)
 }
 
+// dotfileExtTree: dotfiles mixed with regular and extension-less files, used
+// to verify that -X keeps dotfiles grouped. Expected -X order: Makefile
+// (no ext), .hidden (dotfile group), a.go, README.md (by extension).
+func dotfileExtTree() *fakefs.Entry {
+	return fakefs.Dir("root", dirMeta("9000"),
+		fakefs.File(".hidden", 1, mtime("2026-01-01 00:00:00"), fileMeta("9001")),
+		fakefs.File("Makefile", 200, mtime("2026-03-01 10:00:00"), fileMeta("9002")),
+		fakefs.File("README.md", 10, mtime("2026-02-01 10:00:00"), fileMeta("9003")),
+		fakefs.File("a.go", 50, mtime("2026-01-20 10:00:00"), fileMeta("9004")),
+	)
+}
+
+// dotfileGroupTree: a directory plus extensionless, dotfile (with and without
+// an extension) and regular extension entries. Used to verify that -X keeps the
+// whole dotfile group together (incl. a dotfile that *has* an extension, which
+// must not sort among the regular extension files) and that "." / ".." are not
+// force-pinned to the top.
+func dotfileGroupTree() *fakefs.Entry {
+	return fakefs.Dir("root", dirMeta("9100"),
+		fakefs.Dir("src", dirMeta("9101")),
+		fakefs.File("Makefile", 200, mtime("2026-03-01 10:00:00"), fileMeta("9102")),
+		fakefs.File(".hidden", 1, mtime("2026-01-01 00:00:00"), fileMeta("9103")),
+		fakefs.File(".config.json", 30, mtime("2026-01-02 00:00:00"), fileMeta("9104")),
+		fakefs.File("main.go", 50, mtime("2026-01-20 10:00:00"), fileMeta("9105")),
+		fakefs.File("app.json", 40, mtime("2026-01-21 10:00:00"), fileMeta("9106")),
+	)
+}
+
 // execTree: a single executable file to exercise the '*' indicator.
 func execTree() *fakefs.Entry {
 	return fakefs.Dir("root", dirMeta("8000"),
