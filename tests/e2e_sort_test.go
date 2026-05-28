@@ -13,6 +13,11 @@ import (
 // output, the fixture is too tame and we should change it.
 
 func TestSort_AlphabeticalIsDefault(t *testing.T) {
+	// Pin to the C locale so collation is deterministic across systems
+	// (uppercase before lowercase, byte order).
+	t.Setenv("LC_ALL", "")
+	t.Setenv("LC_COLLATE", "C")
+	t.Setenv("LANG", "")
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1e", "/root")
 	assertGolden(t, "sort_alphabetical", r.Stdout)

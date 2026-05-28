@@ -20,6 +20,17 @@ import (
 
 var updateGolden = flag.Bool("update", false, "regenerate golden files")
 
+// TestMain pins the collation locale to C for the whole suite so name sorting
+// is deterministic regardless of the host's locale. logo-ls sorts names via
+// the active LC_COLLATE (matching system ls), so without this the goldens
+// would drift between C and UTF-8 environments.
+func TestMain(m *testing.M) {
+	os.Setenv("LC_ALL", "C")
+	os.Setenv("LC_COLLATE", "C")
+	os.Setenv("LANG", "C")
+	os.Exit(m.Run())
+}
+
 // fixedTime is a deterministic time formatter. It ignores time.Now() so
 // goldens don't drift over the years.
 type fixedTime struct{}

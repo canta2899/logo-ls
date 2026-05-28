@@ -3,11 +3,41 @@ package format
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
 )
+
+// compareName orders two names the way system ls does, honouring the active
+// collation locale (LC_ALL → LC_COLLATE → LANG, read at call time). In the
+// C/POSIX locale, comparison is by byte/ASCII order (uppercase before
+// lowercase); in any other locale it falls back to case-insensitive order,
+// matching the en_US.UTF-8 behaviour common on desktops.
+func compareName(a, b string) bool {
+	if cLocaleCollation() {
+		return a < b
+	}
+	return strings.ToLower(a) < strings.ToLower(b)
+}
+
+// cLocaleCollation reports whether the effective collation locale is the
+// C/POSIX locale (or unset), in which case byte-order comparison applies.
+func cLocaleCollation() bool {
+	loc := ""
+	for _, k := range []string{"LC_ALL", "LC_COLLATE", "LANG"} {
+		if v := os.Getenv(k); v != "" {
+			loc = v
+			break
+		}
+	}
+	// Strip any codeset suffix, e.g. "C.UTF-8" → "C".
+	if i := strings.IndexByte(loc, '.'); i >= 0 {
+		loc = loc[:i]
+	}
+	return loc == "" || loc == "C" || loc == "POSIX"
+}
 
 func MainSort(a, b string) bool {
 	// "." and ".." always come first
@@ -36,7 +66,7 @@ func MainSort(a, b string) bool {
 	if bDot {
 		b = strings.TrimPrefix(b, ".")
 	}
-	return strings.ToLower(a) < strings.ToLower(b)
+	return compareName(a, b)
 }
 
 // DotFileOrder checks whether dotfile grouping determines the order.
