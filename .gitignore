@@ -24,3 +24,5 @@ testdata/dirEnv*
 bin/
 logo-ls
 CHANGELOG.md.tmp
+
+dist/

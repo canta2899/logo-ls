@@ -1,0 +1,70 @@
+version: 2
+
+project_name: logo-ls
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./cmd/logo-ls
+    binary: logo-ls
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - "386"
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: "386"
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+      - -tags=minimal
+    ldflags:
+      - -s -w -X github.com/canta2899/logo-ls/app.Version={{ .Version }}
+
+archives:
+  - name_template: "{{ .ProjectName }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  disable: true
+
+homebrew_casks:
+  - name: logo-ls
+    binaries:
+      - logo-ls
+    repository:
+      owner: canta2899
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: "https://github.com/canta2899/logo-ls"
+    description: "ls, but with icons"
+    license: "MIT"
+    commit_author:
+      name: goreleaser-bot
+      email: goreleaser@users.noreply.github.com
+    url:
+      verified: "github.com/canta2899/logo-ls/"
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/logo-ls"]
+          end

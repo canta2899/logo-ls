@@ -1,66 +1,37 @@
-name: Release 
+name: Release
 
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
-  extract-changelog:
-    name: Extract Changelog
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Extract Release Notes
-        run: awk '/^## /{if (p++) exit} p' CHANGELOG.md > CHANGELOG.md.tmp
-      
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: changelog
-          path: CHANGELOG.md.tmp
-          retention_days: 1
-
-  create-release:
-    name: Create Release
-    needs: extract-changelog
+  goreleaser:
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
         with:
-          name: changelog
-          path: .
-      - name: Create Release
-        id: create_release
-        uses: ncipollo/release-action@v1
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Extract release notes
+        run: awk '/^## /{if (p++) exit} p' CHANGELOG.md > CHANGELOG.md.tmp
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean --release-notes=CHANGELOG.md.tmp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          bodyFile: CHANGELOG.md.tmp
-
-  publish-assets:
-    needs: create-release
-    name: Publish assets 
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64]
-        exclude:
-          - goarch: "386"
-            goos: darwin
-    steps:
-      - uses: actions/checkout@v2
-      - uses: wangyoucao577/go-release-action@v1.53
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          project_path: "."
-          build_command: "make"
-          extra_files: LICENSE
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}

@@ -5,7 +5,10 @@ BUILD_FLAGS=-ldflags="-s -w -X 'github.com/canta2899/logo-ls/app.Version=$(VERSI
 
 OUTPUT_NAME=$(APP_NAME)$(if $(findstring windows,$(GOOS)),.exe,)
 
-.PHONY: all bindir clean test test-clean install logo-ls
+GORELEASER_VERSION ?= latest
+GORELEASER=go run github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
+
+.PHONY: all bindir clean test test-clean install logo-ls release-check release-snapshot
 
 all: logo-ls
 
@@ -24,3 +27,9 @@ test:
 
 test-clean:
 	go clean -testcache
+
+release-check:
+	$(GORELEASER) check
+
+release-snapshot:
+	$(GORELEASER) release --snapshot --clean
