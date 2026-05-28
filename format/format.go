@@ -39,31 +39,20 @@ func cLocaleCollation() bool {
 	return loc == "" || loc == "C" || loc == "POSIX"
 }
 
-// sortExtKey returns the extension sort key used by -X, matching GNU ls: a
-// dotfile's extension is everything after its leading dot. Returns "" for
-// names with no extension (LICENSE, Makefile, dirs, "." and "..").
-func sortExtKey(name, ext string) string {
-	if ext != "" {
-		return strings.ToLower(strings.TrimPrefix(ext, "."))
+// extGroupRank ranks an entry for -X (sort by extension) into one of three
+// contiguous groups: 0 = extensionless non-dotfiles (dirs, LICENSE, Makefile),
+// 1 = dotfiles (kept grouped, incl. "." and ".."), 2 = files with an extension.
+func extGroupRank(name, ext string) int {
+	if strings.HasPrefix(name, ".") {
+		return 1
 	}
-	if strings.HasPrefix(name, ".") && name != "." && name != ".." {
-		return strings.ToLower(name[1:])
+	if ext == "" {
+		return 0
 	}
-	return ""
+	return 2
 }
 
 func MainSort(a, b string) bool {
-	// "." and ".." always come first
-	if a == "." || a == ".." {
-		if b == "." || b == ".." {
-			return a < b
-		}
-		return true
-	}
-	if b == "." || b == ".." {
-		return false
-	}
-
 	aDot := strings.HasPrefix(a, ".")
 	bDot := strings.HasPrefix(b, ".")
 
@@ -84,15 +73,9 @@ func MainSort(a, b string) bool {
 
 // DotFileOrder checks whether dotfile grouping determines the order.
 // Returns (result, decided): if decided is true, use result as the less value.
+// "." and ".." are ordinary dotfiles here, sorted within the dotfile group by
+// the caller's comparison rather than force-pinned to the top.
 func DotFileOrder(a, b string) (bool, bool) {
-	aSpecial := a == "." || a == ".."
-	bSpecial := b == "." || b == ".."
-	if aSpecial || bSpecial {
-		if aSpecial && bSpecial {
-			return a < b, true
-		}
-		return aSpecial, true
-	}
 	aDot := strings.HasPrefix(a, ".")
 	bDot := strings.HasPrefix(b, ".")
 	if aDot != bDot {
@@ -131,26 +114,21 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 			return d.Files[i].ModTime.After(d.Files[j].ModTime)
 		}
 	case model.SortExtension:
-		// sort alphabetically by entry extension; dotfiles sort into their
-		// natural extension group (GNU ls behaviour), not forced to the top
+		// extensionless files/dirs first, then dotfiles (kept grouped), then
+		// files sorted by extension. "." and ".." are ordinary dotfiles, sorted
+		// within the dotfile group rather than force-pinned to the top.
 		d.LessFn = func(i, j int) bool {
 			a := d.Files[i].Name + d.Files[i].Ext
 			b := d.Files[j].Name + d.Files[j].Ext
-			// "." and ".." always come first
-			aSpecial := a == "." || a == ".."
-			bSpecial := b == "." || b == ".."
-			if aSpecial || bSpecial {
-				if aSpecial && bSpecial {
-					return a < b
-				}
-				return aSpecial
+			ra := extGroupRank(d.Files[i].Name, d.Files[i].Ext)
+			rb := extGroupRank(d.Files[j].Name, d.Files[j].Ext)
+			if ra != rb {
+				return ra < rb
 			}
-			extA := sortExtKey(d.Files[i].Name, d.Files[i].Ext)
-			extB := sortExtKey(d.Files[j].Name, d.Files[j].Ext)
-			if extA != extB {
-				return extA < extB
+			if ra == 2 && !strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
+				return compareName(d.Files[i].Ext, d.Files[j].Ext)
 			}
-			return compareName(a, b)
+			return MainSort(a, b)
 		}
 	case model.SortNatural:
 		// natural sort of (version) numbers within text
