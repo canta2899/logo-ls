@@ -125,8 +125,13 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 			if ra != rb {
 				return ra < rb
 			}
-			if ra == 2 && !strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
-				return compareName(d.Files[i].Ext, d.Files[j].Ext)
+			if ra == 2 {
+				if compareName(d.Files[i].Ext, d.Files[j].Ext) {
+					return true
+				}
+				if compareName(d.Files[j].Ext, d.Files[i].Ext) {
+					return false
+				}
 			}
 			return MainSort(a, b)
 		}
