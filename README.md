@@ -20,6 +20,14 @@ A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up main
 
 - Ensure your terminal is using a Nerd Font to see the icons properly. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads). Some terminal emulators such as [Ghostty](https://ghostty.org) come with built in support for Nerd Fonts, so you don't have to worry about it.
 
+### Arch Linux
+
+Install the logo-ls [AUR package](https://aur.archlinux.org/packages/logo-ls).
+
+```bash
+yay -S logo-ls
+```
+
 ### Linux and OSX
 
 The following script downloads the latest release of logo-ls to `~/.local/bin` and can be used to install or update logo-ls.
