@@ -1,9 +1,8 @@
+// Package format handles formatting and sorting logic
 package format
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/canta2899/logo-ls/icons"
@@ -59,7 +58,7 @@ func DotFileOrder(a, b string) (bool, bool) {
 	return false, false
 }
 
-// Custom less functions
+// SetLessFunction is the custom less function to allow several sorting modes
 func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 	switch sortMode {
 	case model.SortAlphabetical:
@@ -85,7 +84,6 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 		}
 	case model.SortModTime:
 		// sort by modification time, newest first
-		// not sorting by alphabetical order because equality is quite rare
 		d.LessFn = func(i, j int) bool {
 			return d.Files[i].ModTime.After(d.Files[j].ModTime)
 		}
@@ -132,55 +130,6 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 			return i < j
 		}
 	}
-}
-
-// get indicator of the file
-func GetIndicator(name string, isLongMode bool) (i string) {
-	stats, err := os.Lstat(name)
-
-	if err != nil {
-		return ""
-	}
-
-	modebit := stats.Mode()
-
-	switch {
-	case modebit&os.ModeDir > 0:
-		i = "/"
-	case modebit&os.ModeNamedPipe > 0:
-		i = "|"
-	case modebit&os.ModeSymlink > 0:
-		i = GetSymlinkIndicator(name, isLongMode)
-	case modebit&os.ModeSocket > 0:
-		i = "="
-	case modebit&1000000 > 0:
-		i = "*"
-	}
-	return i
-}
-
-func IsLink(name string) bool {
-	stats, err := os.Lstat(name)
-
-	if err != nil {
-		return false
-	}
-
-	modebit := stats.Mode()
-
-	return modebit&os.ModeSymlink > 0
-}
-
-func GetSymlinkIndicator(name string, isLongMode bool) string {
-	if !isLongMode {
-		return "@"
-	}
-
-	if s, err := filepath.EvalSymlinks(name); err == nil {
-		return " ~> " + strings.Replace(s, os.Getenv("HOME"), "~", 1)
-	}
-
-	return ""
 }
 
 func GetOpenDirIcon() *icons.IconInfo {

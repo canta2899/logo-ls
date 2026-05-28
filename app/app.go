@@ -1,4 +1,4 @@
-// Package app
+// Package app defines the main application logic
 package app
 
 import (
@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"slices"
 	"sort"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
+	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -24,6 +24,7 @@ type App struct {
 	Writer   io.Writer
 	ExitCode model.ExitCode
 	Logger   *log.Logger
+	FS       fs.FS
 }
 
 // Args stores the parsed command-line arguments as separate files and directories.
@@ -58,14 +59,14 @@ func (a *App) GetArguments() *Args {
 	args := &Args{}
 
 	for _, argPath := range a.Config.FileList {
-		abs, err := filepath.Abs(argPath)
+		abs, err := a.FS.Abs(argPath)
 		if err != nil {
 			a.Logger.Printf("cannot get absolute path for %q: %v\n", argPath, err)
 			a.ExitCode.SetSerious()
 			continue
 		}
 
-		f, err := os.Open(abs)
+		f, err := a.FS.Open(abs)
 		if err != nil {
 			a.Logger.Printf("cannot access %q: %v\n", argPath, err)
 			a.ExitCode.SetSerious()
@@ -82,13 +83,13 @@ func (a *App) GetArguments() *Args {
 
 		if fi.IsDir() {
 			args.Dirs = append(args.Dirs, model.DirectoryEntry{
-				File:    *f,
+				File:    f,
 				AbsPath: abs,
 			})
 		} else {
 			args.Files = append(args.Files, model.FileEntry{
-				FileInfo: fi,
-				AbsPath:  abs,
+				Info:    fi,
+				AbsPath: abs,
 			})
 			f.Close() // no need to keep file handles for single files
 		}
@@ -105,7 +106,7 @@ func (a *App) Run() {
 		filesDir := a.ProcessFiles(args.Files)
 		a.PrintDirectory(filesDir)
 		if len(args.Dirs) > 0 {
-			fmt.Println()
+			fmt.Fprintln(a.Writer)
 		}
 	}
 
@@ -119,7 +120,7 @@ func (a *App) Run() {
 
 // Prints each directory and its subdirectories.
 func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
-	currentAbs, _ := filepath.Abs(".")
+	currentAbs, _ := a.FS.Abs(".")
 	openDirIcon := model.OpenDirIcon
 	if a.Config.DisableIcon {
 		openDirIcon = ""
@@ -127,15 +128,15 @@ func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 
 	for i, dirEntry := range dirs {
 		if i > 0 {
-			fmt.Println()
+			fmt.Fprintln(a.Writer)
 		}
 
 		relName := dirEntry.Name()
-		if rel, err := filepath.Rel(currentAbs, dirEntry.Name()); err == nil {
+		if rel, err := a.FS.Rel(currentAbs, dirEntry.Name()); err == nil {
 			relName = rel
 		}
 
-		fmt.Printf("%s:\n", openDirIcon+relName)
+		fmt.Fprintf(a.Writer, "%s:\n", openDirIcon+relName)
 
 		a.recurseDirectory(&dirEntry, currentAbs)
 	}
@@ -151,7 +152,7 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 
 	for i, dirEntry := range dirs {
 		if pName {
-			fmt.Printf("%s:\n", openDirIcon+dirEntry.Name())
+			fmt.Fprintf(a.Writer, "%s:\n", openDirIcon+dirEntry.Name())
 		}
 
 		d, err := a.ProcessDirectory(&dirEntry)
@@ -163,7 +164,7 @@ func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 
 		a.PrintDirectory(d)
 		if i < len(dirs)-1 {
-			fmt.Println()
+			fmt.Fprintln(a.Writer)
 		}
 	}
 }
@@ -178,7 +179,7 @@ func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath
 		stack = stack[:idx]
 
 		if current.header != "" {
-			fmt.Printf("\n%s:\n", model.OpenDirIcon+current.header)
+			fmt.Fprintf(a.Writer, "\n%s:\n", model.OpenDirIcon+current.header)
 		}
 
 		d, err := a.ProcessDirectory(current.entry)
@@ -198,52 +199,51 @@ func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath
 
 		for i := len(d.Dirs) - 1; i >= 0; i-- {
 			subdir := d.Dirs[i]
-			childPath := filepath.Join(current.entry.Name(), subdir)
-			if rel, err := filepath.Rel(startingAbsolutePath, childPath); err == nil {
+			childPath := a.FS.Join(current.entry.Name(), subdir)
+			if rel, err := a.FS.Rel(startingAbsolutePath, childPath); err == nil {
 				childPath = rel
 			}
 
-			subdirFullPath := filepath.Join(current.entry.Name(), subdir)
-			f, err := os.Open(subdirFullPath)
+			subdirFullPath := a.FS.Join(current.entry.Name(), subdir)
+			f, err := a.FS.Open(subdirFullPath)
 			if err != nil {
 				a.Logger.Printf("cannot access %q: %v\n", childPath, err)
 				a.ExitCode.SetMinor()
 				continue
 			}
-			abs, err := filepath.Abs(subdirFullPath)
+			abs, err := a.FS.Abs(subdirFullPath)
 			if err != nil {
 				a.Logger.Println("Cannot compute abs path for:", childPath)
 				f.Close()
 				continue
 			}
-			nextEntry := &model.DirectoryEntry{File: *f, AbsPath: abs}
+			nextEntry := &model.DirectoryEntry{File: f, AbsPath: abs}
 			stack = append(stack, &RecursiveLookupFrame{entry: nextEntry, header: childPath})
 		}
 	}
 }
 
-// Converts a slice of file entries into a *model.Directory for printing.
+// ProcessFiles converts a slice of file entries into a *model.Directory for printing.
 func (a *App) ProcessFiles(files []model.FileEntry) *model.Directory {
 	t := new(model.Directory)
 	isLong := a.Config.LongListingMode != model.LongListingNone
 
 	for _, fileEntry := range files {
-		entry := a.buildEntry(fileEntry.AbsPath, fileEntry.FileInfo, isLong)
+		entry := a.buildEntry(fileEntry.AbsPath, fileEntry.Info, isLong)
 		t.Files = append(t.Files, entry)
 	}
 
 	return t
 }
 
-// Reads the contents of the given directory, builds a *model.Directory
+// ProcessDirectory reads the contents of the given directory, builds a *model.Directory
 // that contains *model.Entry objects for each item, and returns it.
 func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error) {
 	defer func() {
-		// Defer the close in case 'Readdir' triggers partial reads.
 		_ = d.Close()
 	}()
 
-	dirStat, err := d.Stat()
+	dirStat, err := d.File.Stat()
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (a *App) ProcessDirectory(d *model.DirectoryEntry) (*model.Directory, error
 
 // Reads directory contents, creates *model.Entry objects, adds special entries (.), (..)
 // and sets up Git statuses if requested.
-func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*model.Directory, error) {
+func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*model.Directory, error) {
 	t := new(model.Directory)
 	isLong := a.Config.LongListingMode != model.LongListingNone
 
@@ -277,16 +277,13 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		return t, nil
 	}
 
-	entries, err := d.ReadDir(0)
+	entries, err := d.File.ReadDir(0)
 	// We proceed even if err != nil, as entries may contain a partial list.
 
 	// If Git status is requested, prepare the repository info map.
 	var gitRepoStatus map[string]string
 	if a.Config.GitStatus {
-		gitRepoStatus = format.GetFilesGitStatus(d.Name())
-		if len(gitRepoStatus) == 0 {
-			gitRepoStatus = nil
-		}
+		gitRepoStatus = a.FS.GitStatus(d.Name())
 	}
 
 	showHidden := a.Config.AllMode != model.IncludeDefault
@@ -298,10 +295,10 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 			continue
 		}
 
-		fullpath := filepath.Join(d.Name(), name)
-		fi, err := de.Info() // fi might be nil on error
-		if err != nil {
-			a.Logger.Printf("cannot access %q: %v\n", fullpath, err)
+		fullpath := a.FS.Join(d.Name(), name)
+		fi, infoErr := de.Info() // fi might be nil on error
+		if infoErr != nil {
+			a.Logger.Printf("cannot access %q: %v\n", fullpath, infoErr)
 			a.ExitCode.SetMinor()
 		}
 
@@ -318,15 +315,14 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 		}
 
 		if !a.Config.DisableIcon {
-			if fi != nil && format.IsLink(fullpath) {
-				if s, err := filepath.EvalSymlinks(fullpath); err == nil {
-					realExt := filepath.Ext(s)
+			if fi != nil && a.FS.IsLink(fullpath) {
+				if s, err := a.FS.EvalSymlinks(fullpath); err == nil {
+					realExt := a.FS.Ext(s)
 					realName := s[0 : len(s)-len(realExt)]
-					realIndicator := format.GetIndicator(s, isLong)
+					realIndicator := a.FS.Indicator(s, isLong)
 					entry.Icon = format.GetIcon(realName, realExt, realIndicator)
 				}
 			} else if fi == nil {
-				// Re-evaluate icon based on what we know
 				entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
 			}
 		}
@@ -350,14 +346,13 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 			t.Files = append(t.Files, t.Info)
 		}
 
-		pp := filepath.Dir(d.Name())
-		pStat, _ := os.Lstat(pp)
+		pp := a.FS.Dir(d.Name())
+		pStat, _ := a.FS.Lstat(pp)
 
 		parentEntry := a.buildEntry(pp, pStat, isLong)
 		parentEntry.Name = ".."
 		parentEntry.Ext = ""
 
-		// Overwrite icon for parent
 		if !a.Config.DisableIcon {
 			parentEntry.Icon = format.GetOpenDirIcon()
 		}
@@ -368,14 +363,14 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat os.FileInfo) (*
 	return t, err
 }
 
-// Constructs a *model.Entry from a given path, os.FileInfo, and whether we are
+// Constructs a *model.Entry from a given path, fs.FileInfo, and whether we are
 // in a long-listing context.
-func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.Entry {
+func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.Entry {
 	entry := &model.Entry{}
 
 	if fi == nil {
-		entry.Name = filepath.Base(fullPath)
-		entry.Ext = filepath.Ext(entry.Name)
+		entry.Name = a.FS.Base(fullPath)
+		entry.Ext = a.FS.Ext(entry.Name)
 		entry.Name = entry.Name[0 : len(entry.Name)-len(entry.Ext)]
 		entry.Mode = "???????????"
 		entry.Owner = "?"
@@ -388,27 +383,32 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 		entry.Name = name
 		entry.Ext = ""
 	} else {
-		entry.Ext = filepath.Ext(name)
+		entry.Ext = a.FS.Ext(name)
 		entry.Name = name[0 : len(name)-len(entry.Ext)]
 	}
 	entry.Size = fi.Size()
 	entry.ModTime = fi.ModTime()
-	entry.Indicator = format.GetIndicator(fullPath, isLong)
+	entry.Indicator = a.FS.Indicator(fullPath, isLong)
 
 	if a.Config.ShowInodeNumber {
-		entry.InodeNumber = format.GetInodeNumber(fullPath)
+		entry.InodeNumber = a.FS.InodeNumber(fullPath)
 	}
 
 	if isLong {
-		entry.Mode = format.GetModeExtended(&fi, fullPath)
+		entry.Mode = a.FS.ModeExtended(fi, fullPath)
 		entry.ModeBits = uint32(fi.Mode())
-		entry.NumHardLinks = format.GetHardLinkCount(fullPath)
-		owner, group := model.GetOwnerGroupInfo(fi, a.Config.NoGroup, a.Config.LongListingMode)
+		entry.NumHardLinks = a.FS.HardLinks(fullPath)
+		showOwner := a.Config.LongListingMode == model.LongListingDefault ||
+			a.Config.LongListingMode == model.LongListingOwner
+		showGroup := !a.Config.NoGroup &&
+			(a.Config.LongListingMode == model.LongListingDefault ||
+				a.Config.LongListingMode == model.LongListingGroup)
+		owner, group := a.FS.OwnerGroup(fi, showOwner, showGroup)
 		entry.Owner, entry.Group = owner, group
 	}
 
 	if a.Config.ShowBlockSize {
-		model.DirBlocks(entry, fi)
+		entry.Blocks = a.FS.Blocks(fi)
 	}
 
 	if !a.Config.DisableIcon {
@@ -418,7 +418,7 @@ func (a *App) buildEntry(fullPath string, fi os.FileInfo, isLong bool) *model.En
 	return entry
 }
 
-// Sorts the directory's files according to the app config and prints them.
+// PrintDirectory sorts the directory's files according to the app config and prints them.
 func (a *App) PrintDirectory(d *model.Directory) {
 	if d == nil {
 		return
@@ -470,7 +470,6 @@ func (a *App) PrintDirectory(d *model.Directory) {
 		}
 	}
 
-	// Flush to buffer and write out
 	buf := new(bytes.Buffer)
 	lineCtw.Flush(buf)
 	a.Write(buf)

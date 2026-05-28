@@ -1,25 +1,33 @@
 package model
 
 import (
-	"os"
 	"sort"
 	"time"
 
+	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/icons"
 )
 
 var OpenDirIcon = icons.IconDef["diropen"].GetColor() + icons.IconDef["diropen"].GetGlyph() + "\033[0m" + " "
-var PathSeparator string = string(os.PathSeparator)
+
+// PathSeparator is the path separator used by the active FS. The osfs
+// implementation initializes this to the OS separator; tests override it.
+var PathSeparator = "/"
 
 type FileEntry struct {
-	os.FileInfo
+	Info    fs.FileInfo
 	AbsPath string
 }
 
+func (f FileEntry) Name() string { return f.Info.Name() }
+
 type DirectoryEntry struct {
-	os.File
+	File    fs.File
 	AbsPath string
 }
+
+func (d *DirectoryEntry) Name() string { return d.File.Name() }
+func (d *DirectoryEntry) Close() error { return d.File.Close() }
 
 type Entry struct {
 	Name, Ext, Indicator string

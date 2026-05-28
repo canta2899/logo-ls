@@ -1,0 +1,4 @@
+-rw-r--r--  1 alice  staff   40 2026-01-04 10:00 clean.txt
+-rw-r--r--  1 alice  staff   20 2026-01-02 10:00 modified.txt  M
+-rw-r--r--  1 alice  staff   10 2026-01-01 10:00 staged.txt    A
+-rw-r--r--  1 alice  staff   30 2026-01-03 10:00 untracked.txt U

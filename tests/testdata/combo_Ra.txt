@@ -1,0 +1,8 @@
+/root:
+./  ../  level1/  top.txt
+
+/root/level1:
+./  ../  a.txt  level2/
+
+/root/level1/level2:
+./  ../  deep.txt

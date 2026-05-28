@@ -1,0 +1,5 @@
+lrwxrwxrwx  1 alice  staff     0 2026-01-01 10:00 link-broken
+lrwxrwxrwx  1 alice  staff     0 2026-01-01 10:00 link-dir ~> /root/subdir
+lrwxrwxrwx  1 alice  staff     0 2026-01-01 10:00 link-file ~> /root/target.txt
+drwxr-xr-x  2 alice  staff     0 2026-01-01 00:00 subdir/
+-rw-r--r--  1 alice  staff   100 2026-01-01 10:00 target.txt

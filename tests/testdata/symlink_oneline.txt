@@ -1,0 +1,5 @@
+link-broken@
+link-dir@
+link-file@
+subdir/
+target.txt

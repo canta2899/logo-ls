@@ -1,0 +1,6 @@
+./
+../
+.config/
+.env
+README.md
+src/

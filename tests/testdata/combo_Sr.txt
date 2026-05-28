@@ -1,0 +1,6 @@
+alpha.txt
+README.md
+file10.go
+Makefile
+file2.go
+zebra.txt
