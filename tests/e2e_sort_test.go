@@ -56,12 +56,12 @@ func TestSort_AllModesAreDistinct(t *testing.T) {
 
 func TestSort_DotfilesAlwaysFirst(t *testing.T) {
 	// For sort modes that apply dotfile grouping (alphabetical, size,
-	// extension, natural), .hidden must lead. Mtime sort and -U intentionally
-	// do not regroup dotfiles, so they are excluded here.
+	// natural), .hidden must lead. Mtime sort and -U intentionally do not
+	// regroup dotfiles; -X (extension) sorts dotfiles into their natural
+	// extension group rather than forcing them first, so all are excluded here.
 	for _, args := range [][]string{
 		{"-1Ae", "/root"},
 		{"-1ASe", "/root"},
-		{"-1AXe", "/root"},
 		{"-1Ave", "/root"},
 	} {
 		vfs := fakefs.New(sortFixture())
@@ -70,6 +70,24 @@ func TestSort_DotfilesAlwaysFirst(t *testing.T) {
 		if len(got) == 0 || got[0] != ".hidden" {
 			t.Errorf("args %v: expected .hidden first, got %v", args, got)
 		}
+	}
+}
+
+func TestSort_ExtensionDotfilesByExt(t *testing.T) {
+	// With -X, dotfiles sort into their extension group (the name after the
+	// leading dot), matching GNU ls, rather than being forced to the top.
+	vfs := fakefs.New(dotfileExtTree())
+	r := runApp(t, vfs, "-1AXe", "/root")
+	assertExitCode(t, model.CodeOk, r.ExitCode)
+	got := lines(r.Stdout)
+	// Key order: "" (Makefile) < "go" (a.go) < "hidden" (.hidden) < "md" (README.md).
+	want := []string{"Makefile", "a.go", ".hidden", "README.md"}
+	if !equalSlice(got, want) {
+		t.Errorf("-AX order:\nwant %v\ngot  %v", want, got)
+	}
+	// .hidden must not lead: no-extension files come before it ("" < "hidden").
+	if got[0] == ".hidden" {
+		t.Errorf("expected .hidden to sort into its extension group, not first: %v", got)
 	}
 }
 

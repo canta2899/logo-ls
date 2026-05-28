@@ -202,7 +202,9 @@ func TestFlag_X_SortByExtension(t *testing.T) {
 	r := runApp(t, vfs, "-1Xe", "/root")
 	assertGolden(t, "flag_X", r.Stdout)
 	assertExitCode(t, model.CodeOk, r.ExitCode)
-	// Intent: -X puts files with no extension first, then .go, then .md.
+	// Intent: -X puts no-extension files first (Makefile, script), then .go,
+	// then .md. mixedExtTree has no dotfiles, so the dotfile-by-extension
+	// behaviour (covered by TestSort_ExtensionDotfilesByExt) does not apply here.
 	got := lines(r.Stdout)
 	if len(got) < 5 {
 		t.Fatalf("expected 5 entries, got %v", got)

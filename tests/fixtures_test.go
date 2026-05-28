@@ -156,6 +156,19 @@ func mixedExtTree() *fakefs.Entry {
 	)
 }
 
+// dotfileExtTree: dotfiles mixed with regular and extension-less files, used
+// to verify that -X sorts dotfiles into their natural extension group instead
+// of forcing them to the top. Expected -X key order: "" (Makefile), "go"
+// (a.go), "hidden" (.hidden), "md" (README.md).
+func dotfileExtTree() *fakefs.Entry {
+	return fakefs.Dir("root", dirMeta("9000"),
+		fakefs.File(".hidden", 1, mtime("2026-01-01 00:00:00"), fileMeta("9001")),
+		fakefs.File("Makefile", 200, mtime("2026-03-01 10:00:00"), fileMeta("9002")),
+		fakefs.File("README.md", 10, mtime("2026-02-01 10:00:00"), fileMeta("9003")),
+		fakefs.File("a.go", 50, mtime("2026-01-20 10:00:00"), fileMeta("9004")),
+	)
+}
+
 // execTree: a single executable file to exercise the '*' indicator.
 func execTree() *fakefs.Entry {
 	return fakefs.Dir("root", dirMeta("8000"),

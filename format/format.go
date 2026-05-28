@@ -11,10 +11,10 @@ import (
 )
 
 // compareName orders two names the way system ls does, honouring the active
-// collation locale (LC_ALL → LC_COLLATE → LANG, read at call time). In the
+// collation locale (LC_ALL -> LC_COLLATE -> LANG, read at call time). In the
 // C/POSIX locale, comparison is by byte/ASCII order (uppercase before
 // lowercase); in any other locale it falls back to case-insensitive order,
-// matching the en_US.UTF-8 behaviour common on desktops.
+// matching the en_US.UTF-8 behaviour
 func compareName(a, b string) bool {
 	if cLocaleCollation() {
 		return a < b
@@ -37,6 +37,19 @@ func cLocaleCollation() bool {
 		loc = loc[:i]
 	}
 	return loc == "" || loc == "C" || loc == "POSIX"
+}
+
+// sortExtKey returns the extension sort key used by -X, matching GNU ls: a
+// dotfile's extension is everything after its leading dot. Returns "" for
+// names with no extension (LICENSE, Makefile, dirs, "." and "..").
+func sortExtKey(name, ext string) string {
+	if ext != "" {
+		return strings.ToLower(strings.TrimPrefix(ext, "."))
+	}
+	if strings.HasPrefix(name, ".") && name != "." && name != ".." {
+		return strings.ToLower(name[1:])
+	}
+	return ""
 }
 
 func MainSort(a, b string) bool {
@@ -118,29 +131,26 @@ func SetLessFunction(d *model.Directory, sortMode model.SortMode) {
 			return d.Files[i].ModTime.After(d.Files[j].ModTime)
 		}
 	case model.SortExtension:
-		// sort alphabetically by entry extension
+		// sort alphabetically by entry extension; dotfiles sort into their
+		// natural extension group (GNU ls behaviour), not forced to the top
 		d.LessFn = func(i, j int) bool {
-			// dotfiles first
 			a := d.Files[i].Name + d.Files[i].Ext
 			b := d.Files[j].Name + d.Files[j].Ext
-			if res, ok := DotFileOrder(a, b); ok {
-				return res
+			// "." and ".." always come first
+			aSpecial := a == "." || a == ".."
+			bSpecial := b == "." || b == ".."
+			if aSpecial || bSpecial {
+				if aSpecial && bSpecial {
+					return a < b
+				}
+				return aSpecial
 			}
-			// directories and files with no extension second
-			if d.Files[i].Ext == "" && d.Files[j].Ext != "" {
-				return true
+			extA := sortExtKey(d.Files[i].Name, d.Files[i].Ext)
+			extB := sortExtKey(d.Files[j].Name, d.Files[j].Ext)
+			if extA != extB {
+				return extA < extB
 			}
-			if d.Files[i].Ext != "" && d.Files[j].Ext == "" {
-				return false
-			}
-			// then, all the rest
-			if MainSort(d.Files[i].Ext, d.Files[j].Ext) {
-				return true
-			} else if strings.EqualFold(d.Files[i].Ext, d.Files[j].Ext) {
-				return MainSort(a, b)
-			} else {
-				return false
-			}
+			return compareName(a, b)
 		}
 	case model.SortNatural:
 		// natural sort of (version) numbers within text
