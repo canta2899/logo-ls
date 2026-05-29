@@ -19,6 +19,7 @@ A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up main
 ### Prerequisites
 
 - Ensure your terminal is using a Nerd Font to see the icons properly. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads). Some terminal emulators such as [Ghostty](https://ghostty.org) come with built in support for Nerd Fonts, so you don't have to worry about it.
+- The command will be installed as `logo-ls`, so you can optionally set an alias for `ls` to `logo-ls` if you want to use it as a drop in replacement for `ls`.
 
 ### Arch Linux
 
@@ -28,40 +29,32 @@ Install the logo-ls [AUR package](https://aur.archlinux.org/packages/logo-ls).
 yay -S logo-ls
 ```
 
-### Linux and OSX
+### Homebrew (tap)
 
-The following script downloads the latest release of logo-ls to `~/.local/bin` and can be used to install or update logo-ls.
+```bash
+brew install canta2899/homebrew-tap/logo-ls
+```
+
+### Binary Release (Linux/OSX/Windows)
+
+Optionally, you can set the variables `LOGO_LS_INSTALL_DIR` and/or `LOGO_LS_VERSION` to specify a custom installation directory and/or version to install. By default, the scripts will install the latest version of logo-ls to `~/.local/bin`.
+
+#### Linux/OSX
 
 ```bash
 curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.sh | sh
 ```
 
-Optionally, you can set the variables `LOGO_LS_INSTALL_DIR` and/or `LOGO_LS_VERSION` to specify a custom installation directory and/or version to install.
-
-If you want to alias `logo-ls` to `ls` you can add the following line to your shell configuration file:
-
-```bash
-alias ls="logo-ls"
-```
-
-### Windows
-
-Windows installation works exactly the same as Linux and OSX, you just have to run the following command in powershell:
+#### Windows
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 irm https://raw.githubusercontent.com/canta2899/logo-ls/main/get.ps1 | iex
 ```
 
-And, optionally, you can set the alias for `ls` to `logo-ls` by running the following command in powershell:
+#### Manual Install
 
-```powershell
-Set-Alias ls logo-ls
-```
-
-### Manual installation
-
-You can manually download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/). Then, you have to extract the archive, check the integrity of the file and move the executable binary of logo-ls to a directory in your `$PATH` (or symlink it).
+You can download the binary for your platform from the [releases page](https://github.com/canta2899/logo-ls/releases/).
 
 ### Build from source
 
@@ -76,9 +69,6 @@ Build the binary, which is outputted to the root directory of the repository:
 ```bash
 make logo-ls
 ```
-
-Then you can move the binary to a directory in your `$PATH` (or symlink it).
-
 ---
 
 ## Adding Icons
