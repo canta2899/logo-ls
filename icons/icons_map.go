@@ -153,7 +153,7 @@ var IconSet = map[string]*IconInfo{
 	"linux":           {Glyph: "\U0000e712", Color: [3]uint8{238, 207, 55}},  // linux
 	"liquid":          {Glyph: "\U0000e275", Color: [3]uint8{40, 182, 246}},  // liquid
 	"lock":            {Glyph: "\U000f033e", Color: [3]uint8{255, 213, 79}},  // lock
-	"log":             {Glyph: "\U0000f719", Color: [3]uint8{175, 180, 43}},  // log
+	"log":             {Glyph: "\U0000f4ed", Color: [3]uint8{175, 180, 43}},  // log
 	"lua":             {Glyph: "\U0000e620", Color: [3]uint8{66, 165, 245}},  // lua
 	"makefile":        {Glyph: "\U000f0229", Color: [3]uint8{239, 83, 80}},   // makefile
 	"manjaro":         {Glyph: "\U0000f312", Color: [3]uint8{73, 185, 90}},   // manjaro
