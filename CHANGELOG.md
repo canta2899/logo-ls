@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## logo-ls [1.5.1]
 
+### Features
+
+- Updated `.log` icon to a one that renders after codepoint migration
+
+## logo-ls [1.5.1]
+
 - New CI/CD which builds binaries and ships them to Homebrew
 
 ## logo-ls [1.5.0]
