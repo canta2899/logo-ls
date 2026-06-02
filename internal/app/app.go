@@ -21,6 +21,8 @@ import (
 	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
+const cannotAccessFmt = "cannot access %q: %v\n"
+
 type App struct {
 	Config   *cli.Config
 	Writer   io.Writer
@@ -77,7 +79,7 @@ func (a *App) GetArguments() *Args {
 
 		f, err := a.FS.Open(abs)
 		if err != nil {
-			a.Logger.Printf("cannot access %q: %v\n", argPath, err)
+			a.Logger.Printf(cannotAccessFmt, argPath, err)
 			a.ExitCode.SetSerious()
 			continue
 		}
@@ -156,7 +158,7 @@ func (a *App) processDirsNonRecursively(dirs []DirectoryEntry) {
 		d, err := a.ProcessDirectory(&dirEntry)
 		dirEntry.Close()
 		if err != nil {
-			a.Logger.Printf("cannot access %q: %v\n", dirEntry.Name(), err)
+			a.Logger.Printf(cannotAccessFmt, dirEntry.Name(), err)
 			a.ExitCode.SetSerious()
 		}
 
@@ -182,7 +184,7 @@ func (a *App) recurseDirectory(start *DirectoryEntry, startingAbsolutePath strin
 		d, err := a.ProcessDirectory(current.entry)
 		current.entry.Close()
 		if err != nil {
-			a.Logger.Printf("cannot access %q: %v\n", current.entry.Name(), err)
+			a.Logger.Printf(cannotAccessFmt, current.entry.Name(), err)
 			a.ExitCode.SetMinor()
 		}
 
@@ -193,30 +195,44 @@ func (a *App) recurseDirectory(start *DirectoryEntry, startingAbsolutePath strin
 		}
 
 		sort.Strings(d.Dirs)
+		stack = a.pushSubdirFrames(stack, current.entry, d.Dirs, startingAbsolutePath)
+	}
+}
 
-		for i := len(d.Dirs) - 1; i >= 0; i-- {
-			subdir := d.Dirs[i]
-			childPath := a.FS.Join(current.entry.Name(), subdir)
-			if rel, err := a.FS.Rel(startingAbsolutePath, childPath); err == nil {
-				childPath = rel
-			}
-
-			subdirFullPath := a.FS.Join(current.entry.Name(), subdir)
-			f, err := a.FS.Open(subdirFullPath)
-			if err != nil {
-				a.Logger.Printf("cannot access %q: %v\n", childPath, err)
-				a.ExitCode.SetMinor()
-				continue
-			}
-			abs, err := a.FS.Abs(subdirFullPath)
-			if err != nil {
-				a.Logger.Println("Cannot compute abs path for:", childPath)
-				f.Close()
-				continue
-			}
-			nextEntry := &DirectoryEntry{File: f, AbsPath: abs}
-			stack = append(stack, &RecursiveLookupFrame{entry: nextEntry, header: childPath})
+func (a *App) pushSubdirFrames(stack []*RecursiveLookupFrame, parent *DirectoryEntry, dirs []string, startingAbsolutePath string) []*RecursiveLookupFrame {
+	for i := len(dirs) - 1; i >= 0; i-- {
+		frame := a.openSubdirFrame(parent, dirs[i], startingAbsolutePath)
+		if frame == nil {
+			continue
 		}
+		stack = append(stack, frame)
+	}
+	return stack
+}
+
+func (a *App) openSubdirFrame(parent *DirectoryEntry, subdir, startingAbsolutePath string) *RecursiveLookupFrame {
+	subdirFullPath := a.FS.Join(parent.Name(), subdir)
+
+	childPath := subdirFullPath
+	if rel, err := a.FS.Rel(startingAbsolutePath, subdirFullPath); err == nil {
+		childPath = rel
+	}
+
+	f, err := a.FS.Open(subdirFullPath)
+	if err != nil {
+		a.Logger.Printf(cannotAccessFmt, childPath, err)
+		a.ExitCode.SetMinor()
+		return nil
+	}
+	abs, err := a.FS.Abs(subdirFullPath)
+	if err != nil {
+		a.Logger.Println("Cannot compute abs path for:", childPath)
+		f.Close()
+		return nil
+	}
+	return &RecursiveLookupFrame{
+		entry:  &DirectoryEntry{File: f, AbsPath: abs},
+		header: childPath,
 	}
 }
 
@@ -250,19 +266,7 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 	t := new(Directory)
 	isLong := a.Config.LongListingMode != cli.LongListingNone
 
-	if a.Config.AllMode == cli.IncludeAll || a.Config.Directory {
-		t.Info = a.buildEntry(d.Name(), dirStat, isLong)
-
-		if !a.Config.Directory {
-			t.Info.Name = "."
-			t.Info.Base = "."
-			t.Info.Ext = ""
-		}
-
-		if !a.Config.DisableIcon {
-			t.Info.Icon = icons.OpenDir()
-		}
-	}
+	a.maybeAttachSelfEntry(t, d, dirStat, isLong)
 
 	if a.Config.Directory {
 		t.Files = append(t.Files, t.Info)
@@ -284,61 +288,88 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 		if !showHidden && strings.HasPrefix(name, ".") {
 			continue
 		}
-
-		fullpath := a.FS.Join(d.Name(), name)
-		fi, infoErr := de.Info() // fi might be nil on error
-		if infoErr != nil {
-			a.Logger.Printf("cannot access %q: %v\n", fullpath, infoErr)
-			a.ExitCode.SetMinor()
-		}
-
-		entry := a.buildEntry(fullpath, fi, isLong)
-
-		if fi == nil {
-			if de.IsDir() {
-				entry.Indicator = "/"
-			} else if de.Type()&iofs.ModeSymlink != 0 {
-				entry.Indicator = "@"
-			}
-			if !a.Config.DisableIcon {
-				entry.Icon = icons.ResolveWith(a.IconOverride, entry.Base, entry.Ext, entry.Indicator)
-			}
-		}
-
-		if gitRepoStatus != nil {
-			entry.GitStatus = gitRepoStatus[name+a.FS.Separator()]
-			if entry.GitStatus == "" {
-				entry.GitStatus = gitRepoStatus[name]
-			}
-		}
-
-		t.Files = append(t.Files, entry)
-		if de.IsDir() {
-			t.Dirs = append(t.Dirs, name+"/")
-		}
+		a.appendChildEntry(t, d, de, gitRepoStatus, isLong)
 	}
 
 	if a.Config.AllMode == cli.IncludeAll {
-		if t.Info != nil {
-			t.Files = append(t.Files, t.Info)
-		}
-
-		pp := a.FS.Dir(d.Name())
-		pStat, _ := a.FS.Lstat(pp)
-
-		parentEntry := a.buildEntry(pp, pStat, isLong)
-		parentEntry.Name = ".."
-		parentEntry.Base = ".."
-		parentEntry.Ext = ""
-
-		if !a.Config.DisableIcon {
-			parentEntry.Icon = icons.OpenDir()
-		}
-
-		t.Files = append(t.Files, parentEntry)
-		t.Parent = parentEntry
+		a.appendDotEntries(t, d, isLong)
 	}
 	return t, err
+}
+
+func (a *App) maybeAttachSelfEntry(t *Directory, d *DirectoryEntry, dirStat fs.FileInfo, isLong bool) {
+	if a.Config.AllMode != cli.IncludeAll && !a.Config.Directory {
+		return
+	}
+	t.Info = a.buildEntry(d.Name(), dirStat, isLong)
+	if !a.Config.Directory {
+		t.Info.Name = "."
+		t.Info.Base = "."
+		t.Info.Ext = ""
+	}
+	if !a.Config.DisableIcon {
+		t.Info.Icon = icons.OpenDir()
+	}
+}
+
+func (a *App) appendChildEntry(t *Directory, d *DirectoryEntry, de fs.DirEntry, gitRepoStatus map[string]string, isLong bool) {
+	name := de.Name()
+	fullpath := a.FS.Join(d.Name(), name)
+	fi, infoErr := de.Info() // fi might be nil on error
+	if infoErr != nil {
+		a.Logger.Printf(cannotAccessFmt, fullpath, infoErr)
+		a.ExitCode.SetMinor()
+	}
+
+	entry := a.buildEntry(fullpath, fi, isLong)
+
+	if fi == nil {
+		a.fillMissingInfo(entry, de)
+	}
+
+	if gitRepoStatus != nil {
+		entry.GitStatus = gitRepoStatus[name+a.FS.Separator()]
+		if entry.GitStatus == "" {
+			entry.GitStatus = gitRepoStatus[name]
+		}
+	}
+
+	t.Files = append(t.Files, entry)
+	if de.IsDir() {
+		t.Dirs = append(t.Dirs, name+"/")
+	}
+}
+
+func (a *App) fillMissingInfo(entry *inspect.InspectedEntry, de fs.DirEntry) {
+	if de.IsDir() {
+		entry.Indicator = "/"
+	} else if de.Type()&iofs.ModeSymlink != 0 {
+		entry.Indicator = "@"
+	}
+	if !a.Config.DisableIcon {
+		entry.Icon = icons.ResolveWith(a.IconOverride, entry.Base, entry.Ext, entry.Indicator)
+	}
+}
+
+func (a *App) appendDotEntries(t *Directory, d *DirectoryEntry, isLong bool) {
+	if t.Info != nil {
+		t.Files = append(t.Files, t.Info)
+	}
+
+	pp := a.FS.Dir(d.Name())
+	pStat, _ := a.FS.Lstat(pp)
+
+	parentEntry := a.buildEntry(pp, pStat, isLong)
+	parentEntry.Name = ".."
+	parentEntry.Base = ".."
+	parentEntry.Ext = ""
+
+	if !a.Config.DisableIcon {
+		parentEntry.Icon = icons.OpenDir()
+	}
+
+	t.Files = append(t.Files, parentEntry)
+	t.Parent = parentEntry
 }
 
 // inspectorFor builds an Inspector for exactly the columns the current mode needs.

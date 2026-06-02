@@ -29,57 +29,74 @@ func Sort(entries []*inspect.InspectedEntry, mode cli.SortMode, reverse bool) {
 func lessFn(entries []*inspect.InspectedEntry, mode cli.SortMode) func(i, j int) bool {
 	switch mode {
 	case cli.SortAlphabetical:
-		return func(i, j int) bool {
-			return mainSort(entries[i].Name, entries[j].Name)
-		}
+		return lessAlpha(entries)
 	case cli.SortSize:
-		return func(i, j int) bool {
-			a, b := entries[i].Name, entries[j].Name
-			if res, ok := dotFileOrder(a, b); ok {
-				return res
-			}
-			if entries[i].Size > entries[j].Size {
-				return true
-			}
-			if entries[i].Size == entries[j].Size {
-				return mainSort(a, b)
-			}
-			return false
-		}
+		return lessSize(entries)
 	case cli.SortModTime:
-		return func(i, j int) bool {
-			return entries[i].ModTime.After(entries[j].ModTime)
-		}
+		return lessModTime(entries)
 	case cli.SortExtension:
-		return func(i, j int) bool {
-			a, b := entries[i].Name, entries[j].Name
-			ra := extGroupRank(entries[i].Base, entries[i].Ext)
-			rb := extGroupRank(entries[j].Base, entries[j].Ext)
-			if ra != rb {
-				return ra < rb
-			}
-			if ra == 2 {
-				if compareName(entries[i].Ext, entries[j].Ext) {
-					return true
-				}
-				if compareName(entries[j].Ext, entries[i].Ext) {
-					return false
-				}
-			}
-			return mainSort(a, b)
-		}
+		return lessExtension(entries)
 	case cli.SortNatural:
-		return func(i, j int) bool {
-			a, b := entries[i].Name, entries[j].Name
-			if res, ok := dotFileOrder(a, b); ok {
-				return res
-			}
-			return a < b
-		}
+		return lessNatural(entries)
 	case cli.SortNone:
 		fallthrough
 	default:
 		return func(i, j int) bool { return i < j }
+	}
+}
+
+func lessAlpha(entries []*inspect.InspectedEntry) func(i, j int) bool {
+	return func(i, j int) bool {
+		return mainSort(entries[i].Name, entries[j].Name)
+	}
+}
+
+func lessSize(entries []*inspect.InspectedEntry) func(i, j int) bool {
+	return func(i, j int) bool {
+		a, b := entries[i].Name, entries[j].Name
+		if res, ok := dotFileOrder(a, b); ok {
+			return res
+		}
+		if entries[i].Size != entries[j].Size {
+			return entries[i].Size > entries[j].Size
+		}
+		return mainSort(a, b)
+	}
+}
+
+func lessModTime(entries []*inspect.InspectedEntry) func(i, j int) bool {
+	return func(i, j int) bool {
+		return entries[i].ModTime.After(entries[j].ModTime)
+	}
+}
+
+func lessExtension(entries []*inspect.InspectedEntry) func(i, j int) bool {
+	return func(i, j int) bool {
+		a, b := entries[i].Name, entries[j].Name
+		ra := extGroupRank(entries[i].Base, entries[i].Ext)
+		rb := extGroupRank(entries[j].Base, entries[j].Ext)
+		if ra != rb {
+			return ra < rb
+		}
+		if ra == 2 {
+			if compareName(entries[i].Ext, entries[j].Ext) {
+				return true
+			}
+			if compareName(entries[j].Ext, entries[i].Ext) {
+				return false
+			}
+		}
+		return mainSort(a, b)
+	}
+}
+
+func lessNatural(entries []*inspect.InspectedEntry) func(i, j int) bool {
+	return func(i, j int) bool {
+		a, b := entries[i].Name, entries[j].Name
+		if res, ok := dotFileOrder(a, b); ok {
+			return res
+		}
+		return a < b
 	}
 }
 

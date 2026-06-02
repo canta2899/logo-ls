@@ -17,7 +17,6 @@ import (
 func TestFileIcons(t *testing.T) {
 	log.Println("Printing each supported file name and ext by the icon pack")
 
-	// get terminal width
 	terminalWidth, _, e := term.GetSize(int(os.Stdout.Fd()))
 	if e != nil {
 		terminalWidth = 80
@@ -31,31 +30,31 @@ func TestFileIcons(t *testing.T) {
 
 	for _, v := range ks {
 		t.Run("Testing icon: "+v, func(st *testing.T) {
-			i := icons.IconSet[v]
-			fmt.Fprintln(os.Stderr)
-			buf := bytes.NewBuffer([]byte(""))
-			log.Println("Printing files of type", i.GetColor()+v+"\033[0m")
-			w := ctw.NewStandardCTW(terminalWidth)
-			for f, d := range icons.IconFileName {
-				if d == i {
-					w.AddRow(d.GetColor(), "    ", d.GetGlyph(), f, "")
-				}
-			}
-			w.Flush(buf)
-			io.Copy(os.Stderr, buf)
-
-			buf = bytes.NewBuffer([]byte(""))
-			log.Println("Printing extentions of type", i.GetColor()+v+"\033[0m")
-			w = ctw.NewStandardCTW(terminalWidth)
-			for e, d := range icons.IconExt {
-				if d == i {
-					w.AddRow(d.GetColor(), "    ", d.GetGlyph(), e, "")
-				}
-			}
-			w.Flush(buf)
-			io.Copy(os.Stderr, buf)
+			runIconSubtest(v, terminalWidth)
 		})
 	}
+}
+
+func runIconSubtest(name string, terminalWidth int) {
+	i := icons.IconSet[name]
+	fmt.Fprintln(os.Stderr)
+	log.Println("Printing files of type", i.GetColor()+name+"\033[0m")
+	writeMatchingEntries(terminalWidth, i, icons.IconFileName)
+
+	log.Println("Printing extentions of type", i.GetColor()+name+"\033[0m")
+	writeMatchingEntries(terminalWidth, i, icons.IconExt)
+}
+
+func writeMatchingEntries(terminalWidth int, target *icons.IconInfo, set map[string]*icons.IconInfo) {
+	buf := bytes.NewBuffer(nil)
+	w := ctw.NewStandardCTW(terminalWidth)
+	for name, info := range set {
+		if info == target {
+			w.AddRow(info.GetColor(), "    ", info.GetGlyph(), name, "")
+		}
+	}
+	w.Flush(buf)
+	io.Copy(os.Stderr, buf)
 }
 
 func TestIconDisplay(t *testing.T) {

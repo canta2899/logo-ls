@@ -73,65 +73,91 @@ func (p *Parser) Parse(args []string) error {
 			break
 		}
 
-		if strings.HasPrefix(arg, "--") {
-			name := arg[2:]
-			var inlineValue string
-			hasInline := false
-			if eq := strings.IndexByte(name, '='); eq >= 0 {
-				inlineValue = name[eq+1:]
-				name = name[:eq]
-				hasInline = true
+		switch {
+		case strings.HasPrefix(arg, "--"):
+			consumed, err := p.parseLong(args, i)
+			if err != nil {
+				return err
 			}
-			found := false
-			for _, f := range p.Flags {
-				if f.Long != name {
-					continue
-				}
-				switch f.Type {
-				case FlagBool:
-					if hasInline {
-						return fmt.Errorf("flag --%s does not take a value", name)
-					}
-					*(f.Value.(*bool)) = true
-				case FlagString:
-					if hasInline {
-						*(f.Value.(*string)) = inlineValue
-					} else {
-						if i+1 >= len(args) {
-							return fmt.Errorf("flag --%s requires a value", name)
-						}
-						i++
-						*(f.Value.(*string)) = args[i]
-					}
-				}
-				found = true
-				break
+			i += consumed
+		case strings.HasPrefix(arg, "-") && len(arg) > 1:
+			if err := p.parseShortCluster(arg[1:]); err != nil {
+				return err
 			}
-			if !found {
-				return fmt.Errorf("unknown flag: --%s", name)
-			}
-		} else if strings.HasPrefix(arg, "-") && len(arg) > 1 {
-			chars := arg[1:]
-			for _, char := range chars {
-				found := false
-				for _, f := range p.Flags {
-					if f.Short == char {
-						if f.Type == FlagBool {
-							*(f.Value.(*bool)) = true
-							found = true
-							break
-						}
-					}
-				}
-				if !found {
-					return fmt.Errorf("unknown flag: -%c", char)
-				}
-			}
-		} else {
+		default:
 			p.Args = append(p.Args, arg)
 		}
 	}
 	return nil
+}
+
+// parseLong handles a "--name[=value]" token. Returns the number of additional
+// args consumed (0 or 1 for a value following the flag).
+func (p *Parser) parseLong(args []string, i int) (int, error) {
+	name := args[i][2:]
+	var inlineValue string
+	hasInline := false
+	if eq := strings.IndexByte(name, '='); eq >= 0 {
+		inlineValue = name[eq+1:]
+		name = name[:eq]
+		hasInline = true
+	}
+
+	f := p.findLong(name)
+	if f == nil {
+		return 0, fmt.Errorf("unknown flag: --%s", name)
+	}
+	return p.assignLong(f, name, args, i, inlineValue, hasInline)
+}
+
+func (p *Parser) findLong(name string) *Flag {
+	for _, f := range p.Flags {
+		if f.Long == name {
+			return f
+		}
+	}
+	return nil
+}
+
+func (p *Parser) assignLong(f *Flag, name string, args []string, i int, inlineValue string, hasInline bool) (int, error) {
+	switch f.Type {
+	case FlagBool:
+		if hasInline {
+			return 0, fmt.Errorf("flag --%s does not take a value", name)
+		}
+		*(f.Value.(*bool)) = true
+		return 0, nil
+	case FlagString:
+		if hasInline {
+			*(f.Value.(*string)) = inlineValue
+			return 0, nil
+		}
+		if i+1 >= len(args) {
+			return 0, fmt.Errorf("flag --%s requires a value", name)
+		}
+		*(f.Value.(*string)) = args[i+1]
+		return 1, nil
+	}
+	return 0, nil
+}
+
+func (p *Parser) parseShortCluster(chars string) error {
+	for _, char := range chars {
+		if !p.setShortBool(char) {
+			return fmt.Errorf("unknown flag: -%c", char)
+		}
+	}
+	return nil
+}
+
+func (p *Parser) setShortBool(char rune) bool {
+	for _, f := range p.Flags {
+		if f.Short == char && f.Type == FlagBool {
+			*(f.Value.(*bool)) = true
+			return true
+		}
+	}
+	return false
 }
 
 func (p *Parser) PrintUsage() {
