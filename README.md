@@ -73,7 +73,7 @@ make logo-ls
 
 ## Icons
 
-`logo-ls` comes with a huge built in set of icons for common file types and directories. You can either contribute to the built in set by opening a pull request with an update to the skill file, or you can add custom icons or overrides for your own use.
+`logo-ls` comes with a huge built in set of icons for common file types and directories. You can either contribute to the built in set by opening a pull request, or you can add custom icons or overrides for your own use.
 
 ### Contribute with new Icons
 
