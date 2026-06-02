@@ -30,6 +30,8 @@ type App struct {
 	// GitReader is optional; when nil the app falls back to FS.GitStatus
 	// (legacy path) so existing test harnesses keep working.
 	GitReader *git.StatusReader
+	// IconExtension is the user's optional icon overrides; nil disables.
+	IconExtension *icons.Extension
 }
 
 // gitStatusFor returns the status map for dir, using the per-app reader when
@@ -301,7 +303,7 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 				entry.Indicator = "@"
 			}
 			if !a.Config.DisableIcon {
-				entry.Icon = icons.Resolve(entry.Base, entry.Ext, entry.Indicator)
+				entry.Icon = icons.ResolveWith(a.IconExtension, entry.Base, entry.Ext, entry.Indicator)
 			}
 		}
 
@@ -348,7 +350,7 @@ func (a *App) inspectorFor(isLong bool) *inspect.Inspector {
 	showGroup := !a.Config.NoGroup &&
 		(a.Config.LongListingMode == cli.LongListingDefault ||
 			a.Config.LongListingMode == cli.LongListingGroup)
-	return inspect.New(a.FS, inspect.DefaultIconResolver(), inspect.Options{
+	return inspect.New(a.FS, inspect.IconResolverWith(a.IconExtension), inspect.Options{
 		Long:            isLong,
 		ShowOwner:       showOwner,
 		ShowGroup:       showGroup,

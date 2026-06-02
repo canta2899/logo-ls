@@ -71,9 +71,63 @@ make logo-ls
 ```
 ---
 
-## Adding Icons
+## Icons
+
+`logo-ls` comes with a huge built in set of icons for common file types and directories. You can either contribute to the built in set by opening a pull request with an update to the skill file, or you can add custom icons or overrides for your own use.
+
+### Contribute with new Icons
 
 If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a built in skill called `/add-icon` which you can use to let your agent do the job for you. If you want to do it manually, you can pretend to be a coding agent and read the skill file yourself.
 
 > **Note for Windows contributors:** the skill file lives at `add-icon-skill.md` in the repo root, and the paths under `.agents/skills/add-icon/SKILL.md` and `.claude/skills/add-icon/SKILL.md` are symlinks to it. Git for Windows does not create real symlinks by default, so these may be checked out as plain text files containing the link target. To get working symlinks, enable Developer Mode (or run as admin) and set `git config --global core.symlinks true` before cloning.
+
+### Extensions and Overrides
+
+If you want to add or override icons, you can drop a YAML file in either of the following locations:
+
+- `$XDG_CONFIG_HOME/logo-ls/logo-ls-icons.yaml` (defaults to `~/.config/logo-ls/logo-ls-icons.yaml`)
+- `~/.logo-ls-icons.yaml`
+
+The first existing file wins. The file is read **once at startup** and merged with the built-in icon set, so it does not impact per-directory listing speed. If the file is missing or empty the loader just skips it, if it cannot be parsed `logo-ls` prints a single warning and continues with built-in icons only.
+
+#### Schema
+
+```yaml
+extensions:        # matched by file extension (without the leading dot)
+  rs:
+    glyph: "U+E7A8"    # codepoint syntax
+    color: "#dea584"
+  ts:
+    glyph: "0xE628"    # 0x form also accepted
+    color: "#3178c6"
+  py:
+    glyph: ""         # YAML string escape also
+    color: "#ffd43b"
+
+files:            # matched by full file name (case-insensitive)
+  .envrc:
+    glyph: "U+E60B"
+    color: "#ecd53f"
+
+directories:       # matched by full directory name (case-insensitive)
+  myproject:
+    glyph: "U+E5FE"
+    color: "#42a5f5"
+
+sub_extensions:    # matched by "<last-segment><ext>"
+  d.ts:
+    glyph: "U+E628"
+    color: "#3178c6"
+```
+
+Each entry needs a `glyph` (which can be either a codepoint or a literal string) and a `color` (in its hex representation). User entries take priority over the built-in icons.
+
+#### Flags
+
+Two flags control the override loader:
+
+- `--no-ext` skips override loading entirely and forces built-in icons only.
+- `--ext-file <path>` loads overrides from an explicit YAML path instead of the default discovery locations.
+
+If neither flag is passed the default discovery paths above are used.
 

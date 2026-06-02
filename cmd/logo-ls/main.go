@@ -9,6 +9,7 @@ import (
 	"github.com/canta2899/logo-ls/internal/app"
 	"github.com/canta2899/logo-ls/pkg/fs/osfs"
 	"github.com/canta2899/logo-ls/internal/cli"
+	"github.com/canta2899/logo-ls/internal/icons"
 	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/mattn/go-colorable"
 )
@@ -24,13 +25,34 @@ func main() {
 
 	logger := log.New(writer, "logo-ls: ", 0)
 
+	var iconExt *icons.Extension
+	switch {
+	case command.NoIconExtension:
+		// user opted out; leave nil
+	case command.IconExtensionFile != "":
+		ext, err := icons.LoadExtensionFromPath(command.IconExtensionFile)
+		if err != nil {
+			logger.Printf("ignoring icon overrides: %v\n", err)
+		} else {
+			iconExt = ext
+		}
+	default:
+		ext, err := icons.LoadExtension()
+		if err != nil {
+			logger.Printf("ignoring icon overrides: %v\n", err)
+		} else {
+			iconExt = ext
+		}
+	}
+
 	app := &app.App{
-		Config:    command,
-		Writer:    writer,
-		Logger:    logger,
-		ExitCode:  cli.CodeOk,
-		FS:        osfs.New(),
-		GitReader: git.NewStatusReader(git.ExecPorcelain{}),
+		Config:        command,
+		Writer:        writer,
+		Logger:        logger,
+		ExitCode:      cli.CodeOk,
+		FS:            osfs.New(),
+		GitReader:     git.NewStatusReader(git.ExecPorcelain{}),
+		IconExtension: iconExt,
 	}
 
 	app.Run()

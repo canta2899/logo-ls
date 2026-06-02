@@ -55,7 +55,9 @@ type runResult struct {
 func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 	t.Helper()
 
-	argv := append([]string{"logo-ls"}, args...)
+	// Force --no-ext so the harness never picks up the developer's personal
+	// icon overrides from $HOME. Keeps goldens reproducible across machines.
+	argv := append([]string{"logo-ls", "--no-ext"}, args...)
 	cfg, _, err := cli.BuildConfig(argv)
 	if err != nil {
 		t.Fatalf("BuildConfig(%v): %v", args, err)

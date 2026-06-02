@@ -153,3 +153,27 @@ func TestMixedArgs(t *testing.T) {
 		t.Errorf("expected FileList to be [\"something\"], got %v", cfg.FileList)
 	}
 }
+
+// Verifies the --no-ext and --ext-file flags parse correctly.
+func TestIconExtensionFlags(t *testing.T) {
+	cfg := parseArgs([]string{"app", "--no-ext"})
+	if !cfg.NoIconExtension {
+		t.Error("expected NoIconExtension to be true")
+	}
+	if cfg.IconExtensionFile != "" {
+		t.Errorf("expected IconExtensionFile empty, got %q", cfg.IconExtensionFile)
+	}
+
+	cfg = parseArgs([]string{"app", "--ext-file", "/tmp/icons.yaml"})
+	if cfg.NoIconExtension {
+		t.Error("expected NoIconExtension to be false")
+	}
+	if cfg.IconExtensionFile != "/tmp/icons.yaml" {
+		t.Errorf("expected IconExtensionFile=/tmp/icons.yaml, got %q", cfg.IconExtensionFile)
+	}
+
+	cfg = parseArgs([]string{"app", "--ext-file=/tmp/inline.yaml"})
+	if cfg.IconExtensionFile != "/tmp/inline.yaml" {
+		t.Errorf("expected inline form to set path, got %q", cfg.IconExtensionFile)
+	}
+}

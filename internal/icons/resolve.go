@@ -2,16 +2,24 @@ package icons
 
 import "strings"
 
-// Resolve picks an icon for a (name, ext, indicator) triple. Rules: dirs by
-// full name, files by full name, by sub-extension, then by extension, with
-// hidden/exe fallbacks. Pure function — no FS access, no shared state.
+// Resolve picks an icon for a (name, ext, indicator) triple.
 func Resolve(name, ext, indicator string) *IconInfo {
+	return ResolveWith(nil, name, ext, indicator)
+}
+
+// ResolveWith is like Resolve but consults a user-provided Extension first
+func ResolveWith(ext *Extension, name, fileExt, indicator string) *IconInfo {
 	var i *IconInfo
 	var ok bool
 
+	lowerNameExt := strings.ToLower(name + fileExt)
+
 	switch indicator {
 	case "/":
-		i, ok = IconDir[strings.ToLower(name+ext)]
+		if i = ext.lookupDir(lowerNameExt); i != nil {
+			break
+		}
+		i, ok = IconDir[lowerNameExt]
 		if ok {
 			break
 		}
@@ -21,18 +29,29 @@ func Resolve(name, ext, indicator string) *IconInfo {
 		}
 		i = IconDef["dir"]
 	default:
-		i, ok = IconFileName[strings.ToLower(name+ext)]
+		if i = ext.lookupFileName(lowerNameExt); i != nil {
+			break
+		}
+		i, ok = IconFileName[lowerNameExt]
 		if ok {
 			break
 		}
 		t := strings.Split(name, ".")
 		if len(t) > 1 && t[0] != "" {
-			i, ok = IconSubExt[strings.ToLower(t[len(t)-1]+ext)]
+			subKey := strings.ToLower(t[len(t)-1] + fileExt)
+			if i = ext.lookupSubExt(subKey); i != nil {
+				break
+			}
+			i, ok = IconSubExt[subKey]
 			if ok {
 				break
 			}
 		}
-		i, ok = IconExt[strings.ToLower(strings.TrimPrefix(ext, "."))]
+		extKey := strings.ToLower(strings.TrimPrefix(fileExt, "."))
+		if i = ext.lookupExt(extKey); i != nil {
+			break
+		}
+		i, ok = IconExt[extKey]
 		if ok {
 			break
 		}
@@ -43,6 +62,11 @@ func Resolve(name, ext, indicator string) *IconInfo {
 		i = IconDef["file"]
 	}
 
+	return applyIndicator(i, indicator)
+}
+
+// applyIndicator handles the "*" executable special case and the nil fallback.
+func applyIndicator(i *IconInfo, indicator string) *IconInfo {
 	if indicator == "*" && i != nil {
 		if i.GetGlyph() == "" {
 			i = IconDef["exe"]
