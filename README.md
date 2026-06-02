@@ -130,3 +130,18 @@ Two flags control the override loader:
 
 If neither flag is passed the default discovery paths above are used.
 
+---
+
+## Benchmarks
+
+The repo ships with a small benchmark harness that compares `logo-ls` (plain and `-D` git-status modes) against the system `ls`, across directories of increasing size. It uses [`hyperfine`](https://github.com/sharkdp/hyperfine) under the hood and is driven by two python scripts.
+
+```sh
+make benchmark       # builds logo-ls, runs hyperfine, writes .benchmark_results.json
+make benchmark-plot  # renders benchmark.png from the saved results
+```
+
+![Benchmark on MacBook Pro M4](.github/assets/benchmark_mbm4pro.png)
+
+On my machine, `logo-ls` is slightly slower than `/bin/ls` (imperceptibly so), and `-D` git-status mode is bottlenecked by `git` itself, but it all still lands comfortably in the imperceptible range.
+

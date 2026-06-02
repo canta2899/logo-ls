@@ -26,3 +26,7 @@ logo-ls
 CHANGELOG.md.tmp
 
 dist/
+
+# benchmarks
+.benchmark_results.json
+benchmark.png
