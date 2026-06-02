@@ -27,7 +27,7 @@ const (
 type InspectedEntry struct {
 	Name    string // raw, as it appears on disk
 	Ext     string // file extension (with leading dot) or "" for dotfiles/no-ext
-	Base    string // Name with Ext stripped — kept so the renderer can compose Base+Ext+Indicator
+	Base    string // Name with Ext stripped; used to compose Base+Ext+Indicator
 	AbsPath string
 	Kind    Kind
 	Mode    iofs.FileMode // raw mode (not a formatted string)
@@ -54,14 +54,9 @@ type InspectedEntry struct {
 	GitStatus string
 }
 
-// IsDir reports whether the entry refers to a directory (post-symlink-follow
-// semantics depend on how the entry was constructed).
-func (e *InspectedEntry) IsDir() bool { return e.Kind == KindDir }
-
-// IsSymlink reports whether the entry refers to a symlink.
+func (e *InspectedEntry) IsDir() bool     { return e.Kind == KindDir }
 func (e *InspectedEntry) IsSymlink() bool { return e.Kind == KindSymlink }
 
-// kindFromMode picks the Kind that matches an os.FileMode.
 func kindFromMode(m iofs.FileMode) Kind {
 	switch {
 	case m&iofs.ModeDir != 0:

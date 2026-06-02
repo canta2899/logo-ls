@@ -6,9 +6,7 @@ import (
 	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
-// OpenDirIconString returns the colored "open directory" header used when
-// printing a directory banner (e.g. `dir/:`). When showIcon is false the
-// returned string is empty so the banner has no glyph.
+// OpenDirIconString returns the colored open-directory glyph for a directory banner, or "" when icons are disabled.
 func OpenDirIconString(showIcon bool) string {
 	if !showIcon {
 		return ""
@@ -17,8 +15,7 @@ func OpenDirIconString(showIcon bool) string {
 	return d.GetColor() + d.GetGlyph() + "\033[0m" + " "
 }
 
-// FileEntry refers to an entity the CLI was asked to list directly (e.g.
-// `logo-ls file.txt`).
+// FileEntry is a non-directory argument (e.g. logo-ls file.txt).
 type FileEntry struct {
 	Info    fs.FileInfo
 	AbsPath string
@@ -26,8 +23,7 @@ type FileEntry struct {
 
 func (f FileEntry) Name() string { return f.Info.Name() }
 
-// DirectoryEntry refers to a directory the CLI was asked to list. The File
-// handle is kept open so ReadDir is cheap; Close releases it.
+// DirectoryEntry holds an open directory handle so ReadDir is cheap.
 type DirectoryEntry struct {
 	File    fs.File
 	AbsPath string

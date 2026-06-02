@@ -10,8 +10,7 @@ import (
 	"github.com/canta2899/logo-ls/internal/inspect/platform"
 )
 
-// foldHome rewrites paths inside HOME to use "~" so symlink targets in long
-// mode read cleanly (matches the legacy osfs behaviour).
+// foldHome replaces the HOME prefix in p with "~" so symlink targets read cleanly.
 func foldHome(p string) string {
 	home := os.Getenv("HOME")
 	if home == "" {
@@ -39,8 +38,7 @@ type Options struct {
 	DisableIcon     bool
 }
 
-// IconResolver picks an icon for an entry. Defaults to the package-level
-// resolver that uses the existing format.GetIcon rules.
+// IconResolver picks an icon for a filesystem entry.
 type IconResolver interface {
 	Resolve(name, ext, indicator string) *icons.IconInfo
 }
@@ -161,10 +159,8 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 }
 
 // indicatorFor returns the trailing classifier glyph ("/", "@", "*", ...).
-// For symlinks in long mode it emits " ~> target" using the inspected
-// LinkTarget; the HOME->~ folding is done here so it doesn't rely on a
-// per-FS Indicator method. A symlink whose target can't be resolved gets
-// an empty indicator in long mode (matches the previous behaviour).
+// For symlinks in long mode it emits " ~> target" with HOME folded to "~".
+// Unresolvable symlinks get an empty indicator in long mode.
 func (i *Inspector) indicatorFor(e *InspectedEntry, m iofs.FileMode) string {
 	if m&iofs.ModeSymlink != 0 {
 		if i.options.Long {
@@ -178,8 +174,6 @@ func (i *Inspector) indicatorFor(e *InspectedEntry, m iofs.FileMode) string {
 	return classifyIndicator(m)
 }
 
-// classifyIndicator returns the indicator string for non-symlinks (and the
-// short-mode classification of any entry).
 func classifyIndicator(m iofs.FileMode) string {
 	switch {
 	case m&iofs.ModeDir != 0:
@@ -196,14 +190,11 @@ func classifyIndicator(m iofs.FileMode) string {
 	return ""
 }
 
-// SplitNameExt splits a filename into its (name, ext) parts, treating
-// dotfiles without an interior dot as having no extension. Exported so the
-// renderer can use the same rule when rendering legacy adapter output.
+// SplitNameExt splits a filename into (base, ext), treating dotfiles with no interior dot as having no extension.
 func SplitNameExt(name string, p Pather) (string, string) {
 	return splitNameExt(name, p)
 }
 
-// Pather is the subset of fs.FS used for path manipulation in this package.
 type Pather interface {
 	Ext(path string) string
 }

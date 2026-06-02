@@ -1,4 +1,4 @@
-// Package ctw implements a "standard" column-table-writer that tries to fit multiple columns of data
+// Package ctw implements the column table writers used by the renderer.
 package ctw
 
 import (
@@ -29,7 +29,6 @@ func NewCTW(longMode, oneFilePerLine, icon bool) CTW {
 }
 
 func GetCustomTerminalWidth() int {
-	// screen width for custom tw
 	w, _, e := term.GetSize(int(os.Stdout.Fd()))
 
 	if e != nil {

@@ -34,7 +34,7 @@ func (r *unixReader) Read(absPath string, fi fs.FileInfo, opts Options) Stat {
 	if fi == nil {
 		return Stat{}
 	}
-	// Direct path: caller-supplied sentinel (fakefs).
+	// fakefs supplies a SysProvider instead of a real *syscall.Stat_t.
 	if sp, ok := fi.(SysProvider); ok {
 		s := sp.PlatformStat()
 		if opts.WantXAttr {
@@ -42,7 +42,6 @@ func (r *unixReader) Read(absPath string, fi fs.FileInfo, opts Options) Stat {
 		}
 		return s
 	}
-	// Real OS: read everything from the underlying Stat_t.
 	st, ok := fi.Sys().(*syscall.Stat_t)
 	if !ok {
 		return Stat{}

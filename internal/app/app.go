@@ -21,7 +21,6 @@ import (
 	isort "github.com/canta2899/logo-ls/internal/sort"
 )
 
-// App represents the main application that holds configuration, a writer, exit codes, and a logger.
 type App struct {
 	Config   *cli.Config
 	Writer   io.Writer
@@ -42,7 +41,6 @@ func (a *App) gitStatusFor(dir string) map[string]string {
 	return a.FS.GitStatus(dir)
 }
 
-// Args stores the parsed command-line arguments as separate files and directories.
 type Args struct {
 	Files []FileEntry
 	Dirs  []DirectoryEntry
@@ -53,22 +51,18 @@ type RecursiveLookupFrame struct {
 	header string // if non-empty, printed as: "\n<icon><header>:\n"
 }
 
-// Exit terminates the program with the current stored exit code.
 func (a *App) Exit() {
 	os.Exit(int(a.ExitCode))
 }
 
-// Write copies a buffer to the App's writer, panicking on error.
+// Write panics if copying buf to the writer fails.
 func (a *App) Write(buf *bytes.Buffer) {
 	if _, err := io.Copy(a.Writer, buf); err != nil {
 		panic(err)
 	}
 }
 
-// GetArguments parses the configured file list and categorizes them as files or directories.
-// It also sets an error exit code for entries that are not accessible.
 func (a *App) GetArguments() *Args {
-	// Sort all user inputs.
 	slices.Sort(a.Config.FileList)
 
 	args := &Args{}
@@ -112,11 +106,9 @@ func (a *App) GetArguments() *Args {
 	return args
 }
 
-// Run is the main entry point that orchestrates listing files/directories and printing results.
 func (a *App) Run() {
 	args := a.GetArguments()
 
-	// Process and display all files first.
 	if len(args.Files) > 0 {
 		filesDir := a.ProcessFiles(args.Files)
 		a.PrintDirectory(filesDir)
@@ -125,7 +117,6 @@ func (a *App) Run() {
 		}
 	}
 
-	// Process and display all directories (recursively or not).
 	if a.Config.Recursive {
 		a.processDirsRecursively(args.Dirs)
 	} else {
@@ -133,7 +124,6 @@ func (a *App) Run() {
 	}
 }
 
-// Prints each directory and its subdirectories.
 func (a *App) processDirsRecursively(dirs []DirectoryEntry) {
 	currentAbs, _ := a.FS.Abs(".")
 	openDirIcon := OpenDirIconString(!a.Config.DisableIcon)
@@ -154,7 +144,6 @@ func (a *App) processDirsRecursively(dirs []DirectoryEntry) {
 	}
 }
 
-// Prints each directory (but not subdirectories).
 func (a *App) processDirsNonRecursively(dirs []DirectoryEntry) {
 	pName := len(dirs) > 1
 	openDirIcon := OpenDirIconString(!a.Config.DisableIcon)
@@ -178,7 +167,6 @@ func (a *App) processDirsNonRecursively(dirs []DirectoryEntry) {
 	}
 }
 
-// Processes a directory, prints it, and recurses through subdirectories if any.
 func (a *App) recurseDirectory(start *DirectoryEntry, startingAbsolutePath string) {
 	stack := []*RecursiveLookupFrame{{entry: start, header: ""}}
 
@@ -232,7 +220,6 @@ func (a *App) recurseDirectory(start *DirectoryEntry, startingAbsolutePath strin
 	}
 }
 
-// ProcessFiles converts a slice of file entries into a *Directory for printing.
 func (a *App) ProcessFiles(files []FileEntry) *Directory {
 	t := new(Directory)
 	isLong := a.Config.LongListingMode != cli.LongListingNone
@@ -245,8 +232,6 @@ func (a *App) ProcessFiles(files []FileEntry) *Directory {
 	return t
 }
 
-// ProcessDirectory reads the contents of the given directory, builds a *Directory
-// that contains *model.Entry objects for each item, and returns it.
 func (a *App) ProcessDirectory(d *DirectoryEntry) (*Directory, error) {
 	defer func() {
 		_ = d.Close()
@@ -261,13 +246,10 @@ func (a *App) ProcessDirectory(d *DirectoryEntry) (*Directory, error) {
 	return dirModel, err
 }
 
-// Reads directory contents, creates *model.Entry objects, adds special entries (.), (..)
-// and sets up Git statuses if requested.
 func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Directory, error) {
 	t := new(Directory)
 	isLong := a.Config.LongListingMode != cli.LongListingNone
 
-	// If we need to show the current directory as an entry
 	if a.Config.AllMode == cli.IncludeAll || a.Config.Directory {
 		t.Info = a.buildEntry(d.Name(), dirStat, isLong)
 
@@ -288,9 +270,8 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 	}
 
 	entries, err := d.File.ReadDir(0)
-	// We proceed even if err != nil, as entries may contain a partial list.
+	// proceed even on error: entries may contain a partial list
 
-	// If Git status is requested, prepare the repository info map.
 	var gitRepoStatus map[string]string
 	if a.Config.GitStatus {
 		gitRepoStatus = a.gitStatusFor(d.Name())
@@ -298,7 +279,6 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 
 	showHidden := a.Config.AllMode != cli.IncludeDefault
 
-	// Build entries for each file
 	for _, de := range entries {
 		name := de.Name()
 		if !showHidden && strings.HasPrefix(name, ".") {
@@ -314,9 +294,6 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 
 		entry := a.buildEntry(fullpath, fi, isLong)
 
-		// If we couldn't get full info but we have type from DirEntry, fill
-		// in the indicator and pick a fallback icon. The inspector handles
-		// symlink-icon resolution for entries that do have FileInfo.
 		if fi == nil {
 			if de.IsDir() {
 				entry.Indicator = "/"
@@ -328,7 +305,6 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 			}
 		}
 
-		// If Git status is available, attach it.
 		if gitRepoStatus != nil {
 			entry.GitStatus = gitRepoStatus[name+a.FS.Separator()]
 			if entry.GitStatus == "" {
@@ -365,8 +341,7 @@ func (a *App) populateDirectory(d *DirectoryEntry, dirStat fs.FileInfo) (*Direct
 	return t, err
 }
 
-// inspectorFor returns an Inspector configured to populate exactly the fields
-// the current request needs.
+// inspectorFor builds an Inspector for exactly the columns the current mode needs.
 func (a *App) inspectorFor(isLong bool) *inspect.Inspector {
 	showOwner := a.Config.LongListingMode == cli.LongListingDefault ||
 		a.Config.LongListingMode == cli.LongListingOwner
@@ -384,16 +359,12 @@ func (a *App) inspectorFor(isLong bool) *inspect.Inspector {
 	})
 }
 
-// buildEntry runs an Inspector on (fullPath, fi) and returns the resulting
-// InspectedEntry. When fi is nil it falls back to a stub entry with just the
-// name set so the renderer still has something to print.
+// buildEntry inspects fullPath. When fi is nil, returns a stub entry with just the name set.
 func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *inspect.InspectedEntry {
 	insp := a.inspectorFor(isLong)
 	return insp.Inspect(fullPath, fi)
 }
 
-// PrintDirectory sorts the directory's files according to the app config
-// and renders them.
 func (a *App) PrintDirectory(d *Directory) {
 	if d == nil {
 		return
