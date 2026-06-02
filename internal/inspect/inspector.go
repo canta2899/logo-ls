@@ -1,10 +1,12 @@
 package inspect
 
 import (
+	iofs "io/fs"
 	"strings"
 
 	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/inspect/platform"
 )
 
 // Options configures what the inspector collects per entry. The renderer
@@ -26,26 +28,30 @@ type IconResolver interface {
 	Resolve(name, ext, indicator string) *icons.IconInfo
 }
 
-// GitStatusReader returns a git status map keyed by absolute path, or nil
-// if the directory is not inside a repository.
-type GitStatusReader interface {
-	Status(dir string) map[string]string
+// namedOwner is implemented by FileInfo values that know their owner/group
+// without needing a uid/gid lookup. fakefs uses it so tests don't depend on
+// the host's user database.
+type namedOwner interface {
+	OwnerName() string
+	GroupName() string
 }
 
 // Inspector is the single place that touches fs.FS for per-file metadata.
 // Owns per-instance caches that used to live as package globals.
 type Inspector struct {
-	fs      fs.FS
-	icons   IconResolver
-	options Options
+	fs       fs.FS
+	icons    IconResolver
+	options  Options
+	platform platform.Reader
 }
 
 // New returns a fresh inspector.
 func New(filesystem fs.FS, ir IconResolver, opts Options) *Inspector {
 	return &Inspector{
-		fs:      filesystem,
-		icons:   ir,
-		options: opts,
+		fs:       filesystem,
+		icons:    ir,
+		options:  opts,
+		platform: platform.NewReader(),
 	}
 }
 
@@ -65,21 +71,43 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 	e.ModTime = fi.ModTime()
 	e.Kind = kindFromMode(fi.Mode())
 
-	if i.options.ShowInode {
-		e.Inode = i.fs.InodeNumber(absPath)
-	}
-	if i.options.ShowBlocks {
-		e.Blocks = i.fs.Blocks(fi)
+	wantStat := i.options.ShowInode || i.options.ShowBlocks || i.options.Long
+	if wantStat {
+		stat := i.platform.Read(absPath, fi, platform.Options{WantXAttr: i.options.Long && i.options.WantXAttr})
+		if i.options.ShowInode {
+			e.Inode = stat.Inode
+		}
+		if i.options.ShowBlocks {
+			e.Blocks = stat.Blocks
+			if e.Blocks == 0 && e.Kind == KindFile {
+				e.Blocks = (e.Size + 511) / 512
+			}
+		}
+		if i.options.Long {
+			e.HardLinks = stat.HardLinks
+			if e.HardLinks == 0 {
+				e.HardLinks = 1
+			}
+			e.HasXAttr = stat.HasXAttr
+			if no, ok := fi.(namedOwner); ok {
+				if i.options.ShowOwner {
+					e.Owner = no.OwnerName()
+				}
+				if i.options.ShowGroup {
+					e.Group = no.GroupName()
+				}
+			} else {
+				if i.options.ShowOwner {
+					e.Owner = i.platform.LookupOwner(stat.UID)
+				}
+				if i.options.ShowGroup {
+					e.Group = i.platform.LookupGroup(stat.GID)
+				}
+			}
+		}
 	}
 
-	if i.options.Long {
-		e.HardLinks = i.fs.HardLinks(absPath)
-		owner, group := i.fs.OwnerGroup(fi, i.options.ShowOwner, i.options.ShowGroup)
-		e.Owner = owner
-		e.Group = group
-	}
-
-	e.Indicator = i.fs.Indicator(absPath, i.options.Long)
+	e.Indicator = i.indicatorFor(absPath, fi.Mode())
 
 	if e.Kind == KindSymlink && i.options.ResolveSymlinks {
 		if target, err := i.fs.EvalSymlinks(absPath); err == nil {
@@ -101,7 +129,7 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 		name, ext := splitNameExt(e.Name, i.fs)
 		if e.Kind == KindSymlink && e.LinkResolved != nil {
 			tname, text := splitNameExt(e.LinkResolved.Name, i.fs)
-			tind := i.fs.Indicator(e.LinkTarget, i.options.Long)
+			tind := i.indicatorFor(e.LinkTarget, e.LinkResolved.Mode)
 			e.Icon = i.icons.Resolve(tname, text, tind)
 		} else {
 			e.Icon = i.icons.Resolve(name, ext, e.Indicator)
@@ -109,6 +137,25 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 	}
 
 	return e
+}
+
+// indicatorFor returns the trailing classifier glyph ("/", "@", "*", ...).
+// Symlinks fall back to FS.Indicator so the long-mode " ~> target" rendering
+// still uses the active backend's path resolution and HOME-folding rules.
+func (i *Inspector) indicatorFor(absPath string, m iofs.FileMode) string {
+	switch {
+	case m&iofs.ModeDir != 0:
+		return "/"
+	case m&iofs.ModeNamedPipe != 0:
+		return "|"
+	case m&iofs.ModeSymlink != 0:
+		return i.fs.Indicator(absPath, i.options.Long)
+	case m&iofs.ModeSocket != 0:
+		return "="
+	case m&0o111 != 0:
+		return "*"
+	}
+	return ""
 }
 
 // SplitNameExt splits a filename into its (name, ext) parts, treating

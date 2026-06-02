@@ -395,17 +395,19 @@ func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.En
 	ie := insp.Inspect(fullPath, fi)
 
 	modeStr := ""
+	owner := ie.Owner
+	group := ie.Group
 	if isLong {
 		modeStr = a.FS.ModeExtended(fi, fullPath)
+		// Legacy renderer expects the group column pre-padded with " %v  "
+		// (formatting baked into the old ctw column widths); preserve that
+		// shape here until the renderer is rewritten in Phase 5.
+		if group != "" {
+			group = fmt.Sprintf(" %v  ", group)
+		}
 	}
 
-	entry := inspect.ToLegacy(ie, modeStr, ie.Owner, ie.Group, a.FS)
-	// In long mode the legacy renderer expects a pre-padded group string
-	// (" staff  "); the FS already returns it that way, so preserve it.
-	if isLong {
-		entry.Owner = ie.Owner
-		entry.Group = ie.Group
-	}
+	entry := inspect.ToLegacy(ie, modeStr, owner, group, a.FS)
 	return entry
 }
 

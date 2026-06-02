@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/inspect/platform"
 )
 
 type Meta struct {
@@ -24,6 +25,21 @@ type Meta struct {
 	Nlinks  uint64
 	Blocks  int64
 	Mtime   time.Time
+}
+
+// platformStat builds a platform.Stat from this Meta. Owner/Group are passed
+// out as raw uid/gid via a side table maintained on the fakeFS itself; here
+// we surface just the numeric-looking fields the platform reader needs.
+func (m Meta) platformStat() platform.Stat {
+	nlinks := m.Nlinks
+	if nlinks == 0 {
+		nlinks = 1
+	}
+	return platform.Stat{
+		Inode:     m.Inode,
+		HardLinks: nlinks,
+		Blocks:    m.Blocks,
+	}
 }
 
 type EntryKind int
@@ -399,6 +415,22 @@ func (fi *fakeFileInfo) Mode() iofs.FileMode { return fi.entry.meta.Mode }
 func (fi *fakeFileInfo) ModTime() time.Time  { return fi.entry.mtime }
 func (fi *fakeFileInfo) IsDir() bool         { return fi.entry.kind == kindDir }
 func (fi *fakeFileInfo) Sys() any            { return nil }
+
+// PlatformStat satisfies platform.SysProvider so the inspector can pull
+// fakefs metadata without inventing a real *syscall.Stat_t.
+func (fi *fakeFileInfo) PlatformStat() platform.Stat {
+	return fi.entry.meta.platformStat()
+}
+
+// OwnerName returns the configured owner name on the fake entry. Used by the
+// inspector to keep test fixtures readable without lookup tables.
+func (fi *fakeFileInfo) OwnerName() string { return fi.entry.meta.Owner }
+
+// GroupName returns the configured group name on the fake entry.
+func (fi *fakeFileInfo) GroupName() string { return fi.entry.meta.Group }
+
+// ModeString returns the pre-rendered mode string from the fixture if any.
+func (fi *fakeFileInfo) ModeString() string { return fi.entry.meta.ModeStr }
 
 type fakeDirEntry struct {
 	entry *Entry
