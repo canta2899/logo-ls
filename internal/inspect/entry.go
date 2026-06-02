@@ -26,6 +26,8 @@ const (
 // Populated once, in inspect.Inspect; never mutated downstream.
 type InspectedEntry struct {
 	Name    string // raw, as it appears on disk
+	Ext     string // file extension (with leading dot) or "" for dotfiles/no-ext
+	Base    string // Name with Ext stripped — kept so the renderer can compose Base+Ext+Indicator
 	AbsPath string
 	Kind    Kind
 	Mode    iofs.FileMode // raw mode (not a formatted string)

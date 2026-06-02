@@ -18,6 +18,7 @@ import (
 	"github.com/canta2899/logo-ls/internal/inspect"
 	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/canta2899/logo-ls/internal/render"
+	isort "github.com/canta2899/logo-ls/internal/sort"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -273,6 +274,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 
 		if !a.Config.Directory {
 			t.Info.Name = "."
+			t.Info.Base = "."
 			t.Info.Ext = ""
 		}
 
@@ -317,14 +319,13 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 		// in the indicator and pick a fallback icon. The inspector handles
 		// symlink-icon resolution for entries that do have FileInfo.
 		if fi == nil {
-			entry.Mode = "???????????"
 			if de.IsDir() {
 				entry.Indicator = "/"
 			} else if de.Type()&iofs.ModeSymlink != 0 {
 				entry.Indicator = "@"
 			}
 			if !a.Config.DisableIcon {
-				entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
+				entry.Icon = format.GetIcon(entry.Base, entry.Ext, entry.Indicator)
 			}
 		}
 
@@ -352,6 +353,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 
 		parentEntry := a.buildEntry(pp, pStat, isLong)
 		parentEntry.Name = ".."
+		parentEntry.Base = ".."
 		parentEntry.Ext = ""
 
 		if !a.Config.DisableIcon {
@@ -383,56 +385,28 @@ func (a *App) inspectorFor(isLong bool) *inspect.Inspector {
 	})
 }
 
-// Constructs a *model.Entry from a given path, fs.FileInfo, and whether we are
-// in a long-listing context.
-func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.Entry {
-	if fi == nil {
-		entry := &model.Entry{}
-		entry.Name = a.FS.Base(fullPath)
-		entry.Ext = a.FS.Ext(entry.Name)
-		entry.Name = entry.Name[0 : len(entry.Name)-len(entry.Ext)]
-		entry.Mode = "???????????"
-		entry.Owner = "?"
-		entry.Group = "?"
-		return entry
-	}
-
+// buildEntry runs an Inspector on (fullPath, fi) and returns the resulting
+// InspectedEntry. When fi is nil it falls back to a stub entry with just the
+// name set so the renderer still has something to print.
+func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *inspect.InspectedEntry {
 	insp := a.inspectorFor(isLong)
-	ie := insp.Inspect(fullPath, fi)
-
-	modeStr := ""
-	owner := ie.Owner
-	group := ie.Group
-	if isLong {
-		modeStr = inspect.ModeString(ie.Mode, ie.Sticky, ie.StickyX, ie.HasXAttr)
-		// Legacy renderer expects the group column pre-padded with " %v  "
-		// (formatting baked into the old ctw column widths); preserve that
-		// shape here until the renderer consumes InspectedEntry directly.
-		if group != "" {
-			group = fmt.Sprintf(" %v  ", group)
-		}
-	}
-
-	entry := inspect.ToLegacy(ie, modeStr, owner, group, a.FS)
-	return entry
+	return insp.Inspect(fullPath, fi)
 }
 
-// PrintDirectory sorts the directory's files according to the app config and prints them.
+// PrintDirectory sorts the directory's files according to the app config
+// and renders them.
 func (a *App) PrintDirectory(d *model.Directory) {
 	if d == nil {
 		return
 	}
-
-	format.SetLessFunction(d, a.Config.SortMode)
-	d.Sort(a.Config.SortMode, a.Config.Reverse)
-
+	isort.Sort(d.Files, a.Config.SortMode, a.Config.Reverse)
 	render.Render(a.Writer, d.Files, render.Options{
 		Mode:          a.renderMode(),
 		ShowIcon:      !a.Config.DisableIcon,
 		ShowInode:     a.Config.ShowInodeNumber,
 		ShowBlocks:    a.Config.ShowBlockSize,
 		HumanReadable: a.Config.HumanReadable,
-		TimeFormatter: entryTimeFormatter{tf: a.Config.TimeFormatter},
+		TimeFormatter: a.Config.TimeFormatter,
 	})
 }
 
@@ -445,14 +419,4 @@ func (a *App) renderMode() render.Mode {
 	default:
 		return render.ModeShort
 	}
-}
-
-// entryTimeFormatter adapts the app's *time.Time-based formatter to the
-// renderer's per-entry interface.
-type entryTimeFormatter struct {
-	tf format.Timestamp
-}
-
-func (e entryTimeFormatter) Format(m *model.Entry) string {
-	return e.tf.Format(&m.ModTime)
 }

@@ -79,10 +79,12 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 	e := &InspectedEntry{AbsPath: absPath}
 	if fi == nil {
 		e.Name = i.fs.Base(absPath)
+		e.Base, e.Ext = splitNameExt(e.Name, i.fs)
 		return e
 	}
 
 	e.Name = fi.Name()
+	e.Base, e.Ext = splitNameExt(e.Name, i.fs)
 	e.Mode = fi.Mode()
 	e.Size = fi.Size()
 	e.ModTime = fi.ModTime()

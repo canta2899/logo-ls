@@ -1,11 +1,9 @@
 package model
 
 import (
-	"sort"
-	"time"
-
 	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/inspect"
 )
 
 // OpenDirIconString returns the colored "open directory" header used when
@@ -19,6 +17,8 @@ func OpenDirIconString(showIcon bool) string {
 	return d.GetColor() + d.GetGlyph() + "\033[0m" + " "
 }
 
+// FileEntry refers to an entity the CLI was asked to list directly (e.g.
+// `logo-ls file.txt`).
 type FileEntry struct {
 	Info    fs.FileInfo
 	AbsPath string
@@ -26,6 +26,8 @@ type FileEntry struct {
 
 func (f FileEntry) Name() string { return f.Info.Name() }
 
+// DirectoryEntry refers to a directory the CLI was asked to list. The File
+// handle is kept open so ReadDir is cheap; Close releases it.
 type DirectoryEntry struct {
 	File    fs.File
 	AbsPath string
@@ -34,44 +36,10 @@ type DirectoryEntry struct {
 func (d *DirectoryEntry) Name() string { return d.File.Name() }
 func (d *DirectoryEntry) Close() error { return d.File.Close() }
 
-type Entry struct {
-	Name, Ext, Indicator string
-	ModTime              time.Time
-	Size                 int64
-	Mode                 string
-	ModeBits             uint32
-	NumHardLinks         uint64
-	Owner, Group         string
-	Blocks               int64
-	GitStatus            string
-	Icon                 *icons.IconInfo
-	InodeNumber          string
-}
-
+// Directory is the post-inspection, pre-render bundle for one directory.
 type Directory struct {
-	Info   *Entry
-	Parent *Entry
-	Files  []*Entry
+	Info   *inspect.InspectedEntry
+	Parent *inspect.InspectedEntry
+	Files  []*inspect.InspectedEntry
 	Dirs   []string
-	LessFn func(int, int) bool
-}
-
-func (d *Directory) Len() int {
-	return len(d.Files)
-}
-
-func (d *Directory) Swap(i, j int) {
-	d.Files[i], d.Files[j] = d.Files[j], d.Files[i]
-}
-
-func (d *Directory) Less(i, j int) bool {
-	return d.LessFn(i, j)
-}
-
-func (d *Directory) Sort(sortMode SortMode, reverse bool) {
-	if sortMode != SortNone && reverse {
-		sort.Sort(sort.Reverse(d))
-	} else {
-		sort.Sort(d)
-	}
 }

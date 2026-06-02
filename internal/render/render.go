@@ -1,18 +1,20 @@
-// Package render owns the presentation layer: it consumes model entries
-// and writes the rendered, column-aligned output. It is the only place
-// that decides on column widths, indicator suffixes, time formatting and
-// per-row ANSI codes.
+// Package render owns the presentation layer: it consumes
+// *inspect.InspectedEntry values and writes the rendered, column-aligned
+// output. It is the only place that decides on column widths, indicator
+// suffixes, time formatting and per-row ANSI codes.
 package render
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/internal/inspect"
 )
 
 // Mode selects which renderer to use.
@@ -27,10 +29,10 @@ const (
 	ModeLong
 )
 
-// EntryTimeFormatter renders an entry's modification time. Tests inject a
-// fixed formatter so goldens don't drift.
-type EntryTimeFormatter interface {
-	Format(e *model.Entry) string
+// TimeFormatter renders a single time.Time. Tests inject a deterministic
+// formatter so goldens don't drift.
+type TimeFormatter interface {
+	Format(t *time.Time) string
 }
 
 // Options carries everything the renderer needs that doesn't live on the
@@ -41,11 +43,11 @@ type Options struct {
 	ShowInode     bool
 	ShowBlocks    bool
 	HumanReadable bool
-	TimeFormatter EntryTimeFormatter
+	TimeFormatter TimeFormatter
 }
 
 // Render writes one directory's worth of entries to w in the selected mode.
-func Render(w io.Writer, entries []*model.Entry, opts Options) {
+func Render(w io.Writer, entries []*inspect.InspectedEntry, opts Options) {
 	tw := ctw.NewCTW(opts.Mode == ModeLong, opts.Mode == ModeOneFilePerLine, opts.ShowIcon)
 	for _, e := range entries {
 		addRow(tw, e, opts)
@@ -55,22 +57,21 @@ func Render(w io.Writer, entries []*model.Entry, opts Options) {
 	_, _ = io.Copy(w, buf)
 }
 
-// addRow encodes the per-mode column layout. It's the only place that
-// knows what the CTW's positional rows mean.
-func addRow(tw ctw.CTW, e *model.Entry, opts Options) {
+func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
+	displayName := e.Base + e.Ext + e.Indicator
 	switch opts.Mode {
 	case ModeLong:
 		tw.AddRow(
 			e.Icon.GetColor(),
 			blockSizeWithInode(e, opts),
-			e.Mode,
-			strconv.FormatUint(e.NumHardLinks, 10),
+			inspect.ModeString(e.Mode, e.Sticky, e.StickyX, e.HasXAttr),
+			strconv.FormatUint(hardLinks(e), 10),
 			e.Owner,
-			e.Group,
+			paddedGroup(e.Group),
 			format.GetFormattedSize(e.Size, opts.HumanReadable),
-			opts.TimeFormatter.Format(e),
+			opts.TimeFormatter.Format(&e.ModTime),
 			e.Icon.GetGlyph(),
-			e.Name+e.Ext+e.Indicator,
+			displayName,
 			e.GitStatus,
 		)
 	case ModeOneFilePerLine:
@@ -78,7 +79,7 @@ func addRow(tw ctw.CTW, e *model.Entry, opts Options) {
 			e.Icon.GetColor(),
 			blockSizeWithInode(e, opts),
 			e.Icon.GetGlyph(),
-			e.Name+e.Ext+e.Indicator,
+			displayName,
 			e.GitStatus,
 		)
 	default:
@@ -86,16 +87,33 @@ func addRow(tw ctw.CTW, e *model.Entry, opts Options) {
 			e.Icon.GetColor(),
 			blockSizeWithInode(e, opts),
 			e.Icon.GetGlyph(),
-			e.Name+e.Ext+e.Indicator,
+			displayName,
 			e.GitStatus,
 		)
 	}
 }
 
-func blockSizeWithInode(e *model.Entry, opts Options) string {
+func hardLinks(e *inspect.InspectedEntry) uint64 {
+	if e.HardLinks == 0 {
+		return 1
+	}
+	return e.HardLinks
+}
+
+// paddedGroup wraps a group name in the legacy " %v  " padding the long
+// listing's column widths were tuned for. Empty strings stay empty so the
+// column collapses when -G is set.
+func paddedGroup(g string) string {
+	if g == "" {
+		return ""
+	}
+	return fmt.Sprintf(" %v  ", g)
+}
+
+func blockSizeWithInode(e *inspect.InspectedEntry, opts Options) string {
 	var parts []string
 	if opts.ShowInode {
-		parts = append(parts, e.InodeNumber)
+		parts = append(parts, e.Inode)
 	}
 	if opts.ShowBlocks {
 		parts = append(parts, format.GetFormattedSize(e.Blocks, opts.HumanReadable))

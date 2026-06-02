@@ -13,6 +13,7 @@ import (
 	"github.com/canta2899/logo-ls/fs/osfs"
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/internal/cli"
+	"github.com/canta2899/logo-ls/internal/inspect"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -190,16 +191,17 @@ func TestBuildEntry(t *testing.T) {
 
 // TestPrintDirectory builds a dummy directory model and then verifies that PrintDirectory writes output.
 func TestPrintDirectory(t *testing.T) {
-	dummyEntry := &model.Entry{
+	dummyEntry := &inspect.InspectedEntry{
 		Icon:      &icons.IconInfo{Glyph: "dummy", Color: [3]uint8{0, 0, 0}, IsExecutable: false},
-		Name:      "dummy",
+		Name:      "dummy.txt",
+		Base:      "dummy",
 		Ext:       ".txt",
 		Indicator: "",
 		Size:      456,
 		ModTime:   time.Now(),
 	}
 	dirModel := &model.Directory{
-		Files: []*model.Entry{dummyEntry},
+		Files: []*inspect.InspectedEntry{dummyEntry},
 	}
 
 	conf := &cli.Config{
