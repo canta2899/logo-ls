@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## logo-ls [1.6.0]
+
+### Features
+
+- Icon overrides allow users to extend or change icons through a YAML configuration file (#35)
+
+### Fixes
+
+- Refactored the codebase and reduce the amount of syscalls made by `logo-ls` (measured a 25% faster average execution time) (#34)
+
 ## logo-ls [1.5.2]
 
 ### Features
