@@ -11,6 +11,7 @@ import (
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -67,7 +68,7 @@ func TestCrossBackend_Equivalence(t *testing.T) {
 func runWithOSFS(t *testing.T, args ...string) string {
 	t.Helper()
 	argv := append([]string{"logo-ls"}, args...)
-	cfg, _, err := app.BuildConfig(argv)
+	cfg, _, err := cli.BuildConfig(argv)
 	if err != nil {
 		t.Fatalf("BuildConfig: %v", err)
 	}

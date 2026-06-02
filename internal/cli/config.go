@@ -1,4 +1,7 @@
-package app
+// Package cli parses command-line flags and produces the Config that the
+// rest of logo-ls reads from. It owns nothing that touches the filesystem;
+// app.App wires the parsed config to an inspector + renderer.
+package cli
 
 import (
 	"github.com/canta2899/logo-ls/format"

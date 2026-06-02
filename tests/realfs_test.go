@@ -10,6 +10,7 @@ import (
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -26,7 +27,7 @@ func TestRealFS_Smoke(t *testing.T) {
 		t.Fatalf("mkdir sub: %v", err)
 	}
 
-	cfg, _, err := app.BuildConfig([]string{"logo-ls", "-1e", dir})
+	cfg, _, err := cli.BuildConfig([]string{"logo-ls", "-1e", dir})
 	if err != nil {
 		t.Fatalf("BuildConfig: %v", err)
 	}

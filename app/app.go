@@ -14,6 +14,7 @@ import (
 
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/internal/inspect"
 	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/canta2899/logo-ls/internal/render"
@@ -22,7 +23,7 @@ import (
 
 // App represents the main application that holds configuration, a writer, exit codes, and a logger.
 type App struct {
-	Config   *Config
+	Config   *cli.Config
 	Writer   io.Writer
 	ExitCode model.ExitCode
 	Logger   *log.Logger

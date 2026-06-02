@@ -12,6 +12,7 @@ import (
 
 	"github.com/canta2899/logo-ls/fs/osfs"
 	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -22,7 +23,7 @@ func (d DummyTimeFormatter) Format(t *time.Time) string {
 	return t.Format("2006-01-02 15:04:05")
 }
 
-func newTestApp(conf *Config, logger *log.Logger, writer io.Writer) *App {
+func newTestApp(conf *cli.Config, logger *log.Logger, writer io.Writer) *App {
 	return &App{
 		Config: conf,
 		Writer: writer,
@@ -51,7 +52,7 @@ func TestGetArguments(t *testing.T) {
 
 	nonExistent := filepath.Join(os.TempDir(), "nonexistent_path")
 
-	conf := &Config{
+	conf := &cli.Config{
 		FileList:      []string{nonExistent, tempDir, tempFileName},
 		TimeFormatter: DummyTimeFormatter{},
 	}
@@ -87,7 +88,7 @@ func TestProcessFiles(t *testing.T) {
 	tempFile.Close()
 	defer os.Remove(tempFileName)
 
-	conf := &Config{
+	conf := &cli.Config{
 		LongListingMode: model.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		DisableIcon:     true,
@@ -124,7 +125,7 @@ func TestProcessDirectory(t *testing.T) {
 		t.Fatalf("Failed to create file in temporary directory: %v", err)
 	}
 
-	conf := &Config{
+	conf := &cli.Config{
 		AllMode:         model.IncludeDefault,
 		LongListingMode: model.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
@@ -164,7 +165,7 @@ func TestBuildEntry(t *testing.T) {
 	tempFile.Close()
 	defer os.Remove(tempFileName)
 
-	conf := &Config{
+	conf := &cli.Config{
 		LongListingMode: model.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		ShowInodeNumber: false,
@@ -201,7 +202,7 @@ func TestPrintDirectory(t *testing.T) {
 		Files: []*model.Entry{dummyEntry},
 	}
 
-	conf := &Config{
+	conf := &cli.Config{
 		LongListingMode: model.LongListingNone,
 		OneFilePerLine:  false,
 		DisableIcon:     true,

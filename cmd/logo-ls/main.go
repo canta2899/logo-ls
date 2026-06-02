@@ -8,13 +8,14 @@ import (
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/mattn/go-colorable"
 )
 
 func main() {
-	command := app.GetConfigFromCli()
+	command := cli.GetConfigFromCli()
 
 	var writer io.Writer = os.Stdout
 

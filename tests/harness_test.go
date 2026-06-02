@@ -15,6 +15,7 @@ import (
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -56,7 +57,7 @@ func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 	t.Helper()
 
 	argv := append([]string{"logo-ls"}, args...)
-	cfg, _, err := app.BuildConfig(argv)
+	cfg, _, err := cli.BuildConfig(argv)
 	if err != nil {
 		t.Fatalf("BuildConfig(%v): %v", args, err)
 	}
