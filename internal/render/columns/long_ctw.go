@@ -53,48 +53,40 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 	l.columnWidths[l.numCols-2] = 1 // icon column
 
 	for rowIdx, row := range l.rows {
-		isFirstPrintedCol := true
+		l.writeRow(buf, rowIdx, row, skipCols)
+	}
+}
 
-		for colIdx, cellValue := range row {
-			if skipCols[colIdx] {
-				continue
-			}
-
-			if !isFirstPrintedCol {
-				fmt.Fprint(buf, l.empty)
-			}
-
-			switch {
-			case colIdx == l.numCols-2:
-				fmt.Fprintf(buf, "%s%*s%s",
-					l.iconColors[rowIdx],
-					l.columnWidths[colIdx],
-					cellValue,
-					l.noColor,
-				)
-
-			case colIdx >= l.numCols-1 && !skipCols[l.numCols]:
-				gitColor := l.GetGitColor(row[l.numCols])
-				fmt.Fprintf(buf, "%s%-*s%s",
-					gitColor,
-					l.columnWidths[colIdx],
-					cellValue,
-					l.noColor,
-				)
-
-			case skipCols[l.numCols] && colIdx == l.numCols-1:
-				fmt.Fprintf(buf, "%-*s", l.columnWidths[colIdx], cellValue)
-
-			// permission column is left-aligned
-			case !skipCols[l.numCols] && colIdx == 1:
-				fmt.Fprintf(buf, "%-*s", l.columnWidths[colIdx], cellValue)
-
-			default:
-				fmt.Fprintf(buf, "%*s", l.columnWidths[colIdx], cellValue)
-			}
-
-			isFirstPrintedCol = false
+func (l *LongCTW) writeRow(buf *bytes.Buffer, rowIdx int, row []string, skipCols []bool) {
+	isFirstPrintedCol := true
+	for colIdx, cellValue := range row {
+		if skipCols[colIdx] {
+			continue
 		}
-		fmt.Fprintln(buf)
+		if !isFirstPrintedCol {
+			fmt.Fprint(buf, l.empty)
+		}
+		l.writeCell(buf, rowIdx, colIdx, cellValue, row, skipCols)
+		isFirstPrintedCol = false
+	}
+	fmt.Fprintln(buf)
+}
+
+func (l *LongCTW) writeCell(buf *bytes.Buffer, rowIdx, colIdx int, cellValue string, row []string, skipCols []bool) {
+	gitSkipped := skipCols[l.numCols]
+	width := l.columnWidths[colIdx]
+
+	switch {
+	case colIdx == l.numCols-2:
+		fmt.Fprintf(buf, "%s%*s%s", l.iconColors[rowIdx], width, cellValue, l.noColor)
+	case colIdx >= l.numCols-1 && !gitSkipped:
+		fmt.Fprintf(buf, "%s%-*s%s", l.GetGitColor(row[l.numCols]), width, cellValue, l.noColor)
+	case gitSkipped && colIdx == l.numCols-1:
+		fmt.Fprintf(buf, "%-*s", width, cellValue)
+	case !gitSkipped && colIdx == 1:
+		// permission column is left-aligned
+		fmt.Fprintf(buf, "%-*s", width, cellValue)
+	default:
+		fmt.Fprintf(buf, "%*s", width, cellValue)
 	}
 }

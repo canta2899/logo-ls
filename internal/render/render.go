@@ -58,8 +58,7 @@ func Render(w io.Writer, entries []*inspect.InspectedEntry, opts Options) {
 
 func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 	displayName := e.Base + e.Ext + e.Indicator
-	switch opts.Mode {
-	case ModeLong:
+	if opts.Mode == ModeLong {
 		tw.AddRow(
 			e.Icon.GetColor(),
 			blockSizeWithInode(e, opts),
@@ -73,23 +72,15 @@ func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 			displayName,
 			e.GitStatus,
 		)
-	case ModeOneFilePerLine:
-		tw.AddRow(
-			e.Icon.GetColor(),
-			blockSizeWithInode(e, opts),
-			e.Icon.GetGlyph(),
-			displayName,
-			e.GitStatus,
-		)
-	default:
-		tw.AddRow(
-			e.Icon.GetColor(),
-			blockSizeWithInode(e, opts),
-			e.Icon.GetGlyph(),
-			displayName,
-			e.GitStatus,
-		)
+		return
 	}
+	tw.AddRow(
+		e.Icon.GetColor(),
+		blockSizeWithInode(e, opts),
+		e.Icon.GetGlyph(),
+		displayName,
+		e.GitStatus,
+	)
 }
 
 func hardLinks(e *inspect.InspectedEntry) uint64 {

@@ -88,74 +88,95 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 	e.ModTime = fi.ModTime()
 	e.Kind = kindFromMode(fi.Mode())
 
-	wantStat := i.options.ShowInode || i.options.ShowBlocks || i.options.Long
-	if wantStat {
-		stat := i.platform.Read(absPath, fi, platform.Options{WantXAttr: i.options.Long && i.options.WantXAttr})
-		if i.options.ShowInode {
-			e.Inode = stat.Inode
-		}
-		if i.options.ShowBlocks {
-			e.Blocks = stat.Blocks
-			if e.Blocks == 0 && e.Kind == KindFile {
-				e.Blocks = (e.Size + 511) / 512
-			}
-		}
-		if i.options.Long {
-			e.HardLinks = stat.HardLinks
-			if e.HardLinks == 0 {
-				e.HardLinks = 1
-			}
-			e.HasXAttr = stat.HasXAttr
-			e.Sticky = stat.Sticky
-			e.StickyX = stat.StickyX
-			if no, ok := fi.(namedOwner); ok {
-				if i.options.ShowOwner {
-					e.Owner = no.OwnerName()
-				}
-				if i.options.ShowGroup {
-					e.Group = no.GroupName()
-				}
-			} else {
-				if i.options.ShowOwner {
-					e.Owner = i.platform.LookupOwner(stat.UID)
-				}
-				if i.options.ShowGroup {
-					e.Group = i.platform.LookupGroup(stat.GID)
-				}
-			}
-		}
+	if i.options.ShowInode || i.options.ShowBlocks || i.options.Long {
+		i.applyPlatformStat(e, absPath, fi)
 	}
 
 	if e.Kind == KindSymlink && (i.options.ResolveSymlinks || i.options.Long) {
-		if target, err := i.fs.EvalSymlinks(absPath); err == nil {
-			e.LinkTarget = target
-			if tfi, terr := i.fs.Stat(target); terr == nil {
-				e.LinkResolved = &InspectedEntry{
-					AbsPath: target,
-					Name:    tfi.Name(),
-					Mode:    tfi.Mode(),
-					Size:    tfi.Size(),
-					ModTime: tfi.ModTime(),
-					Kind:    kindFromMode(tfi.Mode()),
-				}
-			}
-		}
+		i.resolveSymlink(e, absPath)
 	}
 
 	e.Indicator = i.indicatorFor(e, fi.Mode())
 
 	if !i.options.DisableIcon && i.icons != nil {
-		name, ext := splitNameExt(e.Name, i.fs)
-		if e.Kind == KindSymlink && e.LinkResolved != nil {
-			tname, text := splitNameExt(e.LinkResolved.Name, i.fs)
-			tind := classifyIndicator(e.LinkResolved.Mode)
-			e.Icon = i.icons.Resolve(tname, text, tind)
-		} else {
-			e.Icon = i.icons.Resolve(name, ext, e.Indicator)
-		}
+		e.Icon = i.resolveIcon(e)
 	}
 
 	return e
+}
+
+func (i *Inspector) applyPlatformStat(e *InspectedEntry, absPath string, fi fs.FileInfo) {
+	stat := i.platform.Read(absPath, fi, platform.Options{WantXAttr: i.options.Long && i.options.WantXAttr})
+	if i.options.ShowInode {
+		e.Inode = stat.Inode
+	}
+	if i.options.ShowBlocks {
+		e.Blocks = stat.Blocks
+		if e.Blocks == 0 && e.Kind == KindFile {
+			e.Blocks = (e.Size + 511) / 512
+		}
+	}
+	if i.options.Long {
+		i.applyLongStat(e, fi, stat)
+	}
+}
+
+func (i *Inspector) applyLongStat(e *InspectedEntry, fi fs.FileInfo, stat platform.Stat) {
+	e.HardLinks = stat.HardLinks
+	if e.HardLinks == 0 {
+		e.HardLinks = 1
+	}
+	e.HasXAttr = stat.HasXAttr
+	e.Sticky = stat.Sticky
+	e.StickyX = stat.StickyX
+	i.applyOwnerGroup(e, fi, stat)
+}
+
+func (i *Inspector) applyOwnerGroup(e *InspectedEntry, fi fs.FileInfo, stat platform.Stat) {
+	if no, ok := fi.(namedOwner); ok {
+		if i.options.ShowOwner {
+			e.Owner = no.OwnerName()
+		}
+		if i.options.ShowGroup {
+			e.Group = no.GroupName()
+		}
+		return
+	}
+	if i.options.ShowOwner {
+		e.Owner = i.platform.LookupOwner(stat.UID)
+	}
+	if i.options.ShowGroup {
+		e.Group = i.platform.LookupGroup(stat.GID)
+	}
+}
+
+func (i *Inspector) resolveSymlink(e *InspectedEntry, absPath string) {
+	target, err := i.fs.EvalSymlinks(absPath)
+	if err != nil {
+		return
+	}
+	e.LinkTarget = target
+	tfi, terr := i.fs.Stat(target)
+	if terr != nil {
+		return
+	}
+	e.LinkResolved = &InspectedEntry{
+		AbsPath: target,
+		Name:    tfi.Name(),
+		Mode:    tfi.Mode(),
+		Size:    tfi.Size(),
+		ModTime: tfi.ModTime(),
+		Kind:    kindFromMode(tfi.Mode()),
+	}
+}
+
+func (i *Inspector) resolveIcon(e *InspectedEntry) *icons.IconInfo {
+	if e.Kind == KindSymlink && e.LinkResolved != nil {
+		tname, text := splitNameExt(e.LinkResolved.Name, i.fs)
+		return i.icons.Resolve(tname, text, classifyIndicator(e.LinkResolved.Mode))
+	}
+	name, ext := splitNameExt(e.Name, i.fs)
+	return i.icons.Resolve(name, ext, e.Indicator)
 }
 
 // indicatorFor returns the trailing classifier glyph ("/", "@", "*", ...).
