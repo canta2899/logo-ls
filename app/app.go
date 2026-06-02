@@ -15,6 +15,7 @@ import (
 	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/inspect"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -357,12 +358,30 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 	return t, err
 }
 
+// inspectorFor returns an Inspector configured to populate exactly the fields
+// the current request needs.
+func (a *App) inspectorFor(isLong bool) *inspect.Inspector {
+	showOwner := a.Config.LongListingMode == model.LongListingDefault ||
+		a.Config.LongListingMode == model.LongListingOwner
+	showGroup := !a.Config.NoGroup &&
+		(a.Config.LongListingMode == model.LongListingDefault ||
+			a.Config.LongListingMode == model.LongListingGroup)
+	return inspect.New(a.FS, inspect.DefaultIconResolver(), inspect.Options{
+		Long:            isLong,
+		ShowOwner:       showOwner,
+		ShowGroup:       showGroup,
+		ShowInode:       a.Config.ShowInodeNumber,
+		ShowBlocks:      a.Config.ShowBlockSize,
+		ResolveSymlinks: !a.Config.DisableIcon,
+		DisableIcon:     a.Config.DisableIcon,
+	})
+}
+
 // Constructs a *model.Entry from a given path, fs.FileInfo, and whether we are
 // in a long-listing context.
 func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.Entry {
-	entry := &model.Entry{}
-
 	if fi == nil {
+		entry := &model.Entry{}
 		entry.Name = a.FS.Base(fullPath)
 		entry.Ext = a.FS.Ext(entry.Name)
 		entry.Name = entry.Name[0 : len(entry.Name)-len(entry.Ext)]
@@ -372,43 +391,21 @@ func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.En
 		return entry
 	}
 
-	name := fi.Name()
-	if strings.HasPrefix(name, ".") && !strings.Contains(name[1:], ".") {
-		entry.Name = name
-		entry.Ext = ""
-	} else {
-		entry.Ext = a.FS.Ext(name)
-		entry.Name = name[0 : len(name)-len(entry.Ext)]
-	}
-	entry.Size = fi.Size()
-	entry.ModTime = fi.ModTime()
-	entry.Indicator = a.FS.Indicator(fullPath, isLong)
+	insp := a.inspectorFor(isLong)
+	ie := insp.Inspect(fullPath, fi)
 
-	if a.Config.ShowInodeNumber {
-		entry.InodeNumber = a.FS.InodeNumber(fullPath)
-	}
-
+	modeStr := ""
 	if isLong {
-		entry.Mode = a.FS.ModeExtended(fi, fullPath)
-		entry.ModeBits = uint32(fi.Mode())
-		entry.NumHardLinks = a.FS.HardLinks(fullPath)
-		showOwner := a.Config.LongListingMode == model.LongListingDefault ||
-			a.Config.LongListingMode == model.LongListingOwner
-		showGroup := !a.Config.NoGroup &&
-			(a.Config.LongListingMode == model.LongListingDefault ||
-				a.Config.LongListingMode == model.LongListingGroup)
-		owner, group := a.FS.OwnerGroup(fi, showOwner, showGroup)
-		entry.Owner, entry.Group = owner, group
+		modeStr = a.FS.ModeExtended(fi, fullPath)
 	}
 
-	if a.Config.ShowBlockSize {
-		entry.Blocks = a.FS.Blocks(fi)
+	entry := inspect.ToLegacy(ie, modeStr, ie.Owner, ie.Group, a.FS)
+	// In long mode the legacy renderer expects a pre-padded group string
+	// (" staff  "); the FS already returns it that way, so preserve it.
+	if isLong {
+		entry.Owner = ie.Owner
+		entry.Group = ie.Group
 	}
-
-	if !a.Config.DisableIcon {
-		entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
-	}
-
 	return entry
 }
 
