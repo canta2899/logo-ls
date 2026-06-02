@@ -3,7 +3,6 @@ package fakefs
 
 import (
 	"errors"
-	"fmt"
 	iofs "io/fs"
 	"maps"
 	"path"
@@ -297,103 +296,6 @@ func (f *fakeFS) EvalSymlinks(p string) (string, error) {
 		return "", err
 	}
 	return target, nil
-}
-
-func (f *fakeFS) Indicator(p string, longMode bool) string {
-	e, err := f.lookup(p)
-	if err != nil {
-		return ""
-	}
-	mode := e.meta.Mode
-	switch {
-	case mode&iofs.ModeDir > 0:
-		return "/"
-	case mode&iofs.ModeNamedPipe > 0:
-		return "|"
-	case mode&iofs.ModeSymlink > 0:
-		if !longMode {
-			return "@"
-		}
-		target, _, err := f.resolveSymlink(p, e)
-		if err != nil {
-			return ""
-		}
-		return " ~> " + target
-	case mode&iofs.ModeSocket > 0:
-		return "="
-	case mode&0o111 != 0:
-		return "*"
-	}
-	return ""
-}
-
-func (f *fakeFS) IsLink(p string) bool {
-	e, err := f.lookup(p)
-	if err != nil {
-		return false
-	}
-	return e.meta.Mode&iofs.ModeSymlink > 0
-}
-
-func (f *fakeFS) InodeNumber(p string) string {
-	e, err := f.lookup(p)
-	if err != nil {
-		return ""
-	}
-	return e.meta.Inode
-}
-
-func (f *fakeFS) HardLinks(p string) uint64 {
-	e, err := f.lookup(p)
-	if err != nil {
-		return 0
-	}
-	if e.meta.Nlinks == 0 {
-		return 1
-	}
-	return e.meta.Nlinks
-}
-
-func (f *fakeFS) ModeExtended(fi fs.FileInfo, p string) string {
-	if fi == nil {
-		return fmt.Sprintf("%-*s", 11, "???????????")
-	}
-	if ff, ok := fi.(*fakeFileInfo); ok && ff.entry.meta.ModeStr != "" {
-		return fmt.Sprintf("%-*s", 11, ff.entry.meta.ModeStr)
-	}
-	return fmt.Sprintf("%-*s", 11, fi.Mode().String())
-}
-
-func (f *fakeFS) OwnerGroup(fi fs.FileInfo, showOwner, showGroup bool) (string, string) {
-	if fi == nil {
-		return "", ""
-	}
-	ff, ok := fi.(*fakeFileInfo)
-	if !ok {
-		return "", ""
-	}
-	var owner, group string
-	if showOwner {
-		owner = ff.entry.meta.Owner
-	}
-	if showGroup && ff.entry.meta.Group != "" {
-		group = fmt.Sprintf(" %v  ", ff.entry.meta.Group)
-	}
-	return owner, group
-}
-
-func (f *fakeFS) Blocks(fi fs.FileInfo) int64 {
-	if fi == nil {
-		return 0
-	}
-	if ff, ok := fi.(*fakeFileInfo); ok {
-		if ff.entry.meta.Blocks != 0 {
-			return ff.entry.meta.Blocks
-		}
-		// Default: ceil(size/512).
-		return (ff.entry.size + 511) / 512
-	}
-	return 0
 }
 
 func (f *fakeFS) GitStatus(dir string) map[string]string {

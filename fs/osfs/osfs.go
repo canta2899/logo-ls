@@ -5,7 +5,6 @@ import (
 	iofs "io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/fs"
@@ -75,53 +74,6 @@ func (o *osFS) Rel(base, target string) (string, error) {
 
 func (o *osFS) FromSlash(path string) string {
 	return filepath.FromSlash(path)
-}
-
-func (o *osFS) Indicator(path string, longMode bool) string {
-	stats, err := os.Lstat(path)
-	if err != nil {
-		return ""
-	}
-	mode := stats.Mode()
-	switch {
-	case mode&os.ModeDir > 0:
-		return "/"
-	case mode&os.ModeNamedPipe > 0:
-		return "|"
-	case mode&os.ModeSymlink > 0:
-		return o.symlinkIndicator(path, longMode)
-	case mode&os.ModeSocket > 0:
-		return "="
-	case mode&1000000 > 0:
-		return "*"
-	}
-	return ""
-}
-
-func (o *osFS) symlinkIndicator(name string, longMode bool) string {
-	if !longMode {
-		return "@"
-	}
-	if s, err := filepath.EvalSymlinks(name); err == nil {
-		home := os.Getenv("HOME")
-		if home != "" {
-			if s == home {
-				s = "~"
-			} else if strings.HasPrefix(s, home+string(filepath.Separator)) {
-				s = "~" + strings.TrimPrefix(s, home)
-			}
-		}
-		return " ~> " + s
-	}
-	return ""
-}
-
-func (o *osFS) IsLink(path string) bool {
-	stats, err := os.Lstat(path)
-	if err != nil {
-		return false
-	}
-	return stats.Mode()&os.ModeSymlink > 0
 }
 
 func (o *osFS) GitStatus(dir string) map[string]string {

@@ -39,6 +39,8 @@ type InspectedEntry struct {
 	Owner     string // raw, unpadded
 	Group     string // raw, unpadded
 	HasXAttr  bool
+	Sticky    bool // S_ISVTX is set
+	StickyX   bool // sticky AND other-executable
 
 	// Symlinks only. Populated when Kind == KindSymlink.
 	LinkTarget   string // raw target as stored on disk (empty if EvalSymlinks not called)

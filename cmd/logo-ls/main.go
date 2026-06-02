@@ -8,6 +8,7 @@ import (
 
 	"github.com/canta2899/logo-ls/app"
 	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/canta2899/logo-ls/model"
 	"github.com/mattn/go-colorable"
 )
@@ -24,11 +25,12 @@ func main() {
 	logger := log.New(writer, "logo-ls: ", 0)
 
 	app := &app.App{
-		Config:   command,
-		Writer:   writer,
-		Logger:   logger,
-		ExitCode: model.CodeOk,
-		FS:       osfs.New(),
+		Config:    command,
+		Writer:    writer,
+		Logger:    logger,
+		ExitCode:  model.CodeOk,
+		FS:        osfs.New(),
+		GitReader: git.NewStatusReader(git.ExecPorcelain{}),
 	}
 
 	app.Run()

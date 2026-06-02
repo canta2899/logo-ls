@@ -4,6 +4,7 @@ package app
 import (
 	"bytes"
 	"fmt"
+	iofs "io/fs"
 	"io"
 	"log"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/internal/inspect"
+	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/canta2899/logo-ls/internal/render"
 	"github.com/canta2899/logo-ls/model"
 )
@@ -25,6 +27,18 @@ type App struct {
 	ExitCode model.ExitCode
 	Logger   *log.Logger
 	FS       fs.FS
+	// GitReader is optional; when nil the app falls back to FS.GitStatus
+	// (legacy path) so existing test harnesses keep working.
+	GitReader *git.StatusReader
+}
+
+// gitStatusFor returns the status map for dir, using the per-app reader when
+// configured and falling back to the legacy FS.GitStatus otherwise.
+func (a *App) gitStatusFor(dir string) map[string]string {
+	if a.GitReader != nil {
+		return a.GitReader.StatusRelative(dir)
+	}
+	return a.FS.GitStatus(dir)
 }
 
 // Args stores the parsed command-line arguments as separate files and directories.
@@ -277,7 +291,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 	// If Git status is requested, prepare the repository info map.
 	var gitRepoStatus map[string]string
 	if a.Config.GitStatus {
-		gitRepoStatus = a.FS.GitStatus(d.Name())
+		gitRepoStatus = a.gitStatusFor(d.Name())
 	}
 
 	showHidden := a.Config.AllMode != model.IncludeDefault
@@ -298,25 +312,17 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 
 		entry := a.buildEntry(fullpath, fi, isLong)
 
-		// If we couldn't get full info but we have type from DirEntry, use it.
+		// If we couldn't get full info but we have type from DirEntry, fill
+		// in the indicator and pick a fallback icon. The inspector handles
+		// symlink-icon resolution for entries that do have FileInfo.
 		if fi == nil {
 			entry.Mode = "???????????"
 			if de.IsDir() {
 				entry.Indicator = "/"
-			} else if de.Type()&os.ModeSymlink != 0 {
+			} else if de.Type()&iofs.ModeSymlink != 0 {
 				entry.Indicator = "@"
 			}
-		}
-
-		if !a.Config.DisableIcon {
-			if fi != nil && a.FS.IsLink(fullpath) {
-				if s, err := a.FS.EvalSymlinks(fullpath); err == nil {
-					realExt := a.FS.Ext(s)
-					realName := s[0 : len(s)-len(realExt)]
-					realIndicator := a.FS.Indicator(s, isLong)
-					entry.Icon = format.GetIcon(realName, realExt, realIndicator)
-				}
-			} else if fi == nil {
+			if !a.Config.DisableIcon {
 				entry.Icon = format.GetIcon(entry.Name, entry.Ext, entry.Indicator)
 			}
 		}
@@ -397,10 +403,10 @@ func (a *App) buildEntry(fullPath string, fi fs.FileInfo, isLong bool) *model.En
 	owner := ie.Owner
 	group := ie.Group
 	if isLong {
-		modeStr = a.FS.ModeExtended(fi, fullPath)
+		modeStr = inspect.ModeString(ie.Mode, ie.Sticky, ie.StickyX, ie.HasXAttr)
 		// Legacy renderer expects the group column pre-padded with " %v  "
 		// (formatting baked into the old ctw column widths); preserve that
-		// shape here until the renderer is rewritten in Phase 5.
+		// shape here until the renderer consumes InspectedEntry directly.
 		if group != "" {
 			group = fmt.Sprintf(" %v  ", group)
 		}

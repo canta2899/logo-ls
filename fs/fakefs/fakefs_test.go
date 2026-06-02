@@ -92,9 +92,6 @@ func TestSymlinkResolution(t *testing.T) {
 	if fi.Mode()&fs.ModeSymlink == 0 {
 		t.Error("lstat should report symlink")
 	}
-	if !f.IsLink("/root/link") {
-		t.Error("IsLink should return true")
-	}
 
 	resolved, err := f.EvalSymlinks("/root/link")
 	if err != nil {
@@ -103,35 +100,33 @@ func TestSymlinkResolution(t *testing.T) {
 	if resolved != "/root/target.txt" {
 		t.Errorf("eval returned %q", resolved)
 	}
-
-	if got := f.Indicator("/root/link", false); got != "@" {
-		t.Errorf("short indicator = %q", got)
-	}
-	if got := f.Indicator("/root/link", true); got != " ~> /root/target.txt" {
-		t.Errorf("long indicator = %q", got)
-	}
 }
 
-func TestOwnerGroupModeBlocks(t *testing.T) {
+// TestPlatformStatExposesMetadata checks that fakeFileInfo surfaces the
+// inode / hardlinks / blocks / owner / group fields via the SysProvider and
+// namedOwner interfaces, which is how the inspector reads them now.
+func TestPlatformStatExposesMetadata(t *testing.T) {
 	spec := Dir("root", defaultDirMeta("1"),
 		File("a.txt", 1024, mtime("2026-01-01 00:00:00"), defaultFileMeta("2")),
 	)
 	f := New(spec)
 	fi, _ := f.Stat("/root/a.txt")
-
-	owner, group := f.OwnerGroup(fi, true, true)
-	if owner != "alice" || group != " staff  " {
-		t.Errorf("owner/group = %q/%q", owner, group)
+	ff, ok := fi.(*fakeFileInfo)
+	if !ok {
+		t.Fatalf("fileinfo not *fakeFileInfo: %T", fi)
 	}
-	owner, group = f.OwnerGroup(fi, true, false)
-	if owner != "alice" || group != "" {
-		t.Errorf("owner-only: %q/%q", owner, group)
+	if ff.OwnerName() != "alice" {
+		t.Errorf("owner: %q", ff.OwnerName())
 	}
-	if got := f.ModeExtended(fi, "/root/a.txt"); got != "-rw-r--r-- " {
-		t.Errorf("mode = %q", got)
+	if ff.GroupName() != "staff" {
+		t.Errorf("group: %q", ff.GroupName())
 	}
-	if got := f.Blocks(fi); got != 2 {
-		t.Errorf("blocks = %d", got)
+	ps := ff.PlatformStat()
+	if ps.Inode != "2" {
+		t.Errorf("inode: %q", ps.Inode)
+	}
+	if ps.HardLinks != 1 {
+		t.Errorf("hardlinks: %d", ps.HardLinks)
 	}
 }
 

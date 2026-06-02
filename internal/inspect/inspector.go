@@ -2,12 +2,29 @@ package inspect
 
 import (
 	iofs "io/fs"
+	"os"
 	"strings"
 
 	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/internal/inspect/platform"
 )
+
+// foldHome rewrites paths inside HOME to use "~" so symlink targets in long
+// mode read cleanly (matches the legacy osfs behaviour).
+func foldHome(p string) string {
+	home := os.Getenv("HOME")
+	if home == "" {
+		return p
+	}
+	if p == home {
+		return "~"
+	}
+	if strings.HasPrefix(p, home+string(os.PathSeparator)) {
+		return "~" + strings.TrimPrefix(p, home)
+	}
+	return p
+}
 
 // Options configures what the inspector collects per entry. The renderer
 // declares its needs and the inspector skips work it doesn't have to do.
@@ -89,6 +106,8 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 				e.HardLinks = 1
 			}
 			e.HasXAttr = stat.HasXAttr
+			e.Sticky = stat.Sticky
+			e.StickyX = stat.StickyX
 			if no, ok := fi.(namedOwner); ok {
 				if i.options.ShowOwner {
 					e.Owner = no.OwnerName()
@@ -107,9 +126,7 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 		}
 	}
 
-	e.Indicator = i.indicatorFor(absPath, fi.Mode())
-
-	if e.Kind == KindSymlink && i.options.ResolveSymlinks {
+	if e.Kind == KindSymlink && (i.options.ResolveSymlinks || i.options.Long) {
 		if target, err := i.fs.EvalSymlinks(absPath); err == nil {
 			e.LinkTarget = target
 			if tfi, terr := i.fs.Stat(target); terr == nil {
@@ -125,11 +142,13 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 		}
 	}
 
+	e.Indicator = i.indicatorFor(e, fi.Mode())
+
 	if !i.options.DisableIcon && i.icons != nil {
 		name, ext := splitNameExt(e.Name, i.fs)
 		if e.Kind == KindSymlink && e.LinkResolved != nil {
 			tname, text := splitNameExt(e.LinkResolved.Name, i.fs)
-			tind := i.indicatorFor(e.LinkTarget, e.LinkResolved.Mode)
+			tind := classifyIndicator(e.LinkResolved.Mode)
 			e.Icon = i.icons.Resolve(tname, text, tind)
 		} else {
 			e.Icon = i.icons.Resolve(name, ext, e.Indicator)
@@ -140,16 +159,33 @@ func (i *Inspector) Inspect(absPath string, fi fs.FileInfo) *InspectedEntry {
 }
 
 // indicatorFor returns the trailing classifier glyph ("/", "@", "*", ...).
-// Symlinks fall back to FS.Indicator so the long-mode " ~> target" rendering
-// still uses the active backend's path resolution and HOME-folding rules.
-func (i *Inspector) indicatorFor(absPath string, m iofs.FileMode) string {
+// For symlinks in long mode it emits " ~> target" using the inspected
+// LinkTarget; the HOME->~ folding is done here so it doesn't rely on a
+// per-FS Indicator method. A symlink whose target can't be resolved gets
+// an empty indicator in long mode (matches the previous behaviour).
+func (i *Inspector) indicatorFor(e *InspectedEntry, m iofs.FileMode) string {
+	if m&iofs.ModeSymlink != 0 {
+		if i.options.Long {
+			if e.LinkTarget == "" {
+				return ""
+			}
+			return " ~> " + foldHome(e.LinkTarget)
+		}
+		return "@"
+	}
+	return classifyIndicator(m)
+}
+
+// classifyIndicator returns the indicator string for non-symlinks (and the
+// short-mode classification of any entry).
+func classifyIndicator(m iofs.FileMode) string {
 	switch {
 	case m&iofs.ModeDir != 0:
 		return "/"
 	case m&iofs.ModeNamedPipe != 0:
 		return "|"
 	case m&iofs.ModeSymlink != 0:
-		return i.fs.Indicator(absPath, i.options.Long)
+		return "@"
 	case m&iofs.ModeSocket != 0:
 		return "="
 	case m&0o111 != 0:
