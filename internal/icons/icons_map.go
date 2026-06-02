@@ -1,45 +1,7 @@
-// assets contains all the Icon glyphs info
+// Package icons holds the icon glyph tables (this file) plus the IconInfo
+// type and resolution rules (see icon.go and resolve.go). This file is
+// data-only: no logic, no methods.
 package icons
-
-import "fmt"
-
-// Icon_Info (icon information)
-type IconInfo struct {
-	Glyph        string
-	Color        [3]uint8 // represents the color in rgb (default 0,0,0 is black)
-	IsExecutable bool     // whether or not the file is executable [true = is executable]
-}
-
-func (i *IconInfo) GetGlyph() string {
-	if i == nil {
-		return ""
-	}
-
-	return i.Glyph
-}
-
-func (i *IconInfo) GetColor() string {
-	if i == nil {
-		return ""
-	}
-
-	if i.IsExecutable {
-		return "\033[38;2;76;175;080m"
-	}
-
-	return fmt.Sprintf("\033[38;2;%03d;%03d;%03dm", i.Color[0], i.Color[1], i.Color[2])
-}
-
-// AsExecutable returns a copy of the icon with IsExecutable set, leaving the
-// shared package-level icon definitions unchanged.
-func (i *IconInfo) AsExecutable() *IconInfo {
-	if i == nil {
-		return nil
-	}
-	cp := *i
-	cp.IsExecutable = true
-	return &cp
-}
 
 var IconSet = map[string]*IconInfo{
 	"3d":              {Glyph: "\U0000e79b", Color: [3]uint8{40, 182, 246}},  // 3d
