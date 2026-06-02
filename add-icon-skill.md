@@ -9,12 +9,12 @@ You are helping the user add a new icon to the logo-ls project. This project use
 
 ## Architecture
 
-The icon system consists of four files in the `icons/` directory:
+The icon system lives in the `internal/icons/` package and consists of these files:
 
-- **`icons/icons_map.go`** — `IconSet` map: defines all available icons. Each entry has a name (key), a glyph (Unicode codepoint), and an RGB color. This is where every new icon must be registered first.
-- **`icons/icons_ext.go`** — `IconExt` map: maps file extensions (e.g. `"js"`, `"py"`) to entries in `IconSet`.
-- **`icons/icons_files.go`** — `IconFileName` map: maps specific file names (e.g. `"tsconfig.json"`, `".babelrc"`) to entries in `IconSet`.
-- **`icons/icons_sub_ext.go`** — `IconSubExt` map: maps compound sub-extensions (e.g. `"spec.ts"`, `"d.ts"`, `"gitlab-ci.yml"`) to entries in `IconSet`. Used to override the default extension icon for specific patterns.
+- **`internal/icons/icons_map.go`** — `IconSet` map: defines all available icons. Each entry has a name (key), a glyph (Unicode codepoint), and an RGB color. This is where every new icon must be registered first.
+- **`internal/icons/icons_ext.go`** — `IconExt` map: maps file extensions (e.g. `"js"`, `"py"`) to entries in `IconSet`.
+- **`internal/icons/icons_files.go`** — `IconFileName` map: maps specific file names (e.g. `"tsconfig.json"`, `".babelrc"`) to entries in `IconSet`.
+- **`internal/icons/icons_sub_ext.go`** — `IconSubExt` map: maps compound sub-extensions (e.g. `"spec.ts"`, `"d.ts"`, `"gitlab-ci.yml"`) to entries in `IconSet`. Used to override the default extension icon for specific patterns.
 
 The `IconInfo` struct looks like this:
 
@@ -34,7 +34,7 @@ Follow these steps interactively:
 
 Ask the user:
 
-1. **Icon name**: The logical name for this icon in `IconSet` (e.g. `"markdown"`, `"docker"`, `"rust"`). Check `icons/icons_map.go` to see if it already exists. If it does, skip to Step 2.
+1. **Icon name**: The logical name for this icon in `IconSet` (e.g. `"markdown"`, `"docker"`, `"rust"`). Check `internal/icons/icons_map.go` to see if it already exists. If it does, skip to Step 2.
 2. **Nerd Font codepoint**: The Unicode codepoint for the glyph (e.g. `U+E7A8` or `e7a8`). The user should look this up at https://www.nerdfonts.com/cheat-sheet.
 3. **RGB color**: Three values 0–255 for red, green, blue (e.g. `66, 165, 245`).
 
@@ -42,24 +42,24 @@ Ask the user:
 
 Ask the user which type of mapping they want. They can choose one or more:
 
-- **Extension** — Map one or more file extensions to this icon (added to `icons/icons_ext.go`)
-- **File name** — Map one or more specific file names to this icon (added to `icons/icons_files.go`)
-- **Sub-extension** — Map one or more compound sub-extensions to this icon (added to `icons/icons_sub_ext.go`)
+- **Extension** — Map one or more file extensions to this icon (added to `internal/icons/icons_ext.go`)
+- **File name** — Map one or more specific file names to this icon (added to `internal/icons/icons_files.go`)
+- **Sub-extension** — Map one or more compound sub-extensions to this icon (added to `internal/icons/icons_sub_ext.go`)
 
 Then ask for the specific extension(s), file name(s), or sub-extension(s) to map.
 
 ### Step 3 — Apply changes
 
-1. If the icon is new, add an entry to `IconSet` in `icons/icons_map.go`. Insert it in **alphabetical order** within the map. Follow the existing formatting style:
+1. If the icon is new, add an entry to `IconSet` in `internal/icons/icons_map.go`. Insert it in **alphabetical order** within the map. Follow the existing formatting style:
    ```go
    "icon-name": {Glyph: "\U0000XXXX", Color: [3]uint8{R, G, B}},
    ```
    The codepoint must be formatted as an 8-digit uppercase Unicode escape (e.g. `\U0000E7A8`).
 
 2. Add entries to the appropriate mapping file(s), also in **alphabetical order**, following the existing formatting style:
-   - Extensions in `icons/icons_ext.go`: `"ext": IconSet["icon-name"],`
-   - File names in `icons/icons_files.go`: `"filename": IconSet["icon-name"],`
-   - Sub-extensions in `icons/icons_sub_ext.go`: `"sub.ext": IconSet["icon-name"],`
+   - Extensions in `internal/icons/icons_ext.go`: `"ext": IconSet["icon-name"],`
+   - File names in `internal/icons/icons_files.go`: `"filename": IconSet["icon-name"],`
+   - Sub-extensions in `internal/icons/icons_sub_ext.go`: `"sub.ext": IconSet["icon-name"],`
 
 3. Verify the changes compile by running `go build ./...`.
 

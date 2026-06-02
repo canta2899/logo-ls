@@ -1,18 +1,18 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 func TestArgs_FileAndDirectory(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1e", "/root/README.md", "/root")
 	assertGolden(t, "args_file_and_dir", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// File appears first (before directory listing).
 	assertContains(t, r.Stdout, "README.md")
 	assertContains(t, r.Stdout, "notes.txt")
@@ -33,7 +33,7 @@ func TestArgs_TwoDirectories(t *testing.T) {
 	vfs := fakefs.New(twoDirRoot())
 	r := runApp(t, vfs, "-1e", "/root/alpha", "/root/beta")
 	assertGolden(t, "args_two_dirs", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	assertContains(t, r.Stdout, "/root/alpha:")
 	assertContains(t, r.Stdout, "/root/beta:")
 	assertContains(t, r.Stdout, "a.txt")

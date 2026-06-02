@@ -1,10 +1,10 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 // Icon tests (behavioral-only by  asserting that default output emits nerd-font glyphs)
@@ -23,7 +23,7 @@ func inPUA(s string) bool {
 func TestIcons_DefaultEmitsGlyphs(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "/root")
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	if !inPUA(r.Stdout) {
 		t.Errorf("expected nerd-font glyph in default output, got:\n%s", r.Stdout)
 	}
@@ -32,7 +32,7 @@ func TestIcons_DefaultEmitsGlyphs(t *testing.T) {
 func TestIcons_FlagESuppressesGlyphs(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-e", "/root")
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	if inPUA(r.Stdout) {
 		t.Errorf("expected no nerd-font glyph with -e, got:\n%s", r.Stdout)
 	}

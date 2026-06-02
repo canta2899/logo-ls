@@ -1,11 +1,11 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 // Sort fixture distinctness: every sort mode must produce a distinct ordering
@@ -21,7 +21,7 @@ func TestSort_AlphabeticalIsDefault(t *testing.T) {
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1e", "/root")
 	assertGolden(t, "sort_alphabetical", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 }
 
 func TestSort_AllModesAreDistinct(t *testing.T) {
@@ -79,7 +79,7 @@ func TestSort_ExtensionDotfilesByExt(t *testing.T) {
 	// interleaved by extension nor force-pinned to the top.
 	vfs := fakefs.New(dotfileExtTree())
 	r := runApp(t, vfs, "-1AXe", "/root")
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	got := lines(r.Stdout)
 	// Makefile (no ext), then .hidden (dotfile group), then a.go, README.md.
 	want := []string{"Makefile", ".hidden", "a.go", "README.md"}
@@ -103,7 +103,7 @@ func TestSort_ExtensionDotfilesStayGrouped(t *testing.T) {
 	t.Setenv("LANG", "")
 	vfs := fakefs.New(dotfileGroupTree())
 	r := runApp(t, vfs, "-1aXe", "/root")
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	got := lines(r.Stdout)
 
 	want := []string{

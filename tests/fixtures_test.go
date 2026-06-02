@@ -3,7 +3,7 @@ package tests
 import (
 	"time"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 // mtime parses a "2006-01-02 15:04:05" string into a time.Time, panicking on

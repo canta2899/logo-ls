@@ -1,18 +1,18 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 func TestCombo_la(t *testing.T) {
 	vfs := fakefs.New(hiddenTree())
 	r := runApp(t, vfs, "-lae", "/root")
 	assertGolden(t, "combo_la", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -la is long mode plus . and ..
 	assertContainsLine(t, r.Stdout, `^drwxr-xr-x.*\./`)
 	assertContainsLine(t, r.Stdout, `\.\./`)
@@ -22,7 +22,7 @@ func TestCombo_lA(t *testing.T) {
 	vfs := fakefs.New(hiddenTree())
 	r := runApp(t, vfs, "-lAe", "/root")
 	assertGolden(t, "combo_lA_almost", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -lA is long mode with hidden files but no . or ..
 	assertContains(t, r.Stdout, ".env")
 	for _, l := range lines(r.Stdout) {

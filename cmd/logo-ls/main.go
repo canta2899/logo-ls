@@ -6,14 +6,15 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/canta2899/logo-ls/app"
-	"github.com/canta2899/logo-ls/fs/osfs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/internal/app"
+	"github.com/canta2899/logo-ls/pkg/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/cli"
+	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/mattn/go-colorable"
 )
 
 func main() {
-	command := app.GetConfigFromCli()
+	command := cli.GetConfigFromCli()
 
 	var writer io.Writer = os.Stdout
 
@@ -23,14 +24,13 @@ func main() {
 
 	logger := log.New(writer, "logo-ls: ", 0)
 
-	model.PathSeparator = string(os.PathSeparator)
-
 	app := &app.App{
-		Config:   command,
-		Writer:   writer,
-		Logger:   logger,
-		ExitCode: model.CodeOk,
-		FS:       osfs.New(),
+		Config:    command,
+		Writer:    writer,
+		Logger:    logger,
+		ExitCode:  cli.CodeOk,
+		FS:        osfs.New(),
+		GitReader: git.NewStatusReader(git.ExecPorcelain{}),
 	}
 
 	app.Run()

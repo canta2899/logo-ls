@@ -1,17 +1,17 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 func TestError_NonexistentPath(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1e", "/does-not-exist")
-	assertExitCode(t, model.CodeSerious, r.ExitCode)
+	assertExitCode(t, cli.CodeSerious, r.ExitCode)
 	if !strings.Contains(r.Stderr, "does-not-exist") {
 		t.Errorf("expected error mentioning path, got stderr: %q", r.Stderr)
 	}
@@ -26,7 +26,7 @@ func TestError_UnreadableDirectory(t *testing.T) {
 	))
 	r := runApp(t, vfs, "-1Re", "/root")
 	// Recursive listing into a locked dir yields a Minor exit code.
-	if r.ExitCode != model.CodeMinor {
+	if r.ExitCode != cli.CodeMinor {
 		t.Errorf("expected CodeMinor for EACCES, got %d (stderr=%q)", r.ExitCode, r.Stderr)
 	}
 	assertContains(t, r.Stdout, "visible.txt")
@@ -35,7 +35,7 @@ func TestError_UnreadableDirectory(t *testing.T) {
 func TestError_MixedValidAndInvalid(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1e", "/does-not-exist", "/root")
-	assertExitCode(t, model.CodeSerious, r.ExitCode)
+	assertExitCode(t, cli.CodeSerious, r.ExitCode)
 	// Valid arg still listed.
 	assertContains(t, r.Stdout, "README.md")
 	// Bad arg surfaced on stderr.

@@ -1,6 +1,6 @@
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Version](https://img.shields.io/github/v/release/canta2899/logo-ls?style=for-the-badge)
-![Tests](https://github.com/canta2899/logo-ls/actions/workflows/test.yml/badge.svg?style=for-the-badge)
+![Tests](https://img.shields.io/github/actions/workflow/status/canta2899/logo-ls/test.yml?label=Tests&style=for-the-badge)
 
 <div align="center">
 <img src="./.github/assets/screen.png" alt="logo-ls screenshot" width="600"/>
