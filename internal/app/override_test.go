@@ -12,10 +12,10 @@ import (
 	"github.com/canta2899/logo-ls/internal/icons"
 )
 
-// TestAppIconExtensionOverride verifies that an extension wired into the app
-// flows through to the inspector and overrides the resolved icon for matching
+// TestAppIconOverride verifies that an override wired into the app flows
+// through to the inspector and overrides the resolved icon for matching
 // files while leaving non-matching files on the default resolver.
-func TestAppIconExtensionOverride(t *testing.T) {
+func TestAppIconOverride(t *testing.T) {
 	tempDir := t.TempDir()
 	hit := filepath.Join(tempDir, "main.rs")
 	miss := filepath.Join(tempDir, "main.go")
@@ -35,9 +35,9 @@ extensions:
 `), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	ext, err := icons.LoadExtensionFromPath(yamlPath)
+	ov, err := icons.LoadOverridesFromPath(yamlPath)
 	if err != nil {
-		t.Fatalf("LoadExtensionFromPath: %v", err)
+		t.Fatalf("LoadOverridesFromPath: %v", err)
 	}
 
 	conf := &cli.Config{
@@ -46,7 +46,7 @@ extensions:
 		TimeFormatter:   DummyTimeFormatter{},
 	}
 	appInstance := newTestApp(conf, log.New(io.Discard, "", 0), new(bytes.Buffer))
-	appInstance.IconExtension = ext
+	appInstance.IconOverride = ov
 
 	f, err := appInstance.FS.Open(tempDir)
 	if err != nil {
@@ -76,9 +76,7 @@ extensions:
 	}
 }
 
-// TestAppNoIconExtensionMatchesDefault asserts the app behaves identically
-// to before when no extension is supplied.
-func TestAppNoIconExtensionMatchesDefault(t *testing.T) {
+func TestAppNoIconOverrideMatchesDefault(t *testing.T) {
 	tempDir := t.TempDir()
 	path := filepath.Join(tempDir, "main.rs")
 	if err := os.WriteFile(path, []byte("x"), 0o644); err != nil {
@@ -105,7 +103,7 @@ func TestAppNoIconExtensionMatchesDefault(t *testing.T) {
 	for _, e := range d.Files {
 		if e.Name == "main.rs" {
 			if got := e.Icon.GetGlyph(); got != want {
-				t.Errorf("nil extension should match default Resolve, got %q want %q", got, want)
+				t.Errorf("nil override should match default Resolve, got %q want %q", got, want)
 			}
 		}
 	}

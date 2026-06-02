@@ -7,62 +7,48 @@ func Resolve(name, ext, indicator string) *IconInfo {
 	return ResolveWith(nil, name, ext, indicator)
 }
 
-// ResolveWith is like Resolve but consults a user-provided Extension first
-func ResolveWith(ext *Extension, name, fileExt, indicator string) *IconInfo {
-	var i *IconInfo
-	var ok bool
+// ResolveWith is like Resolve but applies a user-provided Override on top of
+// the built-in lookup.
+func ResolveWith(ov *Override, name, fileExt, indicator string) *IconInfo {
+	base := resolveBuiltin(name, fileExt, indicator)
+	if entry, ok := ov.lookupEntry(name, fileExt, indicator); ok {
+		base = entry.apply(base)
+	}
+	return applyIndicator(base, indicator)
+}
 
+// resolveBuiltin runs the built-in lookup chain without any override
+func resolveBuiltin(name, fileExt, indicator string) *IconInfo {
 	lowerNameExt := strings.ToLower(name + fileExt)
 
-	switch indicator {
-	case "/":
-		if i = ext.lookupDir(lowerNameExt); i != nil {
-			break
-		}
-		i, ok = IconDir[lowerNameExt]
-		if ok {
-			break
+	if indicator == "/" {
+		if i, ok := IconDir[lowerNameExt]; ok {
+			return i
 		}
 		if len(name) == 0 || name[0] == '.' {
-			i = IconDef["hiddendir"]
-			break
+			return IconDef["hiddendir"]
 		}
-		i = IconDef["dir"]
-	default:
-		if i = ext.lookupFileName(lowerNameExt); i != nil {
-			break
-		}
-		i, ok = IconFileName[lowerNameExt]
-		if ok {
-			break
-		}
-		t := strings.Split(name, ".")
-		if len(t) > 1 && t[0] != "" {
-			subKey := strings.ToLower(t[len(t)-1] + fileExt)
-			if i = ext.lookupSubExt(subKey); i != nil {
-				break
-			}
-			i, ok = IconSubExt[subKey]
-			if ok {
-				break
-			}
-		}
-		extKey := strings.ToLower(strings.TrimPrefix(fileExt, "."))
-		if i = ext.lookupExt(extKey); i != nil {
-			break
-		}
-		i, ok = IconExt[extKey]
-		if ok {
-			break
-		}
-		if len(name) == 0 || name[0] == '.' {
-			i = IconDef["hiddenfile"]
-			break
-		}
-		i = IconDef["file"]
+		return IconDef["dir"]
 	}
 
-	return applyIndicator(i, indicator)
+	if i, ok := IconFileName[lowerNameExt]; ok {
+		return i
+	}
+	t := strings.Split(name, ".")
+	if len(t) > 1 && t[0] != "" {
+		subKey := strings.ToLower(t[len(t)-1] + fileExt)
+		if i, ok := IconSubExt[subKey]; ok {
+			return i
+		}
+	}
+	extKey := strings.ToLower(strings.TrimPrefix(fileExt, "."))
+	if i, ok := IconExt[extKey]; ok {
+		return i
+	}
+	if len(name) == 0 || name[0] == '.' {
+		return IconDef["hiddenfile"]
+	}
+	return IconDef["file"]
 }
 
 // applyIndicator handles the "*" executable special case and the nil fallback.

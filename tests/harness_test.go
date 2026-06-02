@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/canta2899/logo-ls/internal/app"
-	"github.com/canta2899/logo-ls/pkg/fs"
 	"github.com/canta2899/logo-ls/internal/cli"
+	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
 var updateGolden = flag.Bool("update", false, "regenerate golden files")
@@ -55,9 +55,9 @@ type runResult struct {
 func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 	t.Helper()
 
-	// Force --no-ext so the harness never picks up the developer's personal
-	// icon overrides from $HOME. Keeps goldens reproducible across machines.
-	argv := append([]string{"logo-ls", "--no-ext"}, args...)
+	// Force --no-override so the harness never picks up the developer's
+	// personal icon overrides from $HOME. Keeps goldens reproducible.
+	argv := append([]string{"logo-ls", "--no-override"}, args...)
 	cfg, _, err := cli.BuildConfig(argv)
 	if err != nil {
 		t.Fatalf("BuildConfig(%v): %v", args, err)

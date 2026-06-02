@@ -81,38 +81,37 @@ If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a 
 
 > **Note for Windows contributors:** the skill file lives at `add-icon-skill.md` in the repo root, and the paths under `.agents/skills/add-icon/SKILL.md` and `.claude/skills/add-icon/SKILL.md` are symlinks to it. Git for Windows does not create real symlinks by default, so these may be checked out as plain text files containing the link target. To get working symlinks, enable Developer Mode (or run as admin) and set `git config --global core.symlinks true` before cloning.
 
-### Extensions and Overrides
+### Overrides
 
 If you want to add or override icons, you can drop a YAML file in either of the following locations:
 
-- `$XDG_CONFIG_HOME/logo-ls/logo-ls-icons.yaml` (defaults to `~/.config/logo-ls/logo-ls-icons.yaml`)
-- `~/.logo-ls-icons.yaml`
+- `$XDG_CONFIG_HOME/logo-ls/logo-ls-overrides.yaml` (defaults to `~/.config/logo-ls/logo-ls-overrides.yaml`)
+- `~/.logo-ls-overrides.yaml`
 
 The first existing file wins. The file is read **once at startup** and merged with the built-in icon set, so it does not impact per-directory listing speed. If the file is missing or empty the loader just skips it, if it cannot be parsed `logo-ls` prints a single warning and continues with built-in icons only.
 
 #### Schema
 
+Each entry can set a `glyph`, a `color`, or both. Whichever field you leave out keeps the built-in value for that match, so you can just recolor an existing icon, swap only its glyph, or define a brand-new icon by setting both.
+
 ```yaml
 extensions:        # matched by file extension (without the leading dot)
   rs:
-    glyph: "U+E7A8"    # codepoint syntax
+    glyph: "U+E7A8"    # full override: new glyph and new color
     color: "#dea584"
-  ts:
-    glyph: "0xE628"    # 0x form also accepted
-    color: "#3178c6"
+  go:
+    color: "#ff5555"   # color-only: keep the built-in Go glyph, just recolor it
   py:
-    glyph: ""         # YAML string escape also
-    color: "#ffd43b"
+    glyph: "0xE606"    # glyph-only: keep the built-in Python color
 
-files:            # matched by full file name (case-insensitive)
+files:             # matched by full file name (case-insensitive)
   .envrc:
     glyph: "U+E60B"
     color: "#ecd53f"
 
 directories:       # matched by full directory name (case-insensitive)
   myproject:
-    glyph: "U+E5FE"
-    color: "#42a5f5"
+    color: "#42a5f5" # recolor a directory without changing its glyph
 
 sub_extensions:    # matched by "<last-segment><ext>"
   d.ts:
@@ -120,14 +119,14 @@ sub_extensions:    # matched by "<last-segment><ext>"
     color: "#3178c6"
 ```
 
-Each entry needs a `glyph` (which can be either a codepoint or a literal string) and a `color` (in its hex representation). User entries take priority over the built-in icons.
+Glyphs can be written as `U+XXXX` or `0xXXXX` (parsed as hex codepoints) or as literal strings. Colors are `#RRGGBB` (or the shorthand `#RGB`). User entries take priority over the built-in icons.
 
 #### Flags
 
 Two flags control the override loader:
 
-- `--no-ext` skips override loading entirely and forces built-in icons only.
-- `--ext-file <path>` loads overrides from an explicit YAML path instead of the default discovery locations.
+- `--no-override` skips override loading entirely and forces built-in icons only.
+- `--override-file <path>` loads overrides from an explicit YAML path instead of the default discovery locations.
 
 If neither flag is passed the default discovery paths above are used.
 

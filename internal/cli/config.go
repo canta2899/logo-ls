@@ -19,8 +19,8 @@ type Config struct {
 	HumanReadable     bool
 	ShowBlockSize     bool
 	ShowInodeNumber   bool
-	NoIconExtension   bool
-	IconExtensionFile string
+	NoIconOverride   bool
+	IconOverrideFile string
 }
 
 func NewConfig() *Config {

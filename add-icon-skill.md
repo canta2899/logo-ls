@@ -9,7 +9,7 @@ You are helping the user add a new icon to the logo-ls project. This project use
 
 There are two ways to add an icon, and the user should pick one **before** you start editing files:
 
-1. **Personal YAML override** (no contribution) — drop entries into the user's `~/.config/logo-ls/logo-ls-icons.yaml` (or `~/.logo-ls-icons.yaml`). Loaded once at startup; no rebuild required. Use this when the user just wants the icon on their own machine, or wants to try a glyph/color combination before committing to a PR.
+1. **Personal YAML override** (no contribution) — drop entries into the user's `~/.config/logo-ls/logo-ls-overrides.yaml` (or `~/.logo-ls-overrides.yaml`). Loaded once at startup; no rebuild required. Use this when the user just wants the icon on their own machine, or wants to try a glyph/color combination before committing to a PR.
 2. **Built-in contribution** — edit the Go maps in `internal/icons/` and rebuild. Use this when the user wants the icon shipped upstream.
 
 Workflow tip: a user can iterate on a glyph/color in YAML, then ask you to **promote** the working entries to the built-in maps for a contribution. If they hand you a YAML file (or paste its contents) and say "make this a contribution", read it, then run the Step 3 procedure below for each entry.
@@ -27,7 +27,7 @@ The icon system lives in the `internal/icons/` package.
 
 **User override loader** (do not edit unless the user asks):
 
-- **`internal/icons/extension.go`** — parses the user's YAML file; the four top-level keys (`extensions`, `files`, `directories`, `sub_extensions`) mirror the four built-in maps above. User entries take priority over built-ins at lookup time.
+- **`internal/icons/override.go`** — parses the user's YAML file; the four top-level keys (`extensions`, `files`, `directories`, `sub_extensions`) mirror the four built-in maps above. User entries take priority over built-ins at lookup time. Each entry is sparse: a user can set `glyph` only, `color` only, or both — unset fields keep the built-in value for that match.
 
 The `IconInfo` struct looks like this:
 
@@ -57,8 +57,8 @@ When in doubt, ask which one they want before editing anything.
 
 Check, in order:
 
-1. `$XDG_CONFIG_HOME/logo-ls/logo-ls-icons.yaml` (defaults to `~/.config/logo-ls/logo-ls-icons.yaml`)
-2. `~/.logo-ls-icons.yaml`
+1. `$XDG_CONFIG_HOME/logo-ls/logo-ls-overrides.yaml` (defaults to `~/.config/logo-ls/logo-ls-overrides.yaml`)
+2. `~/.logo-ls-overrides.yaml`
 
 The first existing file wins at runtime. If neither exists, create the XDG path. Do not move an existing file — append to whichever one is already in use.
 
@@ -68,8 +68,10 @@ Ask the user:
 
 1. **Match type**: `extensions`, `files`, `directories`, or `sub_extensions` (same semantics as the built-in maps).
 2. **Pattern**: the extension (without leading dot), file name, directory name, or `last-segment.ext` sub-extension. Case-insensitive at lookup time.
-3. **Glyph**: a Nerd Font codepoint (`U+E7A8`, `0xe7a8`) or a literal string. Codepoint forms with `U+` / `0x` prefix are parsed as hex; everything else is treated as a literal.
-4. **Color**: `#RRGGBB` or `#RGB`.
+3. **Glyph** *(optional)*: a Nerd Font codepoint (`U+E7A8`, `0xe7a8`) or a literal string. Codepoint forms with `U+` / `0x` prefix are parsed as hex; everything else is treated as a literal.
+4. **Color** *(optional)*: `#RRGGBB` or `#RGB`.
+
+At least one of `glyph` or `color` must be set. If the user only wants to recolor an existing icon, ask only for the color and skip the glyph; if they only want to change the glyph, do the inverse. The unset field will fall through to the built-in for the same match.
 
 ### Step 3 — Append the entry
 
@@ -80,13 +82,15 @@ extensions:
   rs:
     glyph: "U+E7A8"
     color: "#dea584"
+  go:
+    color: "#ff5555"     # color-only override: keeps built-in Go glyph
 ```
 
 If the section already exists, append the new key under it — do **not** create a duplicate top-level key.
 
 ### Step 4 — Verify
 
-Tell the user to run `logo-ls` in a directory containing a matching file. If the override misbehaves, suggest `logo-ls --ext-file <path>` to test an alternate file, or `--no-ext` to confirm the issue is in the override (not the built-ins). Parse errors are printed once at startup as `logo-ls: ignoring icon overrides: ...`.
+Tell the user to run `logo-ls` in a directory containing a matching file. If the override misbehaves, suggest `logo-ls --override-file <path>` to test an alternate file, or `--no-override` to confirm the issue is in the override (not the built-ins). Parse errors are printed once at startup as `logo-ls: ignoring icon overrides: ...`.
 
 ### Step 5 — Offer promotion
 

@@ -25,34 +25,34 @@ func main() {
 
 	logger := log.New(writer, "logo-ls: ", 0)
 
-	var iconExt *icons.Extension
+	var iconOverride *icons.Override
 	switch {
-	case command.NoIconExtension:
+	case command.NoIconOverride:
 		// user opted out; leave nil
-	case command.IconExtensionFile != "":
-		ext, err := icons.LoadExtensionFromPath(command.IconExtensionFile)
+	case command.IconOverrideFile != "":
+		ov, err := icons.LoadOverridesFromPath(command.IconOverrideFile)
 		if err != nil {
 			logger.Printf("ignoring icon overrides: %v\n", err)
 		} else {
-			iconExt = ext
+			iconOverride = ov
 		}
 	default:
-		ext, err := icons.LoadExtension()
+		ov, err := icons.LoadOverrides()
 		if err != nil {
 			logger.Printf("ignoring icon overrides: %v\n", err)
 		} else {
-			iconExt = ext
+			iconOverride = ov
 		}
 	}
 
 	app := &app.App{
-		Config:        command,
-		Writer:        writer,
-		Logger:        logger,
-		ExitCode:      cli.CodeOk,
-		FS:            osfs.New(),
-		GitReader:     git.NewStatusReader(git.ExecPorcelain{}),
-		IconExtension: iconExt,
+		Config:       command,
+		Writer:       writer,
+		Logger:       logger,
+		ExitCode:     cli.CodeOk,
+		FS:           osfs.New(),
+		GitReader:    git.NewStatusReader(git.ExecPorcelain{}),
+		IconOverride: iconOverride,
 	}
 
 	app.Run()

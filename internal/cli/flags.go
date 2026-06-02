@@ -60,8 +60,8 @@ func BuildConfig(argv []string) (*Config, *Parser, error) {
 	longListingGroup := opt.Bool('g', "", "like -l, but do not list owner")
 	longListingDefault := opt.Bool('l', "", "use a long listing format")
 
-	noIconExtension := opt.Bool(0, "no-ext", "disable loading the user icon override YAML")
-	iconExtensionFile := opt.String("ext-file", "", "load icon overrides from this YAML file instead of the default paths")
+	noIconOverride := opt.Bool(0, "no-override", "disable loading the user icon override YAML")
+	iconOverrideFile := opt.String("override-file", "", "load icon overrides from this YAML file instead of the default paths")
 
 	if err := opt.Parse(argv); err != nil {
 		return nil, opt, err
@@ -115,8 +115,8 @@ func BuildConfig(argv []string) (*Config, *Parser, error) {
 	c.HumanReadable = *humanReadable
 	c.ShowBlockSize = *showBlockSize
 	c.ShowInodeNumber = *showInodeNumber
-	c.NoIconExtension = *noIconExtension
-	c.IconExtensionFile = *iconExtensionFile
+	c.NoIconOverride = *noIconOverride
+	c.IconOverrideFile = *iconOverrideFile
 
 	if len(opt.Args) > 0 {
 		c.FileList = append(c.FileList, opt.Args...)
