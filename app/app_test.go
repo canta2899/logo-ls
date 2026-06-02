@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/fs/osfs"
 	"github.com/canta2899/logo-ls/icons"
 	"github.com/canta2899/logo-ls/model"
@@ -218,38 +217,3 @@ func TestPrintDirectory(t *testing.T) {
 	}
 }
 
-// TestBlockSizeWithInode verifies that blockSizeWithInode produces a string containing the inode.
-func TestBlockSizeWithInode(t *testing.T) {
-	conf := &Config{
-		ShowInodeNumber: true,
-		ShowBlockSize:   true,
-	}
-	appInstance := &App{Config: conf}
-
-	dummyEntry := &model.Entry{
-		InodeNumber: "98765",
-		Blocks:      16,
-	}
-
-	result := appInstance.blockSizeWithInode(dummyEntry)
-	if !strings.Contains(result, "98765") {
-		t.Errorf("Expected inode number in output, got %q", result)
-	}
-}
-
-// TestGetCTW verifies that getCTW returns a non-nil instance.
-func TestGetCTW(t *testing.T) {
-	conf := &Config{
-		LongListingMode: model.LongListingNone,
-		OneFilePerLine:  false,
-		DisableIcon:     false,
-	}
-	appInstance := &App{Config: conf}
-	ctwInstance := appInstance.getCTW()
-	if ctwInstance == nil {
-		t.Error("getCTW returned nil")
-	}
-	if _, ok := ctwInstance.(ctw.CTW); !ok {
-		t.Error("getCTW did not return an instance that implements ctw.CTW")
-	}
-}

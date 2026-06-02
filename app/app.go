@@ -9,13 +9,12 @@ import (
 	"os"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 
-	"github.com/canta2899/logo-ls/ctw"
 	"github.com/canta2899/logo-ls/format"
 	"github.com/canta2899/logo-ls/fs"
 	"github.com/canta2899/logo-ls/internal/inspect"
+	"github.com/canta2899/logo-ls/internal/render"
 	"github.com/canta2899/logo-ls/model"
 )
 
@@ -420,71 +419,33 @@ func (a *App) PrintDirectory(d *model.Directory) {
 	format.SetLessFunction(d, a.Config.SortMode)
 	d.Sort(a.Config.SortMode, a.Config.Reverse)
 
-	lineCtw := a.getCTW()
+	render.Render(a.Writer, d.Files, render.Options{
+		Mode:          a.renderMode(),
+		ShowIcon:      !a.Config.DisableIcon,
+		ShowInode:     a.Config.ShowInodeNumber,
+		ShowBlocks:    a.Config.ShowBlockSize,
+		HumanReadable: a.Config.HumanReadable,
+		TimeFormatter: entryTimeFormatter{tf: a.Config.TimeFormatter},
+	})
+}
 
+func (a *App) renderMode() render.Mode {
 	switch {
 	case a.Config.LongListingMode != model.LongListingNone:
-		for _, f := range d.Files {
-			lineCtw.AddRow(
-				f.Icon.GetColor(),
-				a.blockSizeWithInode(f),
-				f.Mode,
-				strconv.Itoa(int(f.NumHardLinks)),
-				f.Owner,
-				f.Group,
-				format.GetFormattedSize(f.Size, a.Config.HumanReadable),
-				a.Config.TimeFormatter.Format(&f.ModTime),
-				f.Icon.GetGlyph(),
-				f.Name+f.Ext+f.Indicator,
-				f.GitStatus,
-			)
-		}
-
+		return render.ModeLong
 	case a.Config.OneFilePerLine:
-		for _, f := range d.Files {
-			lineCtw.AddRow(
-				f.Icon.GetColor(),
-				a.blockSizeWithInode(f),
-				f.Icon.GetGlyph(),
-				f.Name+f.Ext+f.Indicator,
-				f.GitStatus,
-			)
-		}
-
+		return render.ModeOneFilePerLine
 	default:
-		for _, f := range d.Files {
-			lineCtw.AddRow(
-				f.Icon.GetColor(),
-				a.blockSizeWithInode(f),
-				f.Icon.GetGlyph(),
-				f.Name+f.Ext+f.Indicator,
-				f.GitStatus,
-			)
-		}
+		return render.ModeShort
 	}
-
-	buf := new(bytes.Buffer)
-	lineCtw.Flush(buf)
-	a.Write(buf)
 }
 
-// Instantiates the proper ctw.CTW based on app config.
-func (a *App) getCTW() ctw.CTW {
-	longMode := a.Config.LongListingMode != model.LongListingNone
-	return ctw.NewCTW(longMode, a.Config.OneFilePerLine, !a.Config.DisableIcon)
+// entryTimeFormatter adapts the app's *time.Time-based formatter to the
+// renderer's per-entry interface.
+type entryTimeFormatter struct {
+	tf format.Timestamp
 }
 
-// Generates the block size and optional inode as a single string.
-func (a *App) blockSizeWithInode(e *model.Entry) string {
-	var parts []string
-
-	if a.Config.ShowInodeNumber {
-		parts = append(parts, e.InodeNumber)
-	}
-
-	if a.Config.ShowBlockSize {
-		parts = append(parts, format.GetFormattedSize(e.Blocks, a.Config.HumanReadable))
-	}
-
-	return strings.TrimSpace(strings.Join(parts, " "))
+func (e entryTimeFormatter) Format(m *model.Entry) string {
+	return e.tf.Format(&m.ModTime)
 }
