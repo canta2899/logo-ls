@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/canta2899/logo-ls/model"
 	"golang.org/x/term"
 )
 
@@ -20,21 +19,13 @@ type CTW interface {
 const standardTerminalWidth = 80
 
 func NewCTW(longMode, oneFilePerLine, icon bool) CTW {
-	var out CTW
-
 	if longMode {
-		out = NewLongCTW(10)
-	} else if oneFilePerLine {
-		out = NewLongCTW(4)
-	} else {
-		out = NewStandardCTW(GetCustomTerminalWidth())
+		return NewLongCTW(10)
 	}
-
-	if !icon {
-		model.OpenDirIcon = ""
+	if oneFilePerLine {
+		return NewLongCTW(4)
 	}
-
-	return out
+	return NewStandardCTW(GetCustomTerminalWidth())
 }
 
 func GetCustomTerminalWidth() int {

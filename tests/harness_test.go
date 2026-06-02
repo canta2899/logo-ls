@@ -55,10 +55,6 @@ type runResult struct {
 func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 	t.Helper()
 
-	// Set the path separator on model so PrintDirectory's git-status keying
-	// matches the fake FS layout.
-	model.PathSeparator = vfs.Separator()
-
 	argv := append([]string{"logo-ls"}, args...)
 	cfg, _, err := app.BuildConfig(argv)
 	if err != nil {

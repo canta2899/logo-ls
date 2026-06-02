@@ -30,8 +30,15 @@ func (i *IconInfo) GetColor() string {
 	return fmt.Sprintf("\033[38;2;%03d;%03d;%03dm", i.Color[0], i.Color[1], i.Color[2])
 }
 
-func (i *IconInfo) MakeExe() {
-	i.IsExecutable = true
+// AsExecutable returns a copy of the icon with IsExecutable set, leaving the
+// shared package-level icon definitions unchanged.
+func (i *IconInfo) AsExecutable() *IconInfo {
+	if i == nil {
+		return nil
+	}
+	cp := *i
+	cp.IsExecutable = true
+	return &cp
 }
 
 var IconSet = map[string]*IconInfo{

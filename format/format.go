@@ -206,7 +206,7 @@ func GetIcon(name, ext, indicator string) *icons.IconInfo {
 		if i.GetGlyph() == "\uf723" {
 			i = icons.IconDef["exe"]
 		}
-		i.MakeExe()
+		i = i.AsExecutable()
 	}
 
 	if i == nil {

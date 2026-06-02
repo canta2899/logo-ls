@@ -26,8 +26,6 @@ func TestRealFS_Smoke(t *testing.T) {
 		t.Fatalf("mkdir sub: %v", err)
 	}
 
-	model.PathSeparator = string(os.PathSeparator)
-
 	cfg, _, err := app.BuildConfig([]string{"logo-ls", "-1e", dir})
 	if err != nil {
 		t.Fatalf("BuildConfig: %v", err)

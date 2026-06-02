@@ -8,11 +8,16 @@ import (
 	"github.com/canta2899/logo-ls/icons"
 )
 
-var OpenDirIcon = icons.IconDef["diropen"].GetColor() + icons.IconDef["diropen"].GetGlyph() + "\033[0m" + " "
-
-// PathSeparator is the path separator used by the active FS. The osfs
-// implementation initializes this to the OS separator; tests override it.
-var PathSeparator = "/"
+// OpenDirIconString returns the colored "open directory" header used when
+// printing a directory banner (e.g. `dir/:`). When showIcon is false the
+// returned string is empty so the banner has no glyph.
+func OpenDirIconString(showIcon bool) string {
+	if !showIcon {
+		return ""
+	}
+	d := icons.IconDef["diropen"]
+	return d.GetColor() + d.GetGlyph() + "\033[0m" + " "
+}
 
 type FileEntry struct {
 	Info    fs.FileInfo

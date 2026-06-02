@@ -23,8 +23,6 @@ func main() {
 
 	logger := log.New(writer, "logo-ls: ", 0)
 
-	model.PathSeparator = string(os.PathSeparator)
-
 	app := &app.App{
 		Config:   command,
 		Writer:   writer,

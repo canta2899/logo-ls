@@ -121,10 +121,7 @@ func (a *App) Run() {
 // Prints each directory and its subdirectories.
 func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 	currentAbs, _ := a.FS.Abs(".")
-	openDirIcon := model.OpenDirIcon
-	if a.Config.DisableIcon {
-		openDirIcon = ""
-	}
+	openDirIcon := model.OpenDirIconString(!a.Config.DisableIcon)
 
 	for i, dirEntry := range dirs {
 		if i > 0 {
@@ -145,10 +142,7 @@ func (a *App) processDirsRecursively(dirs []model.DirectoryEntry) {
 // Prints each directory (but not subdirectories).
 func (a *App) processDirsNonRecursively(dirs []model.DirectoryEntry) {
 	pName := len(dirs) > 1
-	openDirIcon := model.OpenDirIcon
-	if a.Config.DisableIcon {
-		openDirIcon = ""
-	}
+	openDirIcon := model.OpenDirIconString(!a.Config.DisableIcon)
 
 	for i, dirEntry := range dirs {
 		if pName {
@@ -179,7 +173,7 @@ func (a *App) recurseDirectory(start *model.DirectoryEntry, startingAbsolutePath
 		stack = stack[:idx]
 
 		if current.header != "" {
-			fmt.Fprintf(a.Writer, "\n%s:\n", model.OpenDirIcon+current.header)
+			fmt.Fprintf(a.Writer, "\n%s:\n", model.OpenDirIconString(!a.Config.DisableIcon)+current.header)
 		}
 
 		d, err := a.ProcessDirectory(current.entry)
@@ -329,7 +323,7 @@ func (a *App) populateDirectory(d *model.DirectoryEntry, dirStat fs.FileInfo) (*
 
 		// If Git status is available, attach it.
 		if gitRepoStatus != nil {
-			entry.GitStatus = gitRepoStatus[name+model.PathSeparator]
+			entry.GitStatus = gitRepoStatus[name+a.FS.Separator()]
 			if entry.GitStatus == "" {
 				entry.GitStatus = gitRepoStatus[name]
 			}

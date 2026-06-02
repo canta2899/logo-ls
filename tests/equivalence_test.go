@@ -66,7 +66,6 @@ func TestCrossBackend_Equivalence(t *testing.T) {
 
 func runWithOSFS(t *testing.T, args ...string) string {
 	t.Helper()
-	model.PathSeparator = string(os.PathSeparator)
 	argv := append([]string{"logo-ls"}, args...)
 	cfg, _, err := app.BuildConfig(argv)
 	if err != nil {
