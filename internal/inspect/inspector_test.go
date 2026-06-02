@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 	"github.com/canta2899/logo-ls/internal/inspect"
 )
 

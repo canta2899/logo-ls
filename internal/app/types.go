@@ -1,9 +1,9 @@
-package model
+package app
 
 import (
-	"github.com/canta2899/logo-ls/fs"
-	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/icons"
 	"github.com/canta2899/logo-ls/internal/inspect"
+	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
 // OpenDirIconString returns the colored "open directory" header used when

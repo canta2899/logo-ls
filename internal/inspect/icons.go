@@ -1,18 +1,12 @@
 package inspect
 
-import (
-	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/icons"
-)
+import "github.com/canta2899/logo-ls/internal/icons"
 
-// defaultIconResolver delegates to format.GetIcon. Once the icon resolver
-// is fully extracted in a later phase, this shim goes away.
 type defaultIconResolver struct{}
 
 func (defaultIconResolver) Resolve(name, ext, indicator string) *icons.IconInfo {
-	return format.GetIcon(name, ext, indicator)
+	return icons.Resolve(name, ext, indicator)
 }
 
-// DefaultIconResolver returns an IconResolver backed by the current
-// format.GetIcon rules.
+// DefaultIconResolver returns the package-level icon resolver.
 func DefaultIconResolver() IconResolver { return defaultIconResolver{} }

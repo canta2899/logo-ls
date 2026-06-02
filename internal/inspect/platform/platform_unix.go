@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/pkg/fs"
 	"golang.org/x/sys/unix"
 )
 

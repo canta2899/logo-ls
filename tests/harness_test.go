@@ -13,10 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canta2899/logo-ls/app"
-	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/app"
+	"github.com/canta2899/logo-ls/pkg/fs"
 	"github.com/canta2899/logo-ls/internal/cli"
-	"github.com/canta2899/logo-ls/model"
 )
 
 var updateGolden = flag.Bool("update", false, "regenerate golden files")
@@ -44,7 +43,7 @@ func (fixedTime) Format(t *time.Time) string {
 type runResult struct {
 	Stdout   string
 	Stderr   string
-	ExitCode model.ExitCode
+	ExitCode cli.ExitCode
 }
 
 // runApp builds an App with the given FS, parses the given flag arguments,
@@ -75,7 +74,7 @@ func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 		Writer:   &stdout,
 		Logger:   log.New(&stderr, "", 0),
 		FS:       vfs,
-		ExitCode: model.CodeOk,
+		ExitCode: cli.CodeOk,
 	}
 	a.Run()
 
@@ -153,7 +152,7 @@ func assertGolden(t *testing.T, name, actual string) {
 }
 
 // assertExitCode fails the test if the run's exit code is not want.
-func assertExitCode(t *testing.T, want model.ExitCode, got model.ExitCode) {
+func assertExitCode(t *testing.T, want cli.ExitCode, got cli.ExitCode) {
 	t.Helper()
 	if got != want {
 		t.Errorf("exit code: want %d, got %d", want, got)

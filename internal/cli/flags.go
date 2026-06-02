@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/model"
 )
 
 var Version = ""
@@ -35,7 +33,7 @@ func BuildConfig(argv []string) (*Config, *Parser, error) {
 	includeAll := opt.Bool('a', "all", "do not ignore entries starting with .")
 	includeAlmost := opt.Bool('A', "almost-all", "do not list implied . and ..")
 
-	c.SortMode = model.SortAlphabetical
+	c.SortMode = SortAlphabetical
 
 	sortNone := opt.Bool('U', "", "do not sort; list entries in directory order")
 	sortNatural := opt.Bool('v', "", "natural sort of (version) numbers within text")
@@ -56,7 +54,7 @@ func BuildConfig(argv []string) (*Config, *Parser, error) {
 
 	completeTimeInformation := opt.Bool('T', "time-style", "display complete time information")
 
-	c.LongListingMode = model.LongListingNone
+	c.LongListingMode = LongListingNone
 
 	longListingMode := opt.Bool('o', "", "like -l, but do not list group information")
 	longListingGroup := opt.Bool('g', "", "like -l, but do not list owner")
@@ -75,34 +73,34 @@ func BuildConfig(argv []string) (*Config, *Parser, error) {
 
 	switch {
 	case *includeAll:
-		c.AllMode = model.IncludeAll
+		c.AllMode = IncludeAll
 	case *includeAlmost:
-		c.AllMode = model.IncludeAlmost
+		c.AllMode = IncludeAlmost
 	}
 
 	switch {
 	case *sortNone:
-		c.SortMode = model.SortNone
+		c.SortMode = SortNone
 	case *sortNatural:
-		c.SortMode = model.SortNatural
+		c.SortMode = SortNatural
 	case *sortExtension:
-		c.SortMode = model.SortExtension
+		c.SortMode = SortExtension
 	case *sortModTime:
-		c.SortMode = model.SortModTime
+		c.SortMode = SortModTime
 	case *sortSize:
-		c.SortMode = model.SortSize
+		c.SortMode = SortSize
 	}
 
 	switch {
 	case *longListingMode:
-		c.LongListingMode = model.LongListingOwner
+		c.LongListingMode = LongListingOwner
 	case *longListingGroup:
-		c.LongListingMode = model.LongListingGroup
+		c.LongListingMode = LongListingGroup
 	case *longListingDefault:
-		c.LongListingMode = model.LongListingDefault
+		c.LongListingMode = LongListingDefault
 	}
 
-	c.TimeFormatter = format.GetFormatter(*completeTimeInformation)
+	c.TimeFormatter = GetFormatter(*completeTimeInformation)
 
 	c.Reverse = *reverse
 	c.Recursive = *recursive

@@ -9,14 +9,14 @@ import (
 	"strings"
 
 	"github.com/canta2899/logo-ls/internal/inspect"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/internal/cli"
 )
 
 // Sort sorts entries in place by mode. When reverse is true (and mode is
 // not SortNone) the result is reversed.
-func Sort(entries []*inspect.InspectedEntry, mode model.SortMode, reverse bool) {
+func Sort(entries []*inspect.InspectedEntry, mode cli.SortMode, reverse bool) {
 	less := lessFn(entries, mode)
-	if mode == model.SortNone {
+	if mode == cli.SortNone {
 		return
 	}
 	if reverse {
@@ -26,13 +26,13 @@ func Sort(entries []*inspect.InspectedEntry, mode model.SortMode, reverse bool) 
 	stdsort.Slice(entries, less)
 }
 
-func lessFn(entries []*inspect.InspectedEntry, mode model.SortMode) func(i, j int) bool {
+func lessFn(entries []*inspect.InspectedEntry, mode cli.SortMode) func(i, j int) bool {
 	switch mode {
-	case model.SortAlphabetical:
+	case cli.SortAlphabetical:
 		return func(i, j int) bool {
 			return mainSort(entries[i].Name, entries[j].Name)
 		}
-	case model.SortSize:
+	case cli.SortSize:
 		return func(i, j int) bool {
 			a, b := entries[i].Name, entries[j].Name
 			if res, ok := dotFileOrder(a, b); ok {
@@ -46,11 +46,11 @@ func lessFn(entries []*inspect.InspectedEntry, mode model.SortMode) func(i, j in
 			}
 			return false
 		}
-	case model.SortModTime:
+	case cli.SortModTime:
 		return func(i, j int) bool {
 			return entries[i].ModTime.After(entries[j].ModTime)
 		}
-	case model.SortExtension:
+	case cli.SortExtension:
 		return func(i, j int) bool {
 			a, b := entries[i].Name, entries[j].Name
 			ra := extGroupRank(entries[i].Base, entries[i].Ext)
@@ -68,7 +68,7 @@ func lessFn(entries []*inspect.InspectedEntry, mode model.SortMode) func(i, j in
 			}
 			return mainSort(a, b)
 		}
-	case model.SortNatural:
+	case cli.SortNatural:
 		return func(i, j int) bool {
 			a, b := entries[i].Name, entries[j].Name
 			if res, ok := dotFileOrder(a, b); ok {
@@ -76,7 +76,7 @@ func lessFn(entries []*inspect.InspectedEntry, mode model.SortMode) func(i, j in
 			}
 			return a < b
 		}
-	case model.SortNone:
+	case cli.SortNone:
 		fallthrough
 	default:
 		return func(i, j int) bool { return i < j }

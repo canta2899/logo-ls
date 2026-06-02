@@ -1,17 +1,17 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 func TestGitStatus_LongMode(t *testing.T) {
 	vfs := fakefs.New(gitRepoTree(), fakefs.WithGitStatus(gitRepoStatus()))
 	r := runApp(t, vfs, "-lDe", "/root")
 	assertGolden(t, "gitstatus_long", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Each tracked file's status code shows up.
 	assertContains(t, r.Stdout, "staged.txt")
 	assertContains(t, r.Stdout, "modified.txt")

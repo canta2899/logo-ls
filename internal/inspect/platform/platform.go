@@ -6,7 +6,7 @@
 package platform
 
 import (
-	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
 // Stat carries every per-file scalar the inspector needs from a single

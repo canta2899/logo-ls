@@ -12,8 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/canta2899/logo-ls/ctw"
-	"github.com/canta2899/logo-ls/format"
+	"github.com/canta2899/logo-ls/internal/render/columns"
 	"github.com/canta2899/logo-ls/internal/inspect"
 )
 
@@ -68,7 +67,7 @@ func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 			strconv.FormatUint(hardLinks(e), 10),
 			e.Owner,
 			paddedGroup(e.Group),
-			format.GetFormattedSize(e.Size, opts.HumanReadable),
+			formatSize(e.Size, opts.HumanReadable),
 			opts.TimeFormatter.Format(&e.ModTime),
 			e.Icon.GetGlyph(),
 			displayName,
@@ -116,7 +115,7 @@ func blockSizeWithInode(e *inspect.InspectedEntry, opts Options) string {
 		parts = append(parts, e.Inode)
 	}
 	if opts.ShowBlocks {
-		parts = append(parts, format.GetFormattedSize(e.Blocks, opts.HumanReadable))
+		parts = append(parts, formatSize(e.Blocks, opts.HumanReadable))
 	}
 	return strings.TrimSpace(strings.Join(parts, " "))
 }

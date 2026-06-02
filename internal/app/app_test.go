@@ -10,11 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/canta2899/logo-ls/fs/osfs"
-	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/pkg/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/icons"
 	"github.com/canta2899/logo-ls/internal/cli"
 	"github.com/canta2899/logo-ls/internal/inspect"
-	"github.com/canta2899/logo-ls/model"
 )
 
 // DummyTimeFormatter implements the minimal time formatter needed for tests.
@@ -90,7 +89,7 @@ func TestProcessFiles(t *testing.T) {
 	defer os.Remove(tempFileName)
 
 	conf := &cli.Config{
-		LongListingMode: model.LongListingNone,
+		LongListingMode: cli.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		DisableIcon:     true,
 	}
@@ -101,12 +100,12 @@ func TestProcessFiles(t *testing.T) {
 		t.Fatalf("Failed to stat temporary file: %v", err)
 	}
 
-	fileEntry := model.FileEntry{
+	fileEntry := FileEntry{
 		Info:    fi,
 		AbsPath: tempFileName,
 	}
 
-	dirModel := appInstance.ProcessFiles([]model.FileEntry{fileEntry})
+	dirModel := appInstance.ProcessFiles([]FileEntry{fileEntry})
 	if len(dirModel.Files) != 1 {
 		t.Errorf("Expected 1 file in processed directory, got %d", len(dirModel.Files))
 	}
@@ -127,8 +126,8 @@ func TestProcessDirectory(t *testing.T) {
 	}
 
 	conf := &cli.Config{
-		AllMode:         model.IncludeDefault,
-		LongListingMode: model.LongListingNone,
+		AllMode:         cli.IncludeDefault,
+		LongListingMode: cli.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		DisableIcon:     true,
 	}
@@ -138,7 +137,7 @@ func TestProcessDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to open temporary directory: %v", err)
 	}
-	dirEntry := &model.DirectoryEntry{File: f, AbsPath: tempDir}
+	dirEntry := &DirectoryEntry{File: f, AbsPath: tempDir}
 
 	dirModel, err := appInstance.ProcessDirectory(dirEntry)
 	if err != nil {
@@ -167,7 +166,7 @@ func TestBuildEntry(t *testing.T) {
 	defer os.Remove(tempFileName)
 
 	conf := &cli.Config{
-		LongListingMode: model.LongListingNone,
+		LongListingMode: cli.LongListingNone,
 		TimeFormatter:   DummyTimeFormatter{},
 		ShowInodeNumber: false,
 		ShowBlockSize:   false,
@@ -200,12 +199,12 @@ func TestPrintDirectory(t *testing.T) {
 		Size:      456,
 		ModTime:   time.Now(),
 	}
-	dirModel := &model.Directory{
+	dirModel := &Directory{
 		Files: []*inspect.InspectedEntry{dummyEntry},
 	}
 
 	conf := &cli.Config{
-		LongListingMode: model.LongListingNone,
+		LongListingMode: cli.LongListingNone,
 		OneFilePerLine:  false,
 		DisableIcon:     true,
 		HumanReadable:   true,

@@ -1,5 +1,6 @@
-package model
+package cli
 
+// Include selects which directory entries to list.
 type Include int
 
 const (
@@ -8,6 +9,7 @@ const (
 	IncludeAll
 )
 
+// SortMode selects the comparator used to order entries.
 type SortMode int
 
 const (
@@ -19,6 +21,7 @@ const (
 	SortNone
 )
 
+// Listing selects the long-mode column set.
 type Listing int
 
 const (
@@ -28,6 +31,7 @@ const (
 	LongListingNone
 )
 
+// ExitCode is the process exit status the CLI reports.
 type ExitCode int
 
 const (
@@ -36,14 +40,14 @@ const (
 	CodeSerious
 )
 
+// SetMinor sets the exit code to CodeMinor unless a more severe code is
+// already in effect.
 func (e *ExitCode) SetMinor() {
 	if *e == CodeSerious {
 		return
 	}
-
 	*e = CodeMinor
 }
 
-func (e *ExitCode) SetSerious() {
-	*e = CodeSerious
-}
+// SetSerious unconditionally raises the exit code to CodeSerious.
+func (e *ExitCode) SetSerious() { *e = CodeSerious }

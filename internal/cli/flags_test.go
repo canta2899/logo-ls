@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/canta2899/logo-ls/model"
 )
 
 // reset os.Args before calling GetConfigFromCli.
@@ -24,10 +23,10 @@ func TestNoArgs(t *testing.T) {
 	if len(cfg.FileList) != 1 || cfg.FileList[0] != "." {
 		t.Errorf("expected FileList to be [\".\"], got %v", cfg.FileList)
 	}
-	if cfg.SortMode != model.SortAlphabetical {
+	if cfg.SortMode != SortAlphabetical {
 		t.Errorf("expected default SortMode to be SortAlphabetical, got %v", cfg.SortMode)
 	}
-	if cfg.LongListingMode != model.LongListingNone {
+	if cfg.LongListingMode != LongListingNone {
 		t.Errorf("expected default LongListingMode to be LongListingNone, got %v", cfg.LongListingMode)
 	}
 }
@@ -47,13 +46,13 @@ func TestFileArgs(t *testing.T) {
 func TestSortFlags(t *testing.T) {
 	tests := []struct {
 		args     []string
-		expected model.SortMode
+		expected SortMode
 	}{
-		{[]string{"app", "-U"}, model.SortNone},
-		{[]string{"app", "-v"}, model.SortNatural},
-		{[]string{"app", "-X"}, model.SortExtension},
-		{[]string{"app", "-t"}, model.SortModTime},
-		{[]string{"app", "-S"}, model.SortSize},
+		{[]string{"app", "-U"}, SortNone},
+		{[]string{"app", "-v"}, SortNatural},
+		{[]string{"app", "-X"}, SortExtension},
+		{[]string{"app", "-t"}, SortModTime},
+		{[]string{"app", "-S"}, SortSize},
 	}
 	for _, tt := range tests {
 		cfg := parseArgs(tt.args)
@@ -67,11 +66,11 @@ func TestSortFlags(t *testing.T) {
 func TestLongListingFlags(t *testing.T) {
 	tests := []struct {
 		args     []string
-		expected model.Listing
+		expected Listing
 	}{
-		{[]string{"app", "-o"}, model.LongListingOwner},
-		{[]string{"app", "-g"}, model.LongListingGroup},
-		{[]string{"app", "-l"}, model.LongListingDefault},
+		{[]string{"app", "-o"}, LongListingOwner},
+		{[]string{"app", "-g"}, LongListingGroup},
+		{[]string{"app", "-l"}, LongListingDefault},
 	}
 	for _, tt := range tests {
 		cfg := parseArgs(tt.args)
@@ -84,7 +83,7 @@ func TestLongListingFlags(t *testing.T) {
 // Verifies various boolean flags.
 func TestIncludeFlags(t *testing.T) {
 	cfg := parseArgs([]string{"app", "-a", "-r", "-R", "-D", "-e", "-i", "-1", "-d", "-G", "-h", "-s", "-T"})
-	if cfg.AllMode != model.IncludeAll {
+	if cfg.AllMode != IncludeAll {
 		t.Errorf("expected AllMode to be IncludeAll, got %v", cfg.AllMode)
 	}
 	if !cfg.Reverse {
@@ -125,7 +124,7 @@ func TestIncludeFlags(t *testing.T) {
 // Verifies that the "-A" flag sets the IncludeAlmost mode.
 func TestIncludeAlmost(t *testing.T) {
 	cfg := parseArgs([]string{"app", "-A"})
-	if cfg.AllMode != model.IncludeAlmost {
+	if cfg.AllMode != IncludeAlmost {
 		t.Errorf("expected AllMode to be IncludeAlmost, got %v", cfg.AllMode)
 	}
 }
@@ -133,10 +132,10 @@ func TestIncludeAlmost(t *testing.T) {
 // Verifies that path can be between flags.
 func TestMixedArgs(t *testing.T) {
 	cfg := parseArgs([]string{"app", "-a", "something", "-l"})
-	if cfg.AllMode != model.IncludeAll {
+	if cfg.AllMode != IncludeAll {
 		t.Errorf("expected AllMode to be IncludeAll, got %v", cfg.AllMode)
 	}
-	if cfg.LongListingMode != model.LongListingDefault {
+	if cfg.LongListingMode != LongListingDefault {
 		t.Errorf("expected LongListingMode to be LongListingDefault, got %v", cfg.LongListingMode)
 	}
 	if len(cfg.FileList) != 1 || cfg.FileList[0] != "something" {
@@ -144,10 +143,10 @@ func TestMixedArgs(t *testing.T) {
 	}
 
 	cfg = parseArgs([]string{"app", "something", "-al"})
-	if cfg.AllMode != model.IncludeAll {
+	if cfg.AllMode != IncludeAll {
 		t.Errorf("expected AllMode to be IncludeAll, got %v", cfg.AllMode)
 	}
-	if cfg.LongListingMode != model.LongListingDefault {
+	if cfg.LongListingMode != LongListingDefault {
 		t.Errorf("expected LongListingMode to be LongListingDefault, got %v", cfg.LongListingMode)
 	}
 	if len(cfg.FileList) != 1 || cfg.FileList[0] != "something" {

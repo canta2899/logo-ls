@@ -8,10 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/app"
-	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/app"
+	"github.com/canta2899/logo-ls/pkg/fs/osfs"
 	"github.com/canta2899/logo-ls/internal/cli"
-	"github.com/canta2899/logo-ls/model"
 )
 
 func TestRealFS_Smoke(t *testing.T) {
@@ -38,11 +37,11 @@ func TestRealFS_Smoke(t *testing.T) {
 		Writer:   &stdout,
 		Logger:   log.New(&stderr, "", 0),
 		FS:       osfs.New(),
-		ExitCode: model.CodeOk,
+		ExitCode: cli.CodeOk,
 	}
 	a.Run()
 
-	if a.ExitCode != model.CodeOk {
+	if a.ExitCode != cli.CodeOk {
 		t.Errorf("exit code: want 0, got %d, stderr=%q", a.ExitCode, stderr.String())
 	}
 	if s := strings.TrimSpace(stderr.String()); s != "" {

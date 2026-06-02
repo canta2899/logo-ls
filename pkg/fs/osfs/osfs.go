@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/internal/inspect/git"
+	"github.com/canta2899/logo-ls/pkg/fs"
 )
 
 func New() fs.FS {
@@ -76,8 +76,10 @@ func (o *osFS) FromSlash(path string) string {
 	return filepath.FromSlash(path)
 }
 
+var osGitReader = git.NewStatusReader(git.ExecPorcelain{})
+
 func (o *osFS) GitStatus(dir string) map[string]string {
-	m := format.GetFilesGitStatus(dir)
+	m := osGitReader.StatusRelative(dir)
 	if len(m) == 0 {
 		return nil
 	}

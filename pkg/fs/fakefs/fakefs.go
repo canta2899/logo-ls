@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/canta2899/logo-ls/fs"
+	"github.com/canta2899/logo-ls/pkg/fs"
 	"github.com/canta2899/logo-ls/internal/inspect/platform"
 )
 

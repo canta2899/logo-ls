@@ -9,10 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/app"
-	"github.com/canta2899/logo-ls/fs/osfs"
+	"github.com/canta2899/logo-ls/internal/app"
+	"github.com/canta2899/logo-ls/pkg/fs/osfs"
 	"github.com/canta2899/logo-ls/internal/cli"
-	"github.com/canta2899/logo-ls/model"
 )
 
 // TestCrossBackend_Equivalence renders the same fixture through fakefs and
@@ -80,10 +79,10 @@ func runWithOSFS(t *testing.T, args ...string) string {
 		Writer:   &stdout,
 		Logger:   log.New(&stderr, "", 0),
 		FS:       osfs.New(),
-		ExitCode: model.CodeOk,
+		ExitCode: cli.CodeOk,
 	}
 	a.Run()
-	if a.ExitCode != model.CodeOk {
+	if a.ExitCode != cli.CodeOk {
 		t.Fatalf("osfs run failed: %s", stderr.String())
 	}
 	return stdout.String()

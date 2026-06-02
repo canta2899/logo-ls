@@ -9,8 +9,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/canta2899/logo-ls/ctw"
-	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/render/columns"
+	"github.com/canta2899/logo-ls/internal/icons"
 	"golang.org/x/term"
 )
 

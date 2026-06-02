@@ -8,7 +8,7 @@ import (
 	iofs "io/fs"
 	"time"
 
-	"github.com/canta2899/logo-ls/icons"
+	"github.com/canta2899/logo-ls/internal/icons"
 )
 
 // Kind classifies a filesystem entry.

@@ -1,18 +1,18 @@
 package tests
 
 import (
+	"github.com/canta2899/logo-ls/internal/cli"
 	"strings"
 	"testing"
 
-	"github.com/canta2899/logo-ls/fs/fakefs"
-	"github.com/canta2899/logo-ls/model"
+	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )
 
 func TestFlag_a_IncludesDotAndParent(t *testing.T) {
 	vfs := fakefs.New(hiddenTree())
 	r := runApp(t, vfs, "-1ae", "/root")
 	assertGolden(t, "flag_a_all", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -a includes ., .. (rendered with trailing '/' since both are dirs).
 	assertContains(t, r.Stdout, "./")
 	assertContains(t, r.Stdout, "../")
@@ -25,7 +25,7 @@ func TestFlag_A_AlmostAllNoDotDotDot(t *testing.T) {
 	vfs := fakefs.New(hiddenTree())
 	r := runApp(t, vfs, "-1Ae", "/root")
 	assertGolden(t, "flag_A_almost", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -A shows hidden files but not . or ..
 	assertContains(t, r.Stdout, ".env")
 	for _, l := range lines(r.Stdout) {
@@ -39,7 +39,7 @@ func TestFlag_l_LongListing(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-le", "/root")
 	assertGolden(t, "flag_l", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: long mode shows mode string and owner+group
 	assertContainsLine(t, r.Stdout, `^-rw-r--r-- .*alice.*staff`)
 }
@@ -48,7 +48,7 @@ func TestFlag_o_OwnerOnly(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-oe", "/root")
 	assertGolden(t, "flag_o", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -o is like -l but no group column
 	assertContains(t, r.Stdout, "alice")
 	assertNotContains(t, r.Stdout, " staff  ")
@@ -58,7 +58,7 @@ func TestFlag_g_GroupOnly(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-ge", "/root")
 	assertGolden(t, "flag_g_grouponly", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -g is like -l but no owner column
 	assertContains(t, r.Stdout, "staff")
 	assertNotContains(t, r.Stdout, "alice")
@@ -68,7 +68,7 @@ func TestFlag_G_NoGroupInLong(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-lGe", "/root")
 	assertGolden(t, "flag_G_nogroup", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -G removes group column from -l
 	assertContains(t, r.Stdout, "alice")
 	assertNotContains(t, r.Stdout, " staff  ")
@@ -82,7 +82,7 @@ func TestFlag_h_HumanReadable(t *testing.T) {
 	))
 	r := runApp(t, vfs, "-lhe", "/root")
 	assertGolden(t, "flag_h", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -h converts byte counts to K/M
 	assertContains(t, r.Stdout, "2M")
 	assertContains(t, r.Stdout, "2K")
@@ -92,7 +92,7 @@ func TestFlag_s_ShowBlockSize(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-se", "/root")
 	assertGolden(t, "flag_s_blocksize", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -s prefixes each entry with the block count (8 per fileMeta).
 	assertContainsLine(t, r.Stdout, `^\s*8 .*notes.txt`)
 }
@@ -101,7 +101,7 @@ func TestFlag_i_ShowInode(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-ie", "/root")
 	assertGolden(t, "flag_i", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -i prefixes each entry with the inode number.
 	assertContains(t, r.Stdout, "1001")
 	assertContains(t, r.Stdout, "1002")
@@ -111,7 +111,7 @@ func TestFlag_1_OneFilePerLine(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1e", "/root")
 	assertGolden(t, "flag_1", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -1 puts each entry on its own line.
 	got := lines(r.Stdout)
 	if len(got) != 3 {
@@ -123,7 +123,7 @@ func TestFlag_d_DirItself(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-de", "/root")
 	assertGolden(t, "flag_d_dironly", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -d lists the dir itself, not its contents.
 	got := lines(r.Stdout)
 	if len(got) != 1 {
@@ -146,7 +146,7 @@ func TestFlag_t_SortByMtime(t *testing.T) {
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1te", "/root")
 	assertGolden(t, "flag_t_modtime", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -t sorts newest first. alpha.txt has mtime 2026-04-01
 	// (the most recent in sortFixture).
 	got := lines(r.Stdout)
@@ -159,7 +159,7 @@ func TestFlag_S_SortBySize(t *testing.T) {
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1Se", "/root")
 	assertGolden(t, "flag_S_sortsize", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -S sorts largest first. zebra.txt is 999 bytes (largest).
 	got := lines(r.Stdout)
 	// dotfiles come first in this app's sort regardless of -S, then largest.
@@ -178,7 +178,7 @@ func TestFlag_U_NoSort(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1Ue", "/root")
 	assertGolden(t, "flag_U", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -U lists in directory (fake = name) order, no further sorting.
 }
 
@@ -186,7 +186,7 @@ func TestFlag_v_NaturalSort(t *testing.T) {
 	vfs := fakefs.New(sortFixture())
 	r := runApp(t, vfs, "-1ve", "/root")
 	assertGolden(t, "flag_v", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -v selects the SortNatural mode. The current implementation
 	// of SortNatural is lexical string compare (with dotfile priority), so
 	// file10 sorts before file2. This is locked in by the golden; the
@@ -201,7 +201,7 @@ func TestFlag_X_SortByExtension(t *testing.T) {
 	vfs := fakefs.New(mixedExtTree())
 	r := runApp(t, vfs, "-1Xe", "/root")
 	assertGolden(t, "flag_X", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -X puts no-extension files first (Makefile, script), then .go,
 	// then .md. mixedExtTree has no dotfiles, so the dotfile-by-extension
 	// behaviour (covered by TestSort_ExtensionDotfilesByExt) does not apply here.
@@ -227,7 +227,7 @@ func TestFlag_T_ExtendedTimeStyle(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-lTe", "/root")
 	assertGolden(t, "flag_T_timestyle", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -T uses the extended timestamp formatter. We override the
 	// formatter in the harness, so we only check the long-mode columns
 	// are still present. Format change is checked at unit level.
@@ -238,7 +238,7 @@ func TestFlag_D_GitStatus(t *testing.T) {
 	vfs := fakefs.New(gitRepoTree(), fakefs.WithGitStatus(gitRepoStatus()))
 	r := runApp(t, vfs, "-1De", "/root")
 	assertGolden(t, "flag_D_gitstatus", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -D attaches git status code to each entry. The codes appear
 	// as a trailing character; the harness strips ANSI so they survive.
 	assertContains(t, r.Stdout, "A") // staged
@@ -250,7 +250,7 @@ func TestFlag_e_NoIcons(t *testing.T) {
 	vfs := fakefs.New(smallTree())
 	r := runApp(t, vfs, "-1e", "/root")
 	assertGolden(t, "flag_e", r.Stdout)
-	assertExitCode(t, model.CodeOk, r.ExitCode)
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	// Intent: -e removes the icon column. No nerd-font glyph (any PUA) appears.
 	if inPUA(r.Stdout) {
 		t.Errorf("found nerd-font glyph in -e output:\n%s", r.Stdout)

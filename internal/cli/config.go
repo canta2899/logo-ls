@@ -4,16 +4,14 @@
 package cli
 
 import (
-	"github.com/canta2899/logo-ls/format"
-	"github.com/canta2899/logo-ls/model"
 )
 
 type Config struct {
 	FileList        []string
-	AllMode         model.Include
-	SortMode        model.SortMode
-	LongListingMode model.Listing
-	TimeFormatter   format.Timestamp
+	AllMode         Include
+	SortMode        SortMode
+	LongListingMode Listing
+	TimeFormatter   Timestamp
 	Recursive       bool
 	GitStatus       bool
 	Reverse         bool
@@ -29,9 +27,9 @@ type Config struct {
 func NewConfig() *Config {
 
 	return &Config{
-		AllMode:         model.IncludeDefault,
-		SortMode:        model.SortAlphabetical,
-		LongListingMode: model.LongListingNone,
+		AllMode:         IncludeDefault,
+		SortMode:        SortAlphabetical,
+		LongListingMode: LongListingNone,
 		Recursive:       false,
 		GitStatus:       false,
 		Reverse:         false,
