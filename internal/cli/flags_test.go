@@ -153,3 +153,27 @@ func TestMixedArgs(t *testing.T) {
 		t.Errorf("expected FileList to be [\"something\"], got %v", cfg.FileList)
 	}
 }
+
+// Verifies the --no-override and --override-file flags parse correctly.
+func TestIconOverrideFlags(t *testing.T) {
+	cfg := parseArgs([]string{"app", "--no-override"})
+	if !cfg.NoIconOverride {
+		t.Error("expected NoIconOverride to be true")
+	}
+	if cfg.IconOverrideFile != "" {
+		t.Errorf("expected IconOverrideFile empty, got %q", cfg.IconOverrideFile)
+	}
+
+	cfg = parseArgs([]string{"app", "--override-file", "/tmp/icons.yaml"})
+	if cfg.NoIconOverride {
+		t.Error("expected NoIconOverride to be false")
+	}
+	if cfg.IconOverrideFile != "/tmp/icons.yaml" {
+		t.Errorf("expected IconOverrideFile=/tmp/icons.yaml, got %q", cfg.IconOverrideFile)
+	}
+
+	cfg = parseArgs([]string{"app", "--override-file=/tmp/inline.yaml"})
+	if cfg.IconOverrideFile != "/tmp/inline.yaml" {
+		t.Errorf("expected inline form to set path, got %q", cfg.IconOverrideFile)
+	}
+}

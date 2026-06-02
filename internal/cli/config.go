@@ -3,29 +3,27 @@
 // app.App wires the parsed config to an inspector + renderer.
 package cli
 
-import (
-)
-
 type Config struct {
-	FileList        []string
-	AllMode         Include
-	SortMode        SortMode
-	LongListingMode Listing
-	TimeFormatter   Timestamp
-	Recursive       bool
-	GitStatus       bool
-	Reverse         bool
-	DisableIcon     bool
-	OneFilePerLine  bool
-	Directory       bool
-	NoGroup         bool
-	HumanReadable   bool
-	ShowBlockSize   bool
-	ShowInodeNumber bool
+	FileList          []string
+	AllMode           Include
+	SortMode          SortMode
+	LongListingMode   Listing
+	TimeFormatter     Timestamp
+	Recursive         bool
+	GitStatus         bool
+	Reverse           bool
+	DisableIcon       bool
+	OneFilePerLine    bool
+	Directory         bool
+	NoGroup           bool
+	HumanReadable     bool
+	ShowBlockSize     bool
+	ShowInodeNumber   bool
+	NoIconOverride   bool
+	IconOverrideFile string
 }
 
 func NewConfig() *Config {
-
 	return &Config{
 		AllMode:         IncludeDefault,
 		SortMode:        SortAlphabetical,
