@@ -55,7 +55,8 @@ homebrew_casks:
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
     directory: Casks
     homepage: "https://github.com/canta2899/logo-ls"
-    description: "ls, but with icons"
+    description: "A minimal ls replacement, with git status indicators and
+      configurable Nerd Font icons"
     license: "MIT"
     commit_author:
       name: goreleaser-bot

@@ -3,7 +3,7 @@
 ![Tests](https://img.shields.io/github/actions/workflow/status/canta2899/logo-ls/test.yml?label=Tests&style=for-the-badge)
 
 <div align="center">
-<img src="./.github/assets/screen.png" alt="logo-ls screenshot" width="600"/>
+<img src="./.github/assets/output.png" alt="logo-ls screenshot" width="600"/>
 </div>
 
 <h1 align="center">

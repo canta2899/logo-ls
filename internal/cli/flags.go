@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
 )
 
 var Version = ""
@@ -152,7 +151,7 @@ func printVersion() {
 }
 
 func printHelpMessage(opt *Parser) {
-	fmt.Println("logo-ls: A modern ls command with icons and Git status integration.")
+	fmt.Println("logo-ls: A minimal ls replacement, with git status indicators and configurable Nerd Font icons.")
 	fmt.Println("Lists information about the FILEs (the current directory by default).")
 	fmt.Println("Sorts entries alphabetically if none of -tvSUX is specified.")
 	fmt.Println()
