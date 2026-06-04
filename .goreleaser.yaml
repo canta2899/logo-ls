@@ -27,7 +27,7 @@ builds:
       - -trimpath
       - -tags=minimal
     ldflags:
-      - -s -w -X github.com/canta2899/logo-ls/app.Version={{ .Version }}
+      - -s -w -X github.com/canta2899/logo-ls/internal/cli.Version={{ .Version }}
 
 archives:
   - name_template: "{{ .ProjectName }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
@@ -89,7 +89,7 @@ aur_sources:
       - go
       - git
     build: |-
-      go build -trimpath -tags=minimal -ldflags="-s -w -X github.com/canta2899/logo-ls/app.Version=${pkgver}" ./cmd/logo-ls
+      go build -trimpath -tags=minimal -ldflags="-s -w -X github.com/canta2899/logo-ls/internal/cli.Version=${pkgver}" ./cmd/logo-ls
     package: |-
       install -Dm755 "./logo-ls" "${pkgdir}/usr/bin/logo-ls"
       install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"

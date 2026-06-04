@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+// Version defines the app version.
+// If moved to other packages it requires updating the
+// build command since it's linked at build time.
+// See the Makefile for details.
 var Version = ""
 
 // ErrHelp and ErrVersionRequested are returned by BuildConfig when the user
