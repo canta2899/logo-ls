@@ -39,6 +39,10 @@ archives:
       - CHANGELOG.md
       - LICENSE
 
+source:
+  enabled: true
+  name_template: "{{ .ProjectName }}-{{ .Tag }}-source"
+
 checksum:
   name_template: "checksums.txt"
 
@@ -69,3 +73,23 @@ homebrew_casks:
           if OS.mac?
             system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/logo-ls"]
           end
+
+aur_sources:
+  - name: logo-ls
+    homepage: "https://github.com/canta2899/logo-ls"
+    description: "A minimal ls replacement, with git status indicators and
+      configurable Nerd Font icons"
+    license: "MIT"
+    git_url: "ssh://aur@aur.archlinux.org/logo-ls.git"
+    private_key: "{{ .Env.AUR_SSH_PRIVATE_KEY }}"
+    commit_author:
+      name: goreleaser-bot
+      email: goreleaser@users.noreply.github.com
+    makedepends:
+      - go
+      - git
+    build: |-
+      go build -trimpath -tags=minimal -ldflags="-s -w -X github.com/canta2899/logo-ls/app.Version=${pkgver}" ./cmd/logo-ls
+    package: |-
+      install -Dm755 "./logo-ls" "${pkgdir}/usr/bin/logo-ls"
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
