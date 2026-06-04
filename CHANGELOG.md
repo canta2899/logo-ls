@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## logo-ls [1.6.2]
+
+### Fixes
+
+- Fixed bug when linking version during build, that caused logo-ls to print empty version
+
 ## logo-ls [1.6.1]
 
 ### Features
