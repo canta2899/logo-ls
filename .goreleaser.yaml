@@ -46,9 +46,6 @@ source:
 checksum:
   name_template: "checksums.txt"
 
-changelog:
-  disable: true
-
 homebrew_casks:
   - name: logo-ls
     binaries:
