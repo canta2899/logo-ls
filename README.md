@@ -10,7 +10,7 @@
     logo-ls
 </h1>
 
-A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Feel free to open an issue or a pull request if you have any questions or want to contribute. If you want to add icons, check the [Adding Icons](#adding-icons) section below for instructions on how to do so.
+A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up maintaining since the original repository went unmaintained some years ago. Contributions are welcome (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
 ---
 
@@ -18,8 +18,8 @@ A fork of [logo-ls](https://github.com/Yash-Handa/logo-ls) which I ended up main
 
 ### Prerequisites
 
-- Ensure your terminal is using a Nerd Font to see the icons properly. You can download your preferred Nerd Font from [here](https://www.nerdfonts.com/font-downloads). Some terminal emulators such as [Ghostty](https://ghostty.org) come with built in support for Nerd Fonts, so you don't have to worry about it.
-- The command will be installed as `logo-ls`, so you can optionally set an alias for `ls` to `logo-ls` if you want to use it as a drop in replacement for `ls`.
+- Ensure your terminal is using a Nerd Font to see the icons properly. You can download your favourite Nerd Font from [here](https://www.nerdfonts.com/font-downloads). Some terminal emulators such as [Ghostty](https://ghostty.org) come with built in support for Nerd Fonts, so you don't have to worry about it.
+- The command will be installed as `logo-ls`, you can optionally set an alias for `ls` to `logo-ls` if you want to use it as a drop in replacement for `ls`.
 
 ### Arch Linux
 
@@ -37,8 +37,6 @@ brew install canta2899/homebrew-tap/logo-ls
 
 ### Binary Release (Linux/OSX/Windows)
 
-Optionally, you can set the variables `LOGO_LS_INSTALL_DIR` and/or `LOGO_LS_VERSION` to specify a custom installation directory and/or version to install. By default, the scripts will install the latest version of logo-ls to `~/.local/bin`.
-
 #### Linux/OSX
 
 ```bash
@@ -51,6 +49,11 @@ curl -L https://raw.githubusercontent.com/canta2899/logo-ls/refs/heads/main/get.
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 irm https://raw.githubusercontent.com/canta2899/logo-ls/main/get.ps1 | iex
 ```
+
+Optionally, you can set these variables:
+
+- `LOGO_LS_INSTALL_DIR` (to specify a different installation directory, defaults to `~/.local/bin`)
+- `LOGO_LS_VERSION` to specify a version (defaults to the latest one)
 
 #### Manual Install
 
@@ -73,17 +76,9 @@ make logo-ls
 
 ## Icons
 
-`logo-ls` comes with a huge built in set of icons for common file types and directories. You can either contribute to the built in set by opening a pull request, or you can add custom icons or overrides for your own use.
+`logo-ls` comes with a huge built in set of icons for common file types and directories. However, you can also add your own custom icons or override existing ones with the built-in override system.
 
-### Contribute with new Icons
-
-If you use any coding agent (OpenCode, Gemini CLI, Claude Code, etc.) there's a built in skill called `/add-icon` which you can use to let your agent do the job for you. If you want to do it manually, you can pretend to be a coding agent and read the skill file yourself.
-
-> **Note for Windows contributors:** the skill file lives at `add-icon-skill.md` in the repo root, and the paths under `.agents/skills/add-icon/SKILL.md` and `.claude/skills/add-icon/SKILL.md` are symlinks to it. Git for Windows does not create real symlinks by default, so these may be checked out as plain text files containing the link target. To get working symlinks, enable Developer Mode (or run as admin) and set `git config --global core.symlinks true` before cloning.
-
-### Overrides
-
-If you want to add or override icons, you can drop a YAML file in either of the following locations:
+You can drop a YAML file in either of the following locations:
 
 - `$XDG_CONFIG_HOME/logo-ls/logo-ls-overrides.yaml` (defaults to `~/.config/logo-ls/logo-ls-overrides.yaml`)
 - `~/.logo-ls-overrides.yaml`
@@ -119,7 +114,7 @@ sub_extensions:    # matched by "<last-segment><ext>"
     color: "#3178c6"
 ```
 
-Glyphs can be written as `U+XXXX` or `0xXXXX` (parsed as hex codepoints) or as literal strings. Colors are `#RRGGBB` (or the shorthand `#RGB`). User entries take priority over the built-in icons.
+Glyphs can be written as `U+XXXX` or `0xXXXX` (parsed as hex codepoints) or as literal strings. Colors are `#RRGGBB` (or the shorthand `#RGB`). User entries take priority over the built-in icons. Glyphs can also be emojis or any other unicode character, but Nerd Font glyphs are recommended for the best visual consistency.
 
 #### Flags
 
