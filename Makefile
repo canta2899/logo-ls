@@ -11,7 +11,7 @@ OUTPUT_NAME=$(APP_NAME)$(if $(findstring windows,$(GOOS)),.exe,)
 GORELEASER_VERSION ?= latest
 GORELEASER=go run github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
 
-.PHONY: all bindir clean test test-clean install logo-ls release-check release-snapshot benchmark benchmark-plot
+.PHONY: all bindir clean test test-clean install logo-ls release-check release-snapshot benchmark benchmark-plot bump-major bump-minor bump-patch
 
 all: logo-ls
 
@@ -42,3 +42,12 @@ benchmark: logo-ls
 
 benchmark-plot:
 	uv run ./scripts/plot.py
+
+bump-major:
+	@bash scripts/bump.sh major
+
+bump-minor:
+	@bash scripts/bump.sh minor
+
+bump-patch:
+	@bash scripts/bump.sh patch

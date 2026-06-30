@@ -24,7 +24,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Extract release notes
-        run: awk '/^## /{if (p++) exit} p' CHANGELOG.md > CHANGELOG.md.tmp
+        run: awk '/^## \[Unreleas/{next} /^## /{if (p++) exit} p' CHANGELOG.md > CHANGELOG.md.tmp
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
