@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Features
+
+- When using the `-D` flag, logo-ls will display git-ignored files in a slightly dimmer color than the other ones, adding a `I` flag next to the name. This allows to immediately see which files are being ignored by git
+
 ## logo-ls [1.7.0]
 
 ### Features
