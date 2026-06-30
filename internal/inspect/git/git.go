@@ -138,8 +138,8 @@ func splitPorcelain(s string) []string {
 }
 
 // ExtractStatusChar picks a single status character from a porcelain XY code.
-// "??" (untracked) is mapped to "U" to match the rendering convention used
-// elsewhere in logo-ls.
+// "??" (untracked) is mapped to "U" and "!!" (ignored) is mapped to "I" to
+// match the rendering conventions used elsewhere in logo-ls.
 func ExtractStatusChar(xy string) string {
 	xy = strings.TrimSpace(xy)
 	if xy == "" {
@@ -147,6 +147,9 @@ func ExtractStatusChar(xy string) string {
 	}
 	if xy == "??" {
 		return "U"
+	}
+	if xy == "!!" {
+		return "I"
 	}
 	for _, r := range xy {
 		if r != ' ' && r != '\t' {
@@ -185,5 +188,5 @@ func (ExecPorcelain) Root(dir string) (string, error) {
 }
 
 func (ExecPorcelain) Status(root string) ([]byte, error) {
-	return exec.Command("git", "-C", root, "status", "--porcelain", "-z").Output()
+	return exec.Command("git", "-C", root, "status", "--porcelain", "--ignored", "-z").Output()
 }

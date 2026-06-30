@@ -11,6 +11,7 @@ func TestExtractStatusChar(t *testing.T) {
 		xy, want string
 	}{
 		{"??", "U"},
+		{"!!", "I"},
 		{"M ", "M"},
 		{" M", "M"},
 		{"A ", "A"},
@@ -105,6 +106,15 @@ func TestParsePorcelain_DoesNotOverwriteFile(t *testing.T) {
 	// at file level. Auto-parent only fills slots that don't already exist.
 	if got[filepath.Clean("/repo/dir/a.go")] != "M" {
 		t.Errorf("file overwritten: %v", got)
+	}
+}
+
+func TestParsePorcelain_Ignored(t *testing.T) {
+	raw := zstream("!! ignored.log")
+	got := ParsePorcelain("/repo", raw)
+	want := filepath.Clean("/repo/ignored.log")
+	if got[want] != "I" {
+		t.Errorf("ignored = %q, want I", got[want])
 	}
 }
 

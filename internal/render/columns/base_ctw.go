@@ -8,6 +8,7 @@ type baseCtw struct {
 	noColor string
 	green   string
 	brown   string
+	dimGray string
 	empty   string
 }
 
@@ -16,7 +17,8 @@ func newBaseCtw() *baseCtw {
 		noColor: "\033[0m",
 		green:   "\033[38;2;055;183;021m",
 		brown:   "\033[38;2;192;154;107m",
-		empty:   "\u0020",
+		dimGray: "\033[38;2;160;160;160m",
+		empty:   " ",
 	}
 }
 
@@ -26,6 +28,8 @@ func (c *baseCtw) GetGitColor(gitStatus string) string {
 		return c.noColor
 	case "U":
 		return c.green
+	case "I":
+		return c.dimGray
 	default:
 		return c.brown
 	}
