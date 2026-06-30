@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Features
+
+- When using the `-D` flag, logo-ls will display git-ignored files in a slightly dimmer color than the other ones, adding a `I` flag next to the name. This allows to immediately see which files are being ignored by git
 
 ## logo-ls [1.6.2]
 
