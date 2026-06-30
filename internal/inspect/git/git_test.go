@@ -118,6 +118,15 @@ func TestParsePorcelain_Ignored(t *testing.T) {
 	}
 }
 
+func TestParsePorcelain_IgnoredDoesNotMarkParent(t *testing.T) {
+	raw := zstream("!! sub/ignored.log")
+	got := ParsePorcelain("/repo", raw)
+	parentKey := filepath.Clean("/repo/sub") + string(filepath.Separator)
+	if status, ok := got[parentKey]; ok {
+		t.Errorf("parent dir should not be marked for ignored file, got %q", status)
+	}
+}
+
 func TestParsePorcelain_Rename(t *testing.T) {
 	// Porcelain -z renames: `R<space>newpath\0oldpath`.
 	raw := []byte("R  new/path.go\x00old/path.go\x00")

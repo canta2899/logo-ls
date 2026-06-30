@@ -100,6 +100,9 @@ func ParsePorcelain(repoRoot string, raw []byte) map[string]string {
 		statusChar := ExtractStatusChar(xy)
 		absFile := filepath.Clean(filepath.Join(repoRoot, filepath.FromSlash(path)))
 		result[absFile] = statusChar
+		if statusChar == "I" {
+			continue
+		}
 		for _, parent := range parentDirsWithinRepo(repoRoot, absFile) {
 			if !strings.HasSuffix(parent, string(filepath.Separator)) {
 				parent += string(filepath.Separator)
