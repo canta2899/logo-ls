@@ -61,6 +61,7 @@ func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 	if opts.Mode == ModeLong {
 		tw.AddRow(
 			e.Icon.GetColor(),
+			e.Icon.IconPadding(),
 			blockSizeWithInode(e, opts),
 			inspect.ModeString(e.Mode, e.Sticky, e.StickyX, e.HasXAttr),
 			strconv.FormatUint(hardLinks(e), 10),
@@ -76,6 +77,7 @@ func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 	}
 	tw.AddRow(
 		e.Icon.GetColor(),
+		e.Icon.IconPadding(),
 		blockSizeWithInode(e, opts),
 		e.Icon.GetGlyph(),
 		displayName,

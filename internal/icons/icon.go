@@ -8,6 +8,16 @@ type IconInfo struct {
 	Glyph        string
 	Color        [3]uint8 // RGB; (0,0,0) is black
 	IsExecutable bool
+	Padding      *int // nil = use default (1 space)
+}
+
+// IconPadding returns the number of space characters to insert between the
+// icon glyph and the entry name. Nil (unset) defaults to 1.
+func (i *IconInfo) IconPadding() int {
+	if i == nil || i.Padding == nil {
+		return 1
+	}
+	return *i.Padding
 }
 
 // GetGlyph returns the icon glyph, or "" when the receiver is nil.
