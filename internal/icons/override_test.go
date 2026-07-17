@@ -293,3 +293,99 @@ func TestLoadOverridesMissingFile(t *testing.T) {
 		t.Fatalf("expected nil override, got %+v", ov)
 	}
 }
+
+func TestIconPaddingGlobal(t *testing.T) {
+	ov, err := loadYAML(t, `
+icon_padding: 2
+extensions:
+  rs:
+    glyph: "X"
+    color: "#112233"
+`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	// Extension with override: should get global padding
+	got := icons.ResolveWith(ov, "main", ".rs", "")
+	if got.IconPadding() != 2 {
+		t.Errorf("expected padding 2, got %d", got.IconPadding())
+	}
+	// Extension without override: should also get global padding
+	got = icons.ResolveWith(ov, "main", ".go", "")
+	if got.IconPadding() != 2 {
+		t.Errorf("expected global padding 2 for non-overridden ext, got %d", got.IconPadding())
+	}
+}
+
+func TestIconPaddingPerEntry(t *testing.T) {
+	p0 := 0
+	ov, err := loadYAML(t, `
+icon_padding: 2
+extensions:
+  rs:
+    glyph: "🦀"
+    color: "#112233"
+    padding: 0
+  go:
+    glyph: "Z"
+    color: "#00ff00"
+`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	_ = p0
+	// rs has per-entry padding=0, should override global
+	got := icons.ResolveWith(ov, "main", ".rs", "")
+	if got.IconPadding() != 0 {
+		t.Errorf("expected per-entry padding 0, got %d", got.IconPadding())
+	}
+	// go has no per-entry padding, should use global
+	got = icons.ResolveWith(ov, "main", ".go", "")
+	if got.IconPadding() != 2 {
+		t.Errorf("expected global padding 2, got %d", got.IconPadding())
+	}
+}
+
+func TestIconPaddingDefault(t *testing.T) {
+	// No padding config at all: should default to 1
+	got := icons.Resolve("main", ".go", "")
+	if got.IconPadding() != 1 {
+		t.Errorf("expected default padding 1, got %d", got.IconPadding())
+	}
+}
+
+func TestIconPaddingOnlyOverride(t *testing.T) {
+	// Entry with only padding set (no glyph, no color) should be valid
+	ov, err := loadYAML(t, `
+extensions:
+  go:
+    padding: 0
+`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	got := icons.ResolveWith(ov, "main", ".go", "")
+	if got.IconPadding() != 0 {
+		t.Errorf("expected padding 0, got %d", got.IconPadding())
+	}
+	// Glyph should be preserved from built-in
+	base := icons.Resolve("main", ".go", "")
+	if got.Glyph != base.Glyph {
+		t.Errorf("expected built-in glyph preserved, got %q", got.Glyph)
+	}
+}
+
+func TestIconPaddingGlobalOnly(t *testing.T) {
+	// Only icon_padding set, no entry overrides
+	ov, err := loadYAML(t, `icon_padding: 3`)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if ov == nil {
+		t.Fatal("expected non-nil override")
+	}
+	got := icons.ResolveWith(ov, "main", ".go", "")
+	if got.IconPadding() != 3 {
+		t.Errorf("expected global padding 3, got %d", got.IconPadding())
+	}
+}

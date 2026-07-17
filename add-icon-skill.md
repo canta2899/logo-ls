@@ -27,7 +27,7 @@ The icon system lives in the `internal/icons/` package.
 
 **User override loader** (do not edit unless the user asks):
 
-- **`internal/icons/override.go`** — parses the user's YAML file; the four top-level keys (`extensions`, `files`, `directories`, `sub_extensions`) mirror the four built-in maps above. User entries take priority over built-ins at lookup time. Each entry is sparse: a user can set `glyph` only, `color` only, or both — unset fields keep the built-in value for that match.
+- **`internal/icons/override.go`** — parses the user's YAML file; the four top-level keys (`extensions`, `files`, `directories`, `sub_extensions`) mirror the four built-in maps above. A top-level `icon_padding` key sets the default number of spaces between icon and filename (default is 1). User entries take priority over built-ins at lookup time. Each entry is sparse: a user can set `glyph` only, `color` only, `padding` only, or any combination — unset fields keep the built-in value for that match. Each entry may also include a `padding` field that overrides the global `icon_padding` for that specific entry.
 
 The `IconInfo` struct looks like this:
 
@@ -36,6 +36,7 @@ type IconInfo struct {
     Glyph        string
     Color        [3]uint8 // RGB color
     IsExecutable bool
+    Padding      *int     // nil = use default (1 space)
 }
 ```
 
@@ -78,15 +79,32 @@ At least one of `glyph` or `color` must be set. If the user only wants to recolo
 Add (or extend) the relevant top-level section. Example:
 
 ```yaml
+icon_padding: 2            # global: 2 spaces between icon and name (default is 1)
+
 extensions:
   rs:
     glyph: "U+E7A8"
     color: "#dea584"
   go:
     color: "#ff5555"     # color-only override: keeps built-in Go glyph
+  crab:
+    glyph: "🦀"
+    color: "#ff4500"
+    padding: 1           # per-entry: emoji is 2 columns wide, so use 1 space
 ```
 
 If the section already exists, append the new key under it — do **not** create a duplicate top-level key.
+
+### Icon Padding
+
+The `icon_padding` top-level field controls the default number of space characters inserted between the icon glyph and the entry name. When omitted, the default is **1**.
+
+Each entry can optionally include a `padding` field to override the global default for that specific entry. This is useful when mixing **Nerd Font icons** (which are 1 terminal column wide) with **emoji icons** (which are 2 terminal columns wide):
+
+- Set `icon_padding: 2` globally to add extra space for narrow Nerd Font glyphs.
+- Use `padding: 1` on emoji entries that are already 2 columns wide, so total visual spacing stays consistent.
+
+Padding values are non-negative integers. A value of `0` means no space between icon and name.
 
 ### Step 4 — Verify
 

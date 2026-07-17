@@ -12,7 +12,12 @@ func Resolve(name, ext, indicator string) *IconInfo {
 func ResolveWith(ov *Override, name, fileExt, indicator string) *IconInfo {
 	base := resolveBuiltin(name, fileExt, indicator)
 	if entry, ok := ov.lookupEntry(name, fileExt, indicator); ok {
-		base = entry.apply(base)
+		base = entry.apply(base, ov.DefaultPadding())
+	} else if dp := ov.DefaultPadding(); dp != nil && base != nil {
+		// No per-entry override, but global default padding applies.
+		copy := *base
+		copy.Padding = dp
+		base = &copy
 	}
 	return applyIndicator(base, indicator)
 }

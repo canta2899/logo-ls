@@ -50,7 +50,7 @@ func writeMatchingEntries(terminalWidth int, target *icons.IconInfo, set map[str
 	w := ctw.NewStandardCTW(terminalWidth)
 	for name, info := range set {
 		if info == target {
-			w.AddRow(info.GetColor(), "    ", info.GetGlyph(), name, "")
+			w.AddRow(info.GetColor(), 1, "    ", info.GetGlyph(), name, "")
 		}
 	}
 	w.Flush(buf)
@@ -79,7 +79,7 @@ func TestIconDisplay(t *testing.T) {
 			buf := bytes.NewBuffer([]byte("\n"))
 			w := ctw.NewStandardCTW(terminalWidth)
 			for _, v := range ks {
-				w.AddRow(set[v].GetColor(), "    ", set[v].GetGlyph(), v, "")
+				w.AddRow(set[v].GetColor(), 1, "    ", set[v].GetGlyph(), v, "")
 			}
 			w.Flush(buf)
 			io.Copy(os.Stdout, buf)

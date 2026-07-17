@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"strings"
 )
 
 // StandardCTW fits multiple columns into the terminal width.
@@ -15,6 +16,7 @@ type StandardCTW struct {
 	nameWidths    []int
 	gitWidths     []int
 	iconColors    []string
+	iconPaddings  []int
 	numCols       int
 	showIcon      bool
 	terminalWidth int
@@ -30,11 +32,12 @@ func NewStandardCTW(termW int) *StandardCTW {
 		nameWidths:    make([]int, 0),
 		gitWidths:     make([]int, 0),
 		iconColors:    make([]string, 0),
+		iconPaddings:  make([]int, 0),
 	}
 	return ctw
 }
 
-func (s *StandardCTW) AddRow(color string, args ...string) {
+func (s *StandardCTW) AddRow(color string, iconPadding int, args ...string) {
 	if len(args) != s.numCols+1 {
 		return
 	}
@@ -49,6 +52,7 @@ func (s *StandardCTW) AddRow(color string, args ...string) {
 
 	s.rows = append(s.rows, args)
 	s.iconColors = append(s.iconColors, color)
+	s.iconPaddings = append(s.iconPaddings, iconPadding)
 }
 
 // Flush writes all rows in a multi-column layout that fits the terminal width.
@@ -135,6 +139,7 @@ func (s *StandardCTW) calcSubColumnWidths(begin, end int) [4]int {
 	maxSizeWidth := 0
 	maxNameWidth := 0
 	maxGitWidth := 0
+	maxIconWidth := 0
 
 	for i := begin; i < end; i++ {
 		if s.sizeWidths[i] > maxSizeWidth {
@@ -146,6 +151,9 @@ func (s *StandardCTW) calcSubColumnWidths(begin, end int) [4]int {
 		if s.gitWidths[i] > maxGitWidth {
 			maxGitWidth = s.gitWidths[i]
 		}
+		if iconW := 1 + s.iconPaddings[i]; iconW > maxIconWidth {
+			maxIconWidth = iconW
+		}
 	}
 
 	result := [4]int{0, 0, 0, 0}
@@ -153,7 +161,7 @@ func (s *StandardCTW) calcSubColumnWidths(begin, end int) [4]int {
 		result[0] = maxSizeWidth + 1
 	}
 	if s.showIcon {
-		result[1] = 2
+		result[1] = maxIconWidth
 	}
 	result[2] = maxNameWidth
 	if maxGitWidth > 0 {
@@ -168,11 +176,15 @@ func (s *StandardCTW) printRowCell(buf *bytes.Buffer, rowIndex int, colSizes [4]
 	}
 
 	if s.showIcon {
+		fill := colSizes[1] - 1
+		if fill < 0 {
+			fill = 0
+		}
 		fmt.Fprintf(buf, "%s%1s%s%s",
 			s.iconColors[rowIndex],
 			s.rows[rowIndex][1],
 			s.noColor,
-			s.empty,
+			strings.Repeat(" ", fill),
 		)
 	}
 

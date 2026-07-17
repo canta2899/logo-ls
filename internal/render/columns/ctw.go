@@ -10,7 +10,7 @@ import (
 )
 
 type CTW interface {
-	AddRow(color string, args ...string)
+	AddRow(color string, iconPadding int, args ...string)
 	Flush(buf *bytes.Buffer)
 	GetGitColor(gitStatus string) string
 	widthsSum(w [][4]int, p int) int

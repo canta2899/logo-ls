@@ -17,10 +17,11 @@ import (
 type Override struct {
 	Source string // absolute path of the YAML file
 
-	dirs      map[string]overrideEntry
-	fileNames map[string]overrideEntry
-	subExts   map[string]overrideEntry
-	exts      map[string]overrideEntry
+	defaultPadding *int
+	dirs           map[string]overrideEntry
+	fileNames      map[string]overrideEntry
+	subExts        map[string]overrideEntry
+	exts           map[string]overrideEntry
 }
 
 // overrideEntry is the parsed form of a single YAML entry.
@@ -28,15 +29,18 @@ type overrideEntry struct {
 	glyph    string
 	hasColor bool
 	color    [3]uint8
+	padding  *int
 }
 
 type yamlEntry struct {
 	Glyph     string `yaml:"glyph"`
 	Codepoint string `yaml:"codepoint"`
 	Color     string `yaml:"color"`
+	Padding   *int   `yaml:"padding"`
 }
 
 type yamlFile struct {
+	IconPadding   *int                 `yaml:"icon_padding"`
 	Directories   map[string]yamlEntry `yaml:"directories"`
 	Files         map[string]yamlEntry `yaml:"files"`
 	Extensions    map[string]yamlEntry `yaml:"extensions"`
@@ -92,7 +96,7 @@ func parseOverrides(path string, data []byte) (*Override, error) {
 	if err := yaml.Unmarshal(data, &raw); err != nil {
 		return nil, fmt.Errorf("parse %s: %w", path, err)
 	}
-	ov := &Override{Source: path}
+	ov := &Override{Source: path, defaultPadding: raw.IconPadding}
 	var err error
 	if ov.dirs, err = buildEntryMap(raw.Directories); err != nil {
 		return nil, fmt.Errorf("%s directories: %w", path, err)
@@ -113,7 +117,16 @@ func parseOverrides(path string, data []byte) (*Override, error) {
 }
 
 func (o *Override) empty() bool {
-	return len(o.dirs)+len(o.fileNames)+len(o.subExts)+len(o.exts) == 0
+	return len(o.dirs)+len(o.fileNames)+len(o.subExts)+len(o.exts) == 0 && o.defaultPadding == nil
+}
+
+// DefaultPadding returns the global icon_padding from the override file,
+// or nil if not set.
+func (o *Override) DefaultPadding() *int {
+	if o == nil {
+		return nil
+	}
+	return o.defaultPadding
 }
 
 func buildEntryMap(in map[string]yamlEntry) (map[string]overrideEntry, error) {
@@ -149,8 +162,9 @@ func parseEntry(e yamlEntry) (overrideEntry, error) {
 		out.hasColor = true
 		out.color = c
 	}
-	if out.glyph == "" && !out.hasColor {
-		return out, errors.New("override must set at least one of glyph, codepoint, or color")
+	out.padding = e.Padding
+	if out.glyph == "" && !out.hasColor && out.padding == nil {
+		return out, errors.New("override must set at least one of glyph, codepoint, color, or padding")
 	}
 	return out, nil
 }
@@ -241,9 +255,14 @@ func (o *Override) lookupEntry(name, fileExt, indicator string) (overrideEntry, 
 }
 
 // apply returns a copy of base with the entry's set fields swapped in.
-func (e overrideEntry) apply(base *IconInfo) *IconInfo {
+func (e overrideEntry) apply(base *IconInfo, defaultPadding *int) *IconInfo {
 	if base == nil {
 		out := &IconInfo{Glyph: e.glyph, Color: e.color}
+		if e.padding != nil {
+			out.Padding = e.padding
+		} else if defaultPadding != nil {
+			out.Padding = defaultPadding
+		}
 		return out
 	}
 	out := *base
@@ -252,6 +271,11 @@ func (e overrideEntry) apply(base *IconInfo) *IconInfo {
 	}
 	if e.hasColor {
 		out.Color = e.color
+	}
+	if e.padding != nil {
+		out.Padding = e.padding
+	} else if defaultPadding != nil {
+		out.Padding = defaultPadding
 	}
 	return &out
 }

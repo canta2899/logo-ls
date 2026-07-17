@@ -3,6 +3,7 @@ package ctw
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 // LongCTW is the column writer for long mode listings.
@@ -11,6 +12,7 @@ type LongCTW struct {
 	rows         [][]string
 	columnWidths []int
 	iconColors   []string
+	iconPaddings []int
 	// numCols = cols - 1; the icon and git status columns are handled separately.
 	numCols int
 }
@@ -25,7 +27,7 @@ func NewLongCTW(cols int) *LongCTW {
 	}
 }
 
-func (l *LongCTW) AddRow(color string, columns ...string) {
+func (l *LongCTW) AddRow(color string, iconPadding int, columns ...string) {
 	if len(columns) != l.numCols+1 {
 		return
 	}
@@ -38,6 +40,7 @@ func (l *LongCTW) AddRow(color string, columns ...string) {
 
 	l.rows = append(l.rows, columns)
 	l.iconColors = append(l.iconColors, color)
+	l.iconPaddings = append(l.iconPaddings, iconPadding)
 }
 
 // Flush writes the table to buf, skipping zero-width columns.
@@ -49,8 +52,16 @@ func (l *LongCTW) Flush(buf *bytes.Buffer) {
 		}
 	}
 
-	l.columnWidths[l.numCols] = 1   // git column
-	l.columnWidths[l.numCols-2] = 1 // icon column
+	l.columnWidths[l.numCols] = 1 // git column
+
+	// Icon column: 1 for glyph + max padding across all rows.
+	maxIconWidth := 1
+	for _, p := range l.iconPaddings {
+		if w := 1 + p; w > maxIconWidth {
+			maxIconWidth = w
+		}
+	}
+	l.columnWidths[l.numCols-2] = maxIconWidth
 
 	for rowIdx, row := range l.rows {
 		l.writeRow(buf, rowIdx, row, skipCols)
@@ -78,7 +89,12 @@ func (l *LongCTW) writeCell(buf *bytes.Buffer, rowIdx, colIdx int, cellValue str
 
 	switch {
 	case colIdx == l.numCols-2:
-		fmt.Fprintf(buf, "%s%*s%s", l.iconColors[rowIdx], width, cellValue, l.noColor)
+		// Icon column: print the glyph and fill remaining width with spaces.
+		fill := width - 1
+		if fill < 0 {
+			fill = 0
+		}
+		fmt.Fprintf(buf, "%s%1s%s%s", l.iconColors[rowIdx], cellValue, l.noColor, strings.Repeat(" ", fill))
 	case colIdx >= l.numCols-1 && !gitSkipped:
 		fmt.Fprintf(buf, "%s%-*s%s", l.GetGitColor(row[l.numCols]), width, cellValue, l.noColor)
 	case gitSkipped && colIdx == l.numCols-1:
