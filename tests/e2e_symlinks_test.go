@@ -32,3 +32,28 @@ func TestSymlink_LongModeShowsLPrefix(t *testing.T) {
 	assertContainsLine(t, r.Stdout, `^l.*link-dir ~> /root/subdir`)
 	assertContainsLine(t, r.Stdout, `^l.*link-broken`)
 }
+
+// Symlinks passed directly as arguments must not be followed in long mode,
+// matching `ls -l link` which prints the link and its target.
+func TestSymlink_LongModeArgShowsTarget(t *testing.T) {
+	vfs := fakefs.New(treeWithSymlinks())
+	r := runApp(t, vfs, "-le", "/root/link-file", "/root/link-dir", "/root/link-broken")
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
+	assertContainsLine(t, r.Stdout, `^l.*link-file ~> /root/target\.txt`)
+	assertContainsLine(t, r.Stdout, `^l.*link-dir ~> /root/subdir`)
+	assertContainsLine(t, r.Stdout, `^l.*link-broken`)
+}
+
+// Without -l, a symlink to a directory is followed and its contents listed,
+// while file and broken links are listed as the link itself.
+func TestSymlink_ShortModeArgs(t *testing.T) {
+	vfs := fakefs.New(treeWithSymlinks())
+	r := runApp(t, vfs, "-1e", "/root/link-dir")
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
+	assertContains(t, r.Stdout, "inner.txt")
+
+	r = runApp(t, vfs, "-1e", "/root/link-file", "/root/link-broken")
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
+	assertContains(t, r.Stdout, "link-file@")
+	assertContains(t, r.Stdout, "link-broken@")
+}

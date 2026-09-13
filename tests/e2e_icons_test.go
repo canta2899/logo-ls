@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"github.com/canta2899/logo-ls/internal/cli"
 	"testing"
+
+	"github.com/canta2899/logo-ls/internal/cli"
 
 	"github.com/canta2899/logo-ls/pkg/fs/fakefs"
 )

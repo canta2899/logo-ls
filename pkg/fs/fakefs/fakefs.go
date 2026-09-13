@@ -267,6 +267,11 @@ func (f *fakeFS) ReadDir(p string) ([]fs.DirEntry, error) {
 	if err != nil {
 		return nil, err
 	}
+	if e.kind == kindSymlink {
+		if _, e, err = f.resolveSymlink(p, e); err != nil {
+			return nil, err
+		}
+	}
 	if e.kind != kindDir {
 		return nil, &iofs.PathError{Op: "readdir", Path: p, Err: errors.New("not a directory")}
 	}

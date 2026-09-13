@@ -77,6 +77,11 @@ func (a *App) GetArguments() *Args {
 			continue
 		}
 
+		if lfi, ok := a.symlinkArgInfo(abs); ok {
+			args.Files = append(args.Files, FileEntry{Info: lfi, AbsPath: abs})
+			continue
+		}
+
 		f, err := a.FS.Open(abs)
 		if err != nil {
 			a.Logger.Printf(cannotAccessFmt, argPath, err)
@@ -106,6 +111,23 @@ func (a *App) GetArguments() *Args {
 		}
 	}
 	return args
+}
+
+// symlinkArgInfo returns the Lstat info for a symlink argument that should be
+// listed as the link itself rather than followed. Like ls, links are only
+// followed when they point to a directory and neither -l nor -d is set.
+func (a *App) symlinkArgInfo(abs string) (fs.FileInfo, bool) {
+	lfi, err := a.FS.Lstat(abs)
+	if err != nil || lfi.Mode()&iofs.ModeSymlink == 0 {
+		return nil, false
+	}
+	if a.Config.LongListingMode != cli.LongListingNone || a.Config.Directory {
+		return lfi, true
+	}
+	if tfi, err := a.FS.Stat(abs); err == nil && tfi.IsDir() {
+		return nil, false
+	}
+	return lfi, true
 }
 
 func (a *App) Run() {
