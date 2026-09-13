@@ -62,8 +62,6 @@ homebrew_casks:
     commit_author:
       name: goreleaser-bot
       email: goreleaser@users.noreply.github.com
-    url:
-      verified: "github.com/canta2899/logo-ls/"
     hooks:
       post:
         install: |
