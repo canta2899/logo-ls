@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixes
+
+- Fixed a bug that caused logo-ls not to resolve symlinks correctly when listing a specific file with `ls -al [file-name]`.
+
 ## logo-ls [1.7.3]
 
 - Updated homebrew formula removing deprecated configuration
