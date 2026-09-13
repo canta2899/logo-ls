@@ -62,12 +62,14 @@ homebrew_casks:
     commit_author:
       name: goreleaser-bot
       email: goreleaser@users.noreply.github.com
-    hooks:
-      post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/logo-ls"]
-          end
+    # GoReleaser's hooks.post.install still emits the deprecated `postflight`
+    # stanza, so the quarantine removal is declared as `postflight_steps` here.
+    custom_block: |
+      postflight_steps do
+        on_macos do
+          run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "logo-ls"], chdir: "."
+        end
+      end
 
 aur_sources:
   - name: logo-ls
