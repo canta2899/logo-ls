@@ -426,6 +426,7 @@ func (a *App) PrintDirectory(d *Directory) {
 	render.Render(a.Writer, d.Files, render.Options{
 		Mode:          a.renderMode(),
 		ShowIcon:      !a.Config.DisableIcon,
+		NoColor:       a.Config.NoColor,
 		ShowInode:     a.Config.ShowInodeNumber,
 		ShowBlocks:    a.Config.ShowBlockSize,
 		HumanReadable: a.Config.HumanReadable,
