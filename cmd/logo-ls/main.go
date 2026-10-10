@@ -12,10 +12,18 @@ import (
 	"github.com/canta2899/logo-ls/internal/icons"
 	"github.com/canta2899/logo-ls/internal/inspect/git"
 	"github.com/mattn/go-colorable"
+	"golang.org/x/term"
 )
 
 func main() {
 	command := cli.GetConfigFromCli()
+
+	// Like ls, print plain names one per line when output is piped or redirected.
+	if !term.IsTerminal(int(os.Stdout.Fd())) {
+		command.DisableIcon = true
+		command.NoColor = true
+		command.OneFilePerLine = true
+	}
 
 	var writer io.Writer = os.Stdout
 
