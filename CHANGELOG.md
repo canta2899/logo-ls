@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixes
+
+- When output is not a terminal (e.g. piped or redirected), logo-ls now prints plain file names, one per line, without icons, colors or type indicators (`/`, `*`, `@`, ...), like `ls` does. This makes it safe to use in scripts or when `ls` is aliased to `logo-ls` ([#38](https://github.com/canta2899/logo-ls/issues/38)).
+- One-file-per-line output no longer pads names with trailing spaces.
+
 ## logo-ls [1.7.4]
 
 ### Fixes
