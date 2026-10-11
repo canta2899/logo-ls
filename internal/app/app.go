@@ -427,6 +427,7 @@ func (a *App) PrintDirectory(d *Directory) {
 		Mode:          a.renderMode(),
 		ShowIcon:      !a.Config.DisableIcon,
 		NoColor:       a.Config.NoColor,
+		NoIndicator:   a.Config.NoIndicator,
 		ShowInode:     a.Config.ShowInodeNumber,
 		ShowBlocks:    a.Config.ShowBlockSize,
 		HumanReadable: a.Config.HumanReadable,

@@ -40,6 +40,7 @@ type Options struct {
 	Mode          Mode
 	ShowIcon      bool
 	NoColor       bool
+	NoIndicator   bool
 	ShowInode     bool
 	ShowBlocks    bool
 	HumanReadable bool
@@ -58,7 +59,12 @@ func Render(w io.Writer, entries []*inspect.InspectedEntry, opts Options) {
 }
 
 func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
-	displayName := e.Base + e.Ext + e.Indicator
+	indicator := e.Indicator
+	// long mode keeps " ~> target" on symlinks, like ls -l does
+	if opts.NoIndicator && (opts.Mode != ModeLong || !e.IsSymlink()) {
+		indicator = ""
+	}
+	displayName := e.Base + e.Ext + indicator
 	color := e.Icon.GetColor()
 	if opts.NoColor {
 		color = ""

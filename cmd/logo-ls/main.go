@@ -22,6 +22,7 @@ func main() {
 	if !term.IsTerminal(int(os.Stdout.Fd())) {
 		command.DisableIcon = true
 		command.NoColor = true
+		command.NoIndicator = true
 		command.OneFilePerLine = true
 	}
 
