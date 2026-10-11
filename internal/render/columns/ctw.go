@@ -14,18 +14,25 @@ type CTW interface {
 	Flush(buf *bytes.Buffer)
 	GetGitColor(gitStatus string) string
 	widthsSum(w [][4]int, p int) int
+	disableColor()
 }
 
 const standardTerminalWidth = 80
 
-func NewCTW(longMode, oneFilePerLine, icon bool) CTW {
-	if longMode {
-		return NewLongCTW(10)
+func NewCTW(longMode, oneFilePerLine, noColor bool) CTW {
+	var w CTW
+	switch {
+	case longMode:
+		w = NewLongCTW(10)
+	case oneFilePerLine:
+		w = NewLongCTW(4)
+	default:
+		w = NewStandardCTW(GetCustomTerminalWidth())
 	}
-	if oneFilePerLine {
-		return NewLongCTW(4)
+	if noColor {
+		w.disableColor()
 	}
-	return NewStandardCTW(GetCustomTerminalWidth())
+	return w
 }
 
 func GetCustomTerminalWidth() int {

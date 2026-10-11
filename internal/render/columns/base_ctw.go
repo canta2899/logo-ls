@@ -22,6 +22,11 @@ func newBaseCtw() *baseCtw {
 	}
 }
 
+// disableColor blanks every ANSI code so rows are written as plain text.
+func (c *baseCtw) disableColor() {
+	*c = baseCtw{empty: c.empty}
+}
+
 func (c *baseCtw) GetGitColor(gitStatus string) string {
 	switch strings.Trim(gitStatus, " ") {
 	case "":

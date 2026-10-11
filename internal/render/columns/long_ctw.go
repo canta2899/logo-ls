@@ -82,7 +82,8 @@ func (l *LongCTW) writeCell(buf *bytes.Buffer, rowIdx, colIdx int, cellValue str
 	case colIdx >= l.numCols-1 && !gitSkipped:
 		fmt.Fprintf(buf, "%s%-*s%s", l.GetGitColor(row[l.numCols]), width, cellValue, l.noColor)
 	case gitSkipped && colIdx == l.numCols-1:
-		fmt.Fprintf(buf, "%-*s", width, cellValue)
+		// last printed column: no padding, so lines carry no trailing spaces
+		fmt.Fprint(buf, cellValue)
 	case !gitSkipped && colIdx == 1:
 		// permission column is left-aligned
 		fmt.Fprintf(buf, "%-*s", width, cellValue)

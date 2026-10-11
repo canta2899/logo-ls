@@ -13,6 +13,8 @@ type Config struct {
 	GitStatus         bool
 	Reverse           bool
 	DisableIcon       bool
+	NoColor           bool
+	NoIndicator       bool
 	OneFilePerLine    bool
 	Directory         bool
 	NoGroup           bool

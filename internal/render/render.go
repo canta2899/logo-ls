@@ -39,6 +39,8 @@ type TimeFormatter interface {
 type Options struct {
 	Mode          Mode
 	ShowIcon      bool
+	NoColor       bool
+	NoIndicator   bool
 	ShowInode     bool
 	ShowBlocks    bool
 	HumanReadable bool
@@ -47,7 +49,7 @@ type Options struct {
 
 // Render writes one directory's worth of entries to w in the selected mode.
 func Render(w io.Writer, entries []*inspect.InspectedEntry, opts Options) {
-	tw := ctw.NewCTW(opts.Mode == ModeLong, opts.Mode == ModeOneFilePerLine, opts.ShowIcon)
+	tw := ctw.NewCTW(opts.Mode == ModeLong, opts.Mode == ModeOneFilePerLine, opts.NoColor)
 	for _, e := range entries {
 		addRow(tw, e, opts)
 	}
@@ -57,10 +59,19 @@ func Render(w io.Writer, entries []*inspect.InspectedEntry, opts Options) {
 }
 
 func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
-	displayName := e.Base + e.Ext + e.Indicator
+	indicator := e.Indicator
+	// long mode keeps " ~> target" on symlinks, like ls -l does
+	if opts.NoIndicator && (opts.Mode != ModeLong || !e.IsSymlink()) {
+		indicator = ""
+	}
+	displayName := e.Base + e.Ext + indicator
+	color := e.Icon.GetColor()
+	if opts.NoColor {
+		color = ""
+	}
 	if opts.Mode == ModeLong {
 		tw.AddRow(
-			e.Icon.GetColor(),
+			color,
 			blockSizeWithInode(e, opts),
 			inspect.ModeString(e.Mode, e.Sticky, e.StickyX, e.HasXAttr),
 			strconv.FormatUint(hardLinks(e), 10),
@@ -75,7 +86,7 @@ func addRow(tw ctw.CTW, e *inspect.InspectedEntry, opts Options) {
 		return
 	}
 	tw.AddRow(
-		e.Icon.GetColor(),
+		color,
 		blockSizeWithInode(e, opts),
 		e.Icon.GetGlyph(),
 		displayName,
