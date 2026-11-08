@@ -115,6 +115,13 @@ func WithGitStatus(status map[string]string) Option {
 	return func(f *fakeFS) { f.gitStatus = status }
 }
 
+// WithCwd sets the working directory. Like os.Getwd with $PWD set, Abs
+// resolves relative paths against it as given (even if it is a symlink),
+// while lookups go through the directory it points to.
+func WithCwd(cwd string) Option {
+	return func(f *fakeFS) { f.cwd = path.Clean(cwd) }
+}
+
 // New returns a fs.FS backed by the given spec rooted at "/".
 //
 // The provided root entry is mounted at "/<root.name>" (so paths look like
@@ -132,6 +139,7 @@ func New(root *Entry, opts ...Option) fs.FS {
 type fakeFS struct {
 	root      *Entry
 	gitStatus map[string]string
+	cwd       string
 }
 
 func (f *fakeFS) Join(parts ...string) string { return path.Join(parts...) }
@@ -162,10 +170,17 @@ func (f *fakeFS) Abs(p string) (string, error) {
 	if strings.HasPrefix(p, "/") {
 		return path.Clean(p), nil
 	}
-	return path.Clean("/" + p), nil
+	return path.Join("/", f.cwd, p), nil
 }
 
 func (f *fakeFS) lookup(p string) (*Entry, error) {
+	if !path.IsAbs(p) && f.cwd != "" {
+		cwd, err := f.EvalSymlinks(f.cwd)
+		if err != nil {
+			return nil, err
+		}
+		p = path.Join(cwd, p)
+	}
 	p = path.Clean(p)
 	if p == "/" {
 		// Synthetic root above the mounted entry. Returns dir metadata so
@@ -240,6 +255,10 @@ func (f *fakeFS) Stat(p string) (fs.FileInfo, error) {
 }
 
 func (f *fakeFS) Lstat(p string) (fs.FileInfo, error) {
+	// A trailing slash forces the final symlink to be followed, as lstat(2) does.
+	if p != "/" && strings.HasSuffix(p, "/") {
+		return f.Stat(p)
+	}
 	e, err := f.lookup(p)
 	if err != nil {
 		return nil, err

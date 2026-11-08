@@ -57,3 +57,20 @@ func TestSymlink_ShortModeArgs(t *testing.T) {
 	assertContains(t, r.Stdout, "link-file@")
 	assertContains(t, r.Stdout, "link-broken@")
 }
+
+// With the working directory reached through a symlink (like /tmp on macOS),
+// listing "./" in long mode must show the directory contents, not the link.
+func TestSymlink_LongModeCwdIsSymlink(t *testing.T) {
+	vfs := fakefs.New(treeWithSymlinks(), fakefs.WithCwd("/root/link-dir"))
+	r := runApp(t, vfs, "-le", "./")
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
+	assertContains(t, r.Stdout, "inner.txt")
+}
+
+// A trailing slash forces a symlink argument to be followed, even with -l.
+func TestSymlink_LongModeTrailingSlashFollows(t *testing.T) {
+	vfs := fakefs.New(treeWithSymlinks())
+	r := runApp(t, vfs, "-le", "/root/link-dir/")
+	assertExitCode(t, cli.CodeOk, r.ExitCode)
+	assertContains(t, r.Stdout, "inner.txt")
+}
