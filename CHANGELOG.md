@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixes
+
+- Fixed a bug that caused `ls -l` to show only the link itself, instead of the directory contents, when the current directory was reached through a symlink (e.g. `cd /tmp && ls -al` on macOS). Symlinks given with a trailing slash (e.g. `ls -l /tmp/`) are now followed too, like `ls` does.
+
 ## logo-ls [1.8.0]
 
 ### Fixes
