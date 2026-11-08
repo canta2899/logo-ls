@@ -65,8 +65,9 @@ func runApp(t *testing.T, vfs fs.FS, args ...string) runResult {
 	cfg.TimeFormatter = fixedTime{}
 
 	// If the user did not pass a path argument, target "/root" (the
-	// conventional fixture root used by tests in this package).
-	if len(cfg.FileList) == 1 && cfg.FileList[0] == "." {
+	// conventional fixture root used by tests in this package), unless the
+	// FS has a working directory set, in which case "." is meaningful.
+	if abs, _ := vfs.Abs("."); abs == "/" && len(cfg.FileList) == 1 && cfg.FileList[0] == "." {
 		cfg.FileList = []string{"/root"}
 	}
 

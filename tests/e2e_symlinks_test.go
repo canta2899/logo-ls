@@ -59,10 +59,10 @@ func TestSymlink_ShortModeArgs(t *testing.T) {
 }
 
 // With the working directory reached through a symlink (like /tmp on macOS),
-// listing "./" in long mode must show the directory contents, not the link.
+// listing it in long mode must show the directory contents, not the link.
 func TestSymlink_LongModeCwdIsSymlink(t *testing.T) {
 	vfs := fakefs.New(treeWithSymlinks(), fakefs.WithCwd("/root/link-dir"))
-	r := runApp(t, vfs, "-le", "./")
+	r := runApp(t, vfs, "-le")
 	assertExitCode(t, cli.CodeOk, r.ExitCode)
 	assertContains(t, r.Stdout, "inner.txt")
 }
