@@ -77,7 +77,7 @@ func (a *App) GetArguments() *Args {
 			continue
 		}
 
-		if lfi, ok := a.symlinkArgInfo(abs); ok {
+		if lfi, ok := a.symlinkArgInfo(argPath); ok {
 			args.Files = append(args.Files, FileEntry{Info: lfi, AbsPath: abs})
 			continue
 		}
@@ -116,15 +116,17 @@ func (a *App) GetArguments() *Args {
 // symlinkArgInfo returns the Lstat info for a symlink argument that should be
 // listed as the link itself rather than followed. Like ls, links are only
 // followed when they point to a directory and neither -l nor -d is set.
-func (a *App) symlinkArgInfo(abs string) (fs.FileInfo, bool) {
-	lfi, err := a.FS.Lstat(abs)
+// The path is checked as given, not made absolute: Abs may resolve "." to a
+// symlinked $PWD and drops trailing slashes, both of which change the result.
+func (a *App) symlinkArgInfo(argPath string) (fs.FileInfo, bool) {
+	lfi, err := a.FS.Lstat(argPath)
 	if err != nil || lfi.Mode()&iofs.ModeSymlink == 0 {
 		return nil, false
 	}
 	if a.Config.LongListingMode != cli.LongListingNone || a.Config.Directory {
 		return lfi, true
 	}
-	if tfi, err := a.FS.Stat(abs); err == nil && tfi.IsDir() {
+	if tfi, err := a.FS.Stat(argPath); err == nil && tfi.IsDir() {
 		return nil, false
 	}
 	return lfi, true
